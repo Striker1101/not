@@ -5,3 +5,67 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+
+/* index.css or globals.css */
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes compress {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(0.95);
+    }
+}
+
+.bounce {
+    animation: bounce 1s infinite;
+}
+
+.compress {
+    animation: compress 1s infinite;
+}
+.dot{
+    animation:  backgroundChange 1s infinite;
+}
+/* index.css or globals.css */
+@keyframes moveToBottom {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(calc(100vh - 100%));
+    }
+}
+
+@media (max-width: 768px) {
+    .move-to-bottom {
+        animation: moveToBottom 2s ease-in-out forwards;
+    }
+}
+@keyframes backgroundChange{
+    from {
+        background-color:greenyellow ;
+    }
+    to {
+        background-color: blue;
+    }
+}
+
+section{
+    margin-left: 10px;
+}

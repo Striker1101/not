@@ -71,7 +71,8 @@ const Nav = () => {
       </div>
       {/* side bar        */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-background-light dark:bg-background-dark   transform ${
+        style={{ zIndex: "100 !important" }}
+        className={`fixed border-r-4  border-blue-300 z-30 top-0 left-0 h-full w-64 bg-background-light dark:bg-background-dark   transform ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 ease-in-out lg:hidden`}
       >

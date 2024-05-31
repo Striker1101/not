@@ -2,30 +2,46 @@ import React, { useState, useEffect } from "react";
 
 const HeaderCard = ({ items }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(true);
 
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     setCurrentIndex((prevIndex) => (prevIndex + 1) % items.length);
-  //   }, 180000); // 180000ms = 3 minutes
+  useEffect(() => {
+    const animationTimer = setTimeout(() => {
+      setIsAnimating(false);
+    }, 60000); // Stop animation after 1 minute
 
-  //   return () => clearInterval(intervalId);
-  // }, [items.length]);
+    const intervalId = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % items.length);
+    }, 180000); // Change item every 3 minutes
+
+    return () => {
+      clearTimeout(animationTimer);
+      clearInterval(intervalId);
+    };
+  }, [items.length]);
 
   const currentItem = items[currentIndex];
-  console.log(currentItem.type, currentIndex);
+
   return (
-    <div className="w-full max-w-sm mx-auto bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
-      this is the start
+    <div
+      className={`w-full flex-glow-2 max-w-sm mx-auto bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden ${
+        isAnimating ? "bounce compress" : ""
+      } `}
+    >
       {currentItem.type === "image" && (
         <img
-          src={currentItem.src}
+          src={currentItem.content}
           alt="Card content"
-          className="w-full h-64 object-cover"
+          className={` object-cover `}
         />
       )}
       {currentItem.type === "video" && (
-        <video className="w-full h-64 object-cover" autoPlay>
-          <source src={currentItem.src} type="video/mp4" />
+        <video className={` object-cover ]`} autoPlay loop muted>
+          <source
+            src={currentItem.content}
+            type="video/mp4"
+            autoFocus
+            autoPlay
+          />
           Your browser does not support the video tag.
         </video>
       )}

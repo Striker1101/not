@@ -4,11 +4,11 @@ import Logo from "./Logo";
 
 export default function Links({ toggle }) {
   return (
-    <div className=" text-background-dark  dark:text-background-light  bg-background-light  dark:bg-background-dark">
+    <div className=" border-r-4 border-blue-300 text-background-dark  dark:text-background-light  bg-background-light  dark:bg-background-dark">
       {toggle ? (
         <div className="hidden lg:flex space-x-4">
           <Link
-            to={"/home"}
+            to={"/"}
             className="hover:bg-primary-light  dark:hover:bg-primary-dark px-3 py-2 rounded-md"
           >
             Home
@@ -48,7 +48,7 @@ export default function Links({ toggle }) {
         <div className=" container px-3 space-y-2 h-screen">
           <Logo />
           <Link
-            to={"/home"}
+            to={"/"}
             className="block px-4 py-2 hover:bg-primary-light dark:hover:bg-primary-dark   rounded-md"
           >
             Home
