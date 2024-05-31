@@ -69,3 +69,38 @@
 section{
     margin-left: 10px;
 }
+
+.contact-container {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    /* Adjust the height as needed */
+    background: url('./resources/images/contact/prism.jpg.webp') no-repeat center center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.blurred-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content {
+    position: relative;
+   
+    border-radius: 10px;
+    padding: 20px;
+    min-width: 80%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
