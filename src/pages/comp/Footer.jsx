@@ -11,7 +11,7 @@ import InputSubmit from "../../components/vendor/form/InputSubmit";
 export default function Footer() {
   return (
     <div
-      className="bg-gradient-to-r from-blue-200 to-green-200 p-10 flex flex-col gap-4 md:flex-row justify-evenly  text-background-dark"
+      className="relative bg-gradient-to-r from-blue-200 to-green-200 p-10 flex flex-col gap-4 md:flex-row justify-evenly  text-background-dark"
       style={{ borderTop: "3px solid gray" }}
     >
       <div className="flex-3 flex flex-col justify-evenly">

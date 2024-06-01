@@ -6,7 +6,7 @@ const BlueButton = ({ children, onClick }) => {
       className="
         bg-blue-800 text-white 
           px-6 py-3 rounded-md 
-          w-32
+          w-auto
           text-nowrap
         transition-colors duration-300
         m-3

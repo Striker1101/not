@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Container from "../../components/Container";
 import TextInput from "../../components/vendor/form/TextInput";
 import TextArea from "../../components/vendor/form/TextArea";
+import SubmitButton from "../../components/vendor/button/SubmitButton";
 export default function Contact() {
   const [formDate, setFormDate] = useState({
     name: "",
@@ -59,14 +60,7 @@ export default function Contact() {
                   name={"message"}
                   value={formDate.message}
                 />
-                <div className="flex items-center justify-center align-middle">
-                  <button
-                    className="bg-blue-700 px-20 py-3 rounded"
-                    type="submit"
-                  >
-                    SUBMIT
-                  </button>
-                </div>
+                <SubmitButton />
               </form>
             </div>
           </div>

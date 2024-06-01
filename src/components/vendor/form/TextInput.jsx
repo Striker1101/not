@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import classNames from "classnames";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const TextInput = ({ placeholder, handleChange, name, value, type }) => {
+const TextInput = ({
+  placeholder,
+  handleChange,
+  name,
+  value,
+  type,
+  required = false,
+}) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isValid, setIsValid] = useState(true);
 
@@ -16,6 +24,8 @@ const TextInput = ({ placeholder, handleChange, name, value, type }) => {
     setIsValid(inputValue.trim() !== "");
   };
 
+  const handlepasswordDisplay = () => {};
+
   return (
     <div className="relative w-full mb-6">
       <input
@@ -24,6 +34,7 @@ const TextInput = ({ placeholder, handleChange, name, value, type }) => {
         autoComplete
         autoCorrect
         defaultValue={value}
+        required={required}
         name={name}
         onBlur={handleBlur}
         onChange={(e) => {
@@ -41,6 +52,17 @@ const TextInput = ({ placeholder, handleChange, name, value, type }) => {
         )}
         placeholder=" "
       />
+      <div className="absolute bottom-3 border-red-300">
+        {type === "password" ? (
+          <div onClick={handlepasswordDisplay}>
+            <FontAwesomeIcon icon="fa-solid fa-eye" />
+          </div>
+        ) : (
+          <div onClick={handlepasswordDisplay}>
+            <FontAwesomeIcon icon="fa-regular fa-eye" />
+          </div>
+        )}
+      </div>
       <label
         className={classNames(
           "absolute left-4 bottom-6 text-sm text-gray-500 transition-all",
