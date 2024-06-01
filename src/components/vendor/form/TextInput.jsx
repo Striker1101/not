@@ -55,11 +55,11 @@ const TextInput = ({
       <div className="absolute bottom-3 border-red-300">
         {type === "password" ? (
           <div onClick={handlepasswordDisplay}>
-            <FontAwesomeIcon icon="fa-solid fa-eye" />
+            {/* <FontAwesomeIcon icon="fa-solid fa-eye" /> */}
           </div>
         ) : (
           <div onClick={handlepasswordDisplay}>
-            <FontAwesomeIcon icon="fa-regular fa-eye" />
+            {/* <FontAwesomeIcon icon="fa-regular fa-eye" /> */}
           </div>
         )}
       </div>

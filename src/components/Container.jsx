@@ -1,5 +1,15 @@
 import React from "react";
-
-export default function Container({ children }) {
-  return <div className="pt-20 z-0">{children}</div>;
+import { Helmet } from "react-helmet";
+import { general } from "../utility/general";
+export default function Container({ children, title }) {
+  return (
+    <div className="">
+      <Helmet>
+        <title>
+          {general.name} - {title}
+        </title>
+      </Helmet>
+      {children}
+    </div>
+  );
 }

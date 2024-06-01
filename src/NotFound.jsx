@@ -1,5 +1,5 @@
 import React from "react";
-import Error from "./assets/images/error-illus.png";
+import Error from "./resources/images/error-illus.png";
 export default function NotFound() {
   return (
     <section className="error-section pt-120 pb-120">

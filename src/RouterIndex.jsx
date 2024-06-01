@@ -9,31 +9,45 @@ import ProtecteDashboard from "./pages/dashboard/ProtecteDashboard";
 import DashboardIndex from "./pages/dashboard/DashboardIndex";
 import AdminIndex from "./pages/admin/AdminIndex";
 import ProtecteAdmin from "./pages/admin/ProtecteAdmin";
+import NotFound from "./NotFound";
+import { useAppState } from "./AppStateContext";
+import Alert from "./components/vendor/alert/Alert";
 
 export default function RouterIndex() {
+  const { message } = useAppState();
+  const { islogged } = useAppState();
   return (
-    <Routes>
-      <Route path="/" index element={<Homepage />} />
-      <Route path="/explore" element={<Explore />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/auth/*" element={<AuthIndex />} />
-      <Route
-        path="/dashboard/*"
-        element={
-          <ProtecteDashboard>
-            <DashboardIndex />
-          </ProtecteDashboard>
-        }
-      />
-      <Route
-        path="/admin/*"
-        element={
-          <ProtecteAdmin>
-            <AdminIndex />
-          </ProtecteAdmin>
-        }
-      />
-    </Routes>
+    <>
+      <div>
+        {message.content && (
+          <Alert type={message.type} message={message.content} timer={false} />
+        )}
+      </div>
+      <Routes>
+        <Route path="/" index element={<Homepage />} />
+        <Route path="/explore" element={<Explore />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/auth/*" element={<AuthIndex />} />
+        <Route
+          path="/dashboard/*"
+          element={
+            <ProtecteDashboard islogged={islogged}>
+              <DashboardIndex />
+            </ProtecteDashboard>
+          }
+        />
+        <Route
+          path="/admin/*"
+          element={
+            <ProtecteAdmin>
+              <AdminIndex />
+            </ProtecteAdmin>
+          }
+        />
+        {/* Define the catch-all route for 404 errors */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
   );
 }

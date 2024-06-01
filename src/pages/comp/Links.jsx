@@ -15,7 +15,6 @@ export default function Links({ toggle }) {
     }
   }, [location.pathname]);
   const offDisplay = { display: containsAuth ? "none" : "block" };
-  console.log(containsAuth);
   return (
     <div className=" border-r-4 border-blue-300 text-background-dark  dark:text-background-light  ">
       {toggle ? (

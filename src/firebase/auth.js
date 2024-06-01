@@ -20,6 +20,7 @@ import {
   onAuthStateChanged,
   signInWithPopup,
   FacebookAuthProvider,
+  updateProfile,
   sendPasswordResetEmail,
 } from "firebase/auth";
 import firebase from "firebase/compat/app";
@@ -98,6 +99,7 @@ export function googleLogin() {
     });
 }
 export function twitterLogin() {}
+
 export function facebookLogin() {
   signInWithPopup(auth, facebookProvider)
     .then((result) => {
@@ -164,31 +166,13 @@ export async function createAccount(name, email, password) {
     );
     const user = userCredential.user;
 
-    // Save user details to Firestore
-    const userRef = doc(db, "User", user.uid);
-    await setDoc(userRef, {
-      name: name,
-      email: email,
-      password: password,
-      amount: 0,
-      dob: null,
-      city: null,
-      address: null,
-      gender: null,
-      country: null,
-      email_notify: false,
-      phone_notify: false,
-      task: false,
-      billing: false,
-      updates: false,
-      b_sport: 0,
-      b_casino: 0,
-      active: true,
-      created_at: Timestamp.now(),
-      updated_at: Timestamp.now(),
+    // Update user profile with the name
+    await updateProfile(user, {
+      displayName: name,
     });
 
-    sendEmailVerification(user);
+    // Send email verification
+    await sendEmailVerification(user);
 
     return {
       status: 200,
@@ -196,7 +180,7 @@ export async function createAccount(name, email, password) {
     };
   } catch (error) {
     const errorMessage = error.message || "Unknown error occurred";
-    return { status: 400, message: errorMessage };
+    return { status: 500, message: errorMessage };
   }
 }
 
