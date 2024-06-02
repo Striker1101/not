@@ -83,6 +83,7 @@ export default function Login() {
               value={formData.password}
               type={"password"}
               required={true}
+              password={true}
             />
             <div className="w-full   m-3 p-0 font-semibold text-blue-500 text-xl relative ">
               <Link

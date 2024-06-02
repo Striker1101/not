@@ -5,9 +5,7 @@ export default function Container({ children, title }) {
   return (
     <div className="">
       <Helmet>
-        <title>
-          {general.name} - {title}
-        </title>
+        <title>{general.name + " -> " + title}</title>
       </Helmet>
       {children}
     </div>

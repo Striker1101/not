@@ -26,7 +26,7 @@ export default function Homepage() {
   }, []);
 
   return (
-    <Container>
+    <Container title={"HomePage"}>
       <section
         id="homeHeader"
         className="flex align-middle justify-center flex-wrap md:flex-wrap md:flex-nowrap items-center p-10"

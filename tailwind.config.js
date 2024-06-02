@@ -21,11 +21,15 @@ module.exports = {
           "text-gradient": "linear-gradient(to right, #10B981, #1D4ED8)",
         },
       },
+      width: {
+        "30vw": "30vw",
+      },
     },
   },
   variants: {
     extend: {
       backgroundColor: ["dark"],
+      width: ["responsive"],
     },
   },
   // plugins: [require("@tailwindcss/forms"), require("@tailwindcss/typography")],

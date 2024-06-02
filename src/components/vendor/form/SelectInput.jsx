@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import classNames from "classnames";
 
-const TextArea = ({ placeholder, handleChange, name, value, bg = "blue" }) => {
+const SelectInput = ({
+  placeholder,
+  handleChange,
+  name,
+  value,
+  bg = "blue",
+  required = false,
+  options = [],
+}) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isValid, setIsValid] = useState(true);
 
@@ -18,7 +26,7 @@ const TextArea = ({ placeholder, handleChange, name, value, bg = "blue" }) => {
 
   return (
     <div className="relative w-full mb-6">
-      <textarea
+      <select
         onFocus={handleFocus}
         autoComplete
         autoCorrect
@@ -30,8 +38,9 @@ const TextArea = ({ placeholder, handleChange, name, value, bg = "blue" }) => {
           validateInput(e.target.value);
           handleChange(e);
         }}
+        required={required}
         className={classNames(
-          `w-full px-4 py-2 rounded-t-xl bg-${bg}-300 border-b-2`,
+          `w-full px-4 py-2 h-10 rounded-t-xl bg-${bg}-300 border-b-2`,
           "focus:outline-none",
           {
             "border-gray-300 dark:border-gray-700": !isFocused && isValid,
@@ -40,7 +49,16 @@ const TextArea = ({ placeholder, handleChange, name, value, bg = "blue" }) => {
           }
         )}
         placeholder=" "
-      ></textarea>
+      >
+        <option value="">Select Your Option</option>
+        {options.map((option, index) => {
+          return (
+            <option key={index} value={option.value}>
+              {option.content}
+            </option>
+          );
+        })}
+      </select>
       <label
         className={classNames(
           "absolute left-4 bottom-6 text-sm text-gray-500 transition-all",
@@ -56,4 +74,4 @@ const TextArea = ({ placeholder, handleChange, name, value, bg = "blue" }) => {
   );
 };
 
-export default TextArea;
+export default SelectInput;

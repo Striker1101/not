@@ -1,6 +1,6 @@
 import React from "react";
 
-const BlueButton = ({ children, onClick }) => {
+const BlueButton = ({ children, onClick, type = null }) => {
   return (
     <button
       className="
@@ -13,6 +13,7 @@ const BlueButton = ({ children, onClick }) => {
         p-4
       "
       onClick={onClick}
+      type={type}
     >
       {children}
     </button>

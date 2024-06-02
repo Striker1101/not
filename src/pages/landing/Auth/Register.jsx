@@ -100,6 +100,7 @@ export default function Register() {
               value={formData.password}
               type={"password"}
               required={true}
+              password={true}
             />
 
             <TextInput
@@ -109,6 +110,7 @@ export default function Register() {
               value={formData.cpassword}
               type={"password"}
               required={true}
+              password={true}
             />
             <div className="">
               <input

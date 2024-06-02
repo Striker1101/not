@@ -1,6 +1,6 @@
 import React from "react";
 
-const DefaultButton = ({ children, onClick }) => {
+const DefaultButton = ({ children, onClick, type }) => {
   return (
     <button
       className="
@@ -16,6 +16,7 @@ const DefaultButton = ({ children, onClick }) => {
          border-blue-400
       "
       onClick={onClick}
+      type={type}
     >
       {children}
     </button>

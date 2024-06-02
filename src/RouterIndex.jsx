@@ -6,7 +6,7 @@ import About from "./pages/landing/About";
 import Contact from "./pages/landing/Contact";
 import AuthIndex from "./pages/landing/Auth/AuthIndex";
 import ProtecteDashboard from "./pages/dashboard/ProtecteDashboard";
-import DashboardIndex from "./pages/dashboard/DashboardIndex";
+import DashboardRoutes from "./pages/dashboard/DashboardRoutes";
 import AdminIndex from "./pages/admin/AdminIndex";
 import ProtecteAdmin from "./pages/admin/ProtecteAdmin";
 import NotFound from "./NotFound";
@@ -33,7 +33,7 @@ export default function RouterIndex() {
           path="/dashboard/*"
           element={
             <ProtecteDashboard islogged={islogged}>
-              <DashboardIndex />
+              <DashboardRoutes />
             </ProtecteDashboard>
           }
         />

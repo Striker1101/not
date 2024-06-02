@@ -59,7 +59,7 @@
 }
 @keyframes backgroundChange{
     from {
-        background-color:greenyellow ;
+        background-color:#b1c691 ;
     }
     to {
         background-color: blue;
@@ -169,6 +169,35 @@ section{
 
     100% {
         transform: scale(0);
+        opacity: 0;
+    }
+}
+
+
+/* styled card */
+
+.card {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    background: gray;
+    animation: ripple-animation 0.6s linear;
+}
+
+@keyframes ripple-animation {
+    from {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    to {
+        transform: scale(100);
         opacity: 0;
     }
 }

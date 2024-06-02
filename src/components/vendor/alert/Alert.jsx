@@ -26,7 +26,6 @@ const Alert = ({ type, message, timer }) => {
       }, 40000); // 4 seconds
       return () => clearTimeout(timeoutId);
     }
-    console.log(!isVisible || message == null, message);
   }, [timer, message, isVisible]);
 
   const handleClose = () => {
