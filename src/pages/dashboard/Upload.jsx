@@ -143,6 +143,7 @@ export default function Upload() {
               bg="gray"
               required={true}
               refInput={refInput}
+              multiple={true}
             />
 
             <SelectInput

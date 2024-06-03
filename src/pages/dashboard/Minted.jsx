@@ -3,6 +3,7 @@ import { datas } from "../../utility/mintedData";
 import Container from "../../components/Container";
 import StyledCard from "../../components/vendor/Card/StyledCard";
 import { ReactComponent as Alien } from "../../resources/images/dashboard/minted/reddit-alien.svg";
+import { Link } from "react-router-dom";
 
 const Minted = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,7 +21,7 @@ const Minted = () => {
   };
 
   return (
-    <Container>
+    <Container title={"Minted NFT"}>
       <div className="minted-component mb-9">
         <div className="mx-5">
           <input
@@ -36,7 +37,9 @@ const Minted = () => {
           <ul className="flex flex-wrap items-center justify-center">
             {filteredData.map((data, index) => (
               <li key={index} className="p-2 ">
-                <StyledCard data={data} />
+                <Link to={`/dashboard/minted/${index}`}>
+                  <StyledCard data={data} />
+                </Link>
               </li>
             ))}
           </ul>

@@ -7,12 +7,14 @@ import Deposit from "./Deposit";
 import Withdraw from "./Withdraw";
 import Buy from "./Buy";
 import Profile from "./Profile";
+import MintedCard from "./MintedCard";
 export default function DashboardRoutes() {
   return (
     <Routes>
       <Route path="/" index element={<IndexPage />} />
       <Route path="/upload" index element={<Upload />} />
       <Route path="/minted" index element={<Minted />} />
+      <Route path="/minted/:id" element={<MintedCard />} />
       <Route path="/deposit" index element={<Deposit />} />
       <Route path="/withdraw" index element={<Withdraw />} />
       <Route path="/buy" index element={<Buy />} />

@@ -10,6 +10,7 @@ const FileInput = ({
   bg = "blue",
   required = true,
   refInput,
+  multiple = false,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isValid, setIsValid] = useState(true);
@@ -34,7 +35,7 @@ const FileInput = ({
         ref={refInput}
         required={required}
         defaultValue={value}
-        multiple
+        multiple={multiple}
         name={name}
         onBlur={handleBlur}
         onChange={(e) => {
