@@ -93,6 +93,10 @@ export default function Deposit() {
       });
   };
 
+  function handleSubmit(e) {
+    e.preventDefault();
+  }
+
   return (
     <Container title="Deposit">
       <div className="flex items-center justify-center flex-col h-screen">
@@ -104,7 +108,11 @@ export default function Deposit() {
           </p>
         </div>
         <div className="w-4/5">
-          <form action="" className="flex items-center justify-center w-full">
+          <form
+            onSubmit={handleSubmit}
+            action=""
+            className="flex items-center justify-center w-full"
+          >
             <div className=" bg-slate-400 p-5">
               <h1 className="text-xl font-semibold p-2 ">
                 DEPOSIT AND SUBMIT PROOF TO TOP UP YOUR BALANCE

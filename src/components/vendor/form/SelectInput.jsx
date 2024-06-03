@@ -50,7 +50,7 @@ const SelectInput = ({
         )}
         placeholder=" "
       >
-        <option value="">Select Your Option</option>
+        <option value=""></option>
         {options.map((option, index) => {
           return (
             <option key={index} value={option.value}>
