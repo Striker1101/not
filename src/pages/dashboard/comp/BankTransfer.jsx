@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppState } from "../../../AppStateContext";
 import Container from "../../../components/Container";
 import GradientDiv from "../../../components/vendor/Card/GradientDiv";
@@ -7,9 +7,14 @@ import TextInput from "../../../components/vendor/form/TextInput";
 import TextArea from "../../../components/vendor/form/TextArea";
 import SubmitButton from "../../../components/vendor/button/SubmitButton";
 import DefaultButton from "../../../components/vendor/button/DefaultButton";
+import {
+  addToCollectionArray,
+  getUpdatedDocument,
+} from "../../../firebase/firestore";
+import DataTable from "./DataTable";
 export default function BankTransfer() {
-  const { removeFirebasePrefix } = useAppState();
   const [loading, setLoading] = useState(false);
+  const [withdraw, setWithdraw] = useState({ regions: [] });
   const [result, setResult] = useState({
     status: 0,
     message: null,
@@ -22,7 +27,24 @@ export default function BankTransfer() {
     bank_address: "",
     withdraw_amount: "",
     additional_info: "",
+    status: false,
   });
+
+  useEffect(() => {
+    // Callback function to handle updates
+    const handleUpdate = (data) => {
+      setWithdraw(data);
+    };
+
+    // Start listening for updates
+    const unsubscribe = getUpdatedDocument("withdraws", handleUpdate);
+
+    // Clean up the listener on component unmount
+    return () => {
+      unsubscribe();
+    };
+  }, [withdraw]);
+
   function handleChange(e) {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
@@ -30,10 +52,15 @@ export default function BankTransfer() {
       [name]: value,
     }));
   }
+
   async function handleSubmit(e) {
     e.preventDefault();
-    console.log(formData);
+    setLoading(true);
+    const result = await addToCollectionArray("withdraws", formData);
+    setResult(result);
+    setLoading(false);
   }
+
   function reset() {
     setFormData({
       creator_name: "",
@@ -43,40 +70,17 @@ export default function BankTransfer() {
       price: "",
       describe: "",
       type: "bank",
+      status: false,
     });
   }
-  const categoryOptions = [
-    {
-      content: "Art",
-      value: "art",
-    },
-    {
-      content: "Music",
-      value: "music",
-    },
-    {
-      content: "Domain names",
-      value: "domain_names",
-    },
-    {
-      content: "Sport",
-      value: "sport",
-    },
-    {
-      content: "Collectible",
-      value: "collectible",
-    },
-    {
-      content: "Photography",
-      value: "photography",
-    },
-  ];
+
   return (
     <Container title={"Withdraw"}>
       <GradientDiv direction={"to left"} col1={"skyblue"} col2={"lightygra"}>
-        <div className="w-full flex items-center justify-center">
+        <div className="w-full flex flex-col items-center justify-center">
           <form
             action=""
+            onSubmit={handleSubmit}
             className="w-4/5 flex flex-col gap-3 bg-slate-200 p-4 rounded-2xl"
           >
             <div className="flex gap-4 justify-evenly font-bold text-2xl ">
@@ -108,7 +112,7 @@ export default function BankTransfer() {
                 placeholder={"Bank Name "}
                 name={"bank_name"}
                 value={formData.bank_name}
-                type={"email"}
+                type={"text"}
                 required={true}
                 bg="gray"
               />
@@ -158,6 +162,10 @@ export default function BankTransfer() {
               </div>
             </div>
           </form>
+
+          <div className="mb-5 pb-5 flex items-center w-4/5 justify-center">
+            <DataTable data={withdraw.regions.slice(1)} />
+          </div>
         </div>
       </GradientDiv>
     </Container>

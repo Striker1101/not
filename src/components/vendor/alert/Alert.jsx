@@ -57,7 +57,7 @@ const Alert = ({ timer, result, setResult }) => {
       <div className="flex justify-between items-center">
         <div>
           <p className="font-bold">
-            {result.message === 200 ? "Success" : "Error"}
+            {result.status === 200 ? "Success" : "Error"}
           </p>
           <p>{removeFirebasePrefix(result.message)}</p>
         </div>

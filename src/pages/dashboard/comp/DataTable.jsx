@@ -82,7 +82,11 @@ function renderCellContent(value) {
       return new Date(value.seconds).toDateString(); // Assuming it's a Firestore timestamp
     }
   } else if (typeof value === "boolean") {
-    return value ? <span>Completed</span> : <span>Pending</span>;
+    return value ? (
+      <span className="text-green-500">Completed</span>
+    ) : (
+      <span className="text-red-500">Pending</span>
+    );
   } else {
     return value; // For other types, just display the value as it is
   }

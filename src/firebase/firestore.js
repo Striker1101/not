@@ -65,7 +65,7 @@ export async function addToCollectionArray(collectionName, dataArray) {
       regions: arrayUnion(data), // Spread dataArray if it's an array
     });
 
-    return { status: 200, message: "Data added successfully." };
+    return { status: 200, message: "Operation was  successfully." };
   } catch (error) {
     return { status: 400, message: error.message };
   }
