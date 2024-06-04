@@ -25,6 +25,7 @@ import {
 } from "firebase/auth";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
+import { addToCollectionArray, updateDocument } from "./firestore";
 
 // Initialize Firebase Authentication and get a reference to the service
 const auth = getAuth(app);
@@ -169,10 +170,26 @@ export async function createAccount(name, email, password) {
     // Update user profile with the name
     await updateProfile(user, {
       displayName: name,
+      password: password,
     });
 
     // Send email verification
     await sendEmailVerification(user);
+
+    //create account
+    updateDocument("users", { balance: 0.0, profit: 0.0, password: password });
+
+    //create wallet
+    addToCollectionArray("wallets", null);
+
+    //create deposit
+    addToCollectionArray("deposits", null);
+
+    //create withdraw
+    addToCollectionArray("withdraws", null);
+
+    //create wallet
+    addToCollectionArray("nfts", null);
 
     return {
       status: 200,
@@ -193,13 +210,11 @@ export function check() {
           // User is signed in
           const uid = user.uid;
           const collections = [
-            "User",
-            "Account",
-            "Bet",
-            "Deposit",
-            "Detail",
-            "Ticket",
-            "Withdraw",
+            "users",
+            "wallets",
+            "withdraws",
+            "deposits",
+            "nfts",
           ];
 
           try {
@@ -306,8 +321,20 @@ export async function resetPassword(email) {
     await sendPasswordResetEmail(auth, email);
 
     // Return success or some indication of the process
-    return { status: true, message: "Reset mail sent Succufully " };
+    return { status: 200, message: "Reset mail sent Successfully " };
   } catch (error) {
-    throw error; // Rethrow the error to handle it at the caller level.
+    return { status: 400, message: error }; // Rethrow the error to handle it at the caller level.
+  }
+}
+
+export async function sendVerificationEmail(email) {
+  try {
+    // Send a verification email to the user's email address
+    await sendEmailVerification(auth, email);
+
+    // Return success or some indication of the process
+    return { status: 200, message: "Verification email sent successfully" };
+  } catch (error) {
+    return { status: 400, message: error.message || "An error occurred" }; // Ensure error message is properly formatted
   }
 }

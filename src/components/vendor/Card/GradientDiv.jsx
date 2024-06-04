@@ -6,7 +6,7 @@ const GradientDiv = ({ children, col1, col2, direction }) => {
   };
 
   return (
-    <div className="w-full h-full p-10" style={gradientStyle}>
+    <div className="w-full h-full" style={gradientStyle}>
       {children}
     </div>
   );

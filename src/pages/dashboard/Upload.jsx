@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Container from "../../components/Container";
 import TextInput from "../../components/vendor/form/TextInput";
 import TextArea from "../../components/vendor/form/TextArea";
@@ -8,9 +8,14 @@ import Alert from "../../components/vendor/alert/Alert";
 import { useAppState } from "../../AppStateContext";
 import DefaultButton from "../../components/vendor/button/DefaultButton";
 import SubmitButton from "../../components/vendor/button/SubmitButton";
+import DataTable from "./comp/DataTable";
+import {
+  addToCollectionArray,
+  getUpdatedDocument,
+} from "../../firebase/firestore";
 export default function Upload() {
-  const { removeFirebasePrefix } = useAppState();
   const [loading, setLoading] = useState(false);
+  const [NFT, setNFT] = useState({ regions: [] });
   const [result, setResult] = useState({
     status: 0,
     message: null,
@@ -22,7 +27,23 @@ export default function Upload() {
     category: "",
     price: "",
     describe: "",
+    status: false,
   });
+
+  useEffect(() => {
+    // Callback function to handle updates
+    const handleUpdate = (data) => {
+      setNFT(data);
+    };
+
+    // Start listening for updates
+    const unsubscribe = getUpdatedDocument("nfts", handleUpdate);
+
+    // Clean up the listener on component unmount
+    return () => {
+      unsubscribe();
+    };
+  }, [NFT]);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -72,7 +93,6 @@ export default function Upload() {
       for (const file of refInput.current.files) {
         if (file.size <= maxSize) {
           dt.items.add(file);
-          console.log(dt.files);
         } else {
           console.log("not");
           return setResult({
@@ -103,18 +123,21 @@ export default function Upload() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    console.log(formData);
+    setLoading(true);
+    const result = await addToCollectionArray("nfts", formData);
+    setResult(result);
+    setLoading(false);
   }
 
   return (
     <Container title={"Upload NFT"}>
-      <div className="w-screen flex items-center justify-center pt-8">
-        <form action="" onSubmit={handleSubmit} className="w-2/3">
-          <Alert
-            message={removeFirebasePrefix(result.message)}
-            timer={false}
-            type={result.status === 200 ? true : false}
-          />
+      <div className="w-screen flex flex-col items-center justify-center pb-8">
+        <form
+          action=""
+          onSubmit={handleSubmit}
+          className="w-2/3  bg-slate-200 dark:bg-slate-400 p-4 rounded-2xl"
+        >
+          <Alert result={result} setResult={setResult} timer={false} />
           <div>
             <TextInput
               handleChange={handleChange}
@@ -182,6 +205,10 @@ export default function Upload() {
             </div>
           </div>
         </form>
+
+        <div className="mb-5 pb-5 flex items-center w-4/5 justify-center">
+          <DataTable data={NFT.regions.slice(1)} />
+        </div>
       </div>
     </Container>
   );

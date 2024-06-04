@@ -10,9 +10,9 @@ import { ReactComponent as WithdrawImg } from "../../resources/images/dashboard/
 import { ReactComponent as BuyImg } from "../../resources/images/dashboard/nav/coins-solid.svg";
 import { ReactComponent as ProfileImg } from "../../resources/images/dashboard/nav/user-pen-solid.svg";
 import { ReactComponent as LogoutImg } from "../../resources/images/dashboard/nav/right-from-bracket-solid.svg";
+import { logout } from "../../firebase/auth";
 
 export default function DashBoardLinks({ toggleSidebar, isOpen }) {
-  function logout() {}
   return (
     <div className="flex flex-col justify-evenly rounded-xl align-middle px-3 h-screen z-10  ">
       <div className="flex gap-3 items-center max-h-2 ">

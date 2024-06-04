@@ -10,9 +10,9 @@ import { ReactComponent as WithdrawImg } from "../../resources/images/dashboard/
 import { ReactComponent as BuyImg } from "../../resources/images/dashboard/nav/coins-solid.svg";
 import { ReactComponent as ProfileImg } from "../../resources/images/dashboard/nav/user-pen-solid.svg";
 import { ReactComponent as LogoutImg } from "../../resources/images/dashboard/nav/right-from-bracket-solid.svg";
+import { logout } from "../../firebase/auth";
 
 export default function DashboardFooter() {
-  function logout() {}
   return (
     <div className="fixed w-screen bottom-0 left-0 py-4 bg-inherit">
       <div className=" flex flex-row justify-evenly align-middle px-3 ">

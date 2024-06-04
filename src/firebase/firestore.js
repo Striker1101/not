@@ -36,11 +36,22 @@ export async function addToCollectionArray(collectionName, dataArray) {
 
     const docRef = doc(db, collectionName, user.uid);
 
+    // Initialize the data object
     const data = {
       ...dataArray,
       created_at: Timestamp.now(),
       updated_at: Timestamp.now(),
     };
+
+    // Check if the dataArray includes a file field
+    if (dataArray.file && dataArray.file.length > 0) {
+      const fileListArray = Array.from(dataArray.file); // Convert FileList to Array
+      const fileUrls = await Promise.all(
+        fileListArray.map((file) => uploadImageToStorage(file))
+      );
+      data.fileUrls = fileUrls; // Store the URLs in the data object
+      delete data.file; // Remove the file field to avoid storing the raw files in Firestore
+    }
 
     // Check if the user document exists
     const docSnap = await getDoc(docRef);
@@ -49,17 +60,14 @@ export async function addToCollectionArray(collectionName, dataArray) {
       await setDoc(docRef, { regions: [] }); // Create document with empty regions array
     }
 
-    // Retry fetching the document after creation
-    const updatedDocSnap = await getDoc(docRef);
-
     // Update the array field in the user document
     await updateDoc(docRef, {
       regions: arrayUnion(data), // Spread dataArray if it's an array
     });
 
-    return { success: true, message: "Data added successfully." };
+    return { status: 200, message: "Data added successfully." };
   } catch (error) {
-    return { success: false, message: error.message };
+    return { status: 400, message: error.message };
   }
 }
 
@@ -91,7 +99,11 @@ export async function uploadProfileImage(file) {
   }
 }
 
-export async function updateDocument(collectionName, documentId, data) {
+export async function updateDocument(
+  collectionName,
+  data,
+  documentId = auth.currentUser.uid
+) {
   try {
     const docRef = doc(db, collectionName, documentId);
 
@@ -101,13 +113,19 @@ export async function updateDocument(collectionName, documentId, data) {
       updated_at: Timestamp.now(),
     };
 
-    // Update the document with the updated data
-    await updateDoc(docRef, updatedData);
+    // Check if the document exists
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      // Update the document with the updated data
+      await updateDoc(docRef, updatedData);
+    } else {
+      // Create the document with the updated data
+      await setDoc(docRef, updatedData);
+    }
 
-    return { success: true, message: "Document updated successfully." };
+    return { success: 200, message: "Document updated successfully." };
   } catch (error) {
-    console.error("Error updating document:", error);
-    return { success: false, message: error.message };
+    return { success: 400, message: error.message };
   }
 }
 
@@ -463,3 +481,37 @@ export const fetchTransactions = async () => {
     throw new Error("Error fetching transactions. Please try again later.");
   }
 };
+
+/**
+ * Function to get a user's document from a collection and watch for any updates.
+ * @param {string} collectionName - The name of the collection.
+ * @param {string} documentId - The ID of the document.
+ * @param {function} onUpdate - Callback function to handle updates.
+ * @returns {function} - Function to unsubscribe from the listener.
+ */
+export function getUpdatedDocument(
+  collectionName,
+  onUpdate,
+  documentId = auth.currentUser.uid
+) {
+  const docRef = doc(db, collectionName, documentId);
+
+  // Set up a listener for the document
+  const unsubscribe = onSnapshot(
+    docRef,
+    (docSnap) => {
+      if (docSnap.exists()) {
+        // Call the onUpdate callback with the document data
+        onUpdate(docSnap.data());
+      } else {
+        console.log("No such document!");
+      }
+    },
+    (error) => {
+      console.error("Error fetching document: ", error);
+    }
+  );
+
+  // Return the unsubscribe function to stop listening to updates
+  return unsubscribe;
+}

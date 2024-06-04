@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useAppState } from "../../../AppStateContext";
 
 const getRandomAnimation = (type) => {
   const animations = {
@@ -9,10 +10,11 @@ const getRandomAnimation = (type) => {
   return animations[type][randomIndex];
 };
 
-const Alert = ({ type, message, timer }) => {
+const Alert = ({ timer, result, setResult }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [animationIn, setAnimationIn] = useState("");
   const [animationOut, setAnimationOut] = useState("");
+  const { removeFirebasePrefix } = useAppState();
 
   useEffect(() => {
     setAnimationIn(getRandomAnimation("in"));
@@ -22,30 +24,42 @@ const Alert = ({ type, message, timer }) => {
   useEffect(() => {
     if (timer) {
       const timeoutId = setTimeout(() => {
-        setIsVisible(false);
-      }, 40000); // 4 seconds
-      return () => clearTimeout(timeoutId);
+        setResult({
+          status: 0,
+          message: null,
+        });
+        setIsVisible(!isVisible);
+      }, 4000); // 4 seconds
+      return () => {
+        clearTimeout(timeoutId);
+      };
     }
-  }, [timer, message, isVisible]);
+  }, [timer, result, isVisible]);
 
   const handleClose = () => {
-    message = null;
-    setIsVisible(isVisible);
+    setResult({
+      status: 0,
+      message: null,
+    });
   };
 
-  if (!isVisible || message == null) return null;
+  if (result.message == null) return null;
 
   return (
     <div
       className={`w-full p-4 rounded-xl shadow-md transition-all duration-500 ${
-        type ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+        result.status === 200
+          ? "bg-green-100 text-green-800"
+          : "bg-red-100 text-red-800"
       }`}
       style={{ animation: `${isVisible ? animationIn : animationOut} 0.5s` }}
     >
       <div className="flex justify-between items-center">
         <div>
-          <p className="font-bold">{type ? "Success" : "Error"}</p>
-          <p>{message}</p>
+          <p className="font-bold">
+            {result.message === 200 ? "Success" : "Error"}
+          </p>
+          <p>{removeFirebasePrefix(result.message)}</p>
         </div>
         <button
           onClick={handleClose}

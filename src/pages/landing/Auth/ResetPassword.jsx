@@ -6,9 +6,15 @@ import Container from "../../../components/Container";
 import { general } from "../../../utility/general";
 import BlueButton from "../../../components/vendor/button/BlueButton";
 import DefaultButton from "../../../components/vendor/button/DefaultButton";
+import Alert from "../../../components/vendor/alert/Alert";
+import { resetPassword, sendVerificationEmail } from "../../../firebase/auth";
 export default function ResetPassword() {
   const [formDate, setFormDate] = useState({
     email: "",
+  });
+  const [result, setResult] = useState({
+    status: 0,
+    message: null,
   });
   const [toggle, setToggle] = useState(null);
   function handleChange(e) {
@@ -18,17 +24,28 @@ export default function ResetPassword() {
       [name]: value,
     }));
   }
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     console.log(formDate);
+    if (toggle === "reset") {
+      //reset password
+      const result = await resetPassword(formDate.email);
+      setResult(result);
+    } else {
+      //email verification
+      const result = sendVerificationEmail(formDate.email);
+      setResult(result);
+    }
   }
   return (
     <Container>
       <div className="auth flex items-center justify-center w-full align-middle">
         <form
           action=""
+          onSubmit={handleSubmit}
           className="p-9 w-3/5 md:w-3/5  rounded-lg bg-slate-200 dark:bg-slate-400  flex items-center flex-col gap-5"
         >
+          <Alert result={result} setResult={setResult} timer={false} />
           <h1 className="font-bold text-lg ">{general.name}</h1>
           <p>Reset Password for Your Account</p>
 

@@ -8,9 +8,9 @@ import { useAppState } from "../../../AppStateContext";
 import Alert from "../../../components/vendor/alert/Alert";
 
 export default function Register() {
-  const { removeFirebasePrefix, islogged } = useAppState();
+  const { islogged } = useAppState();
   //relogin users when they are already loginin/auth
-  if (islogged.status == 200) {
+  if (islogged.status === 200) {
     window.location.href = "/dashboard";
   }
 
@@ -48,6 +48,7 @@ export default function Register() {
     setLoading(true);
     const { name, email, password } = formData;
     const result = await createAccount(name, email, password);
+
     setResult(result);
     setLoading(false);
 
@@ -67,11 +68,8 @@ export default function Register() {
           onSubmit={handleSubmit}
           className="p-9 w-3/5 md:w-3/5  rounded-lg  bg-slate-200 dark:bg-slate-400 "
         >
-          <Alert
-            message={removeFirebasePrefix(result.message)}
-            timer={false}
-            type={result.status === 200 ? true : false}
-          />
+          <Alert result={result} setResult={setResult} timer={false} />
+
           <div className="flex items-center flex-col gap-5">
             <h1 className="font-bold text-lg ">{general.name}</h1>
             <p>Create An Account With Rear Sea NFT Marketplace</p>
@@ -121,8 +119,8 @@ export default function Register() {
                 required
               />
               <label htmlFor="tc">
-                I accept the Rear Sea AUS (by Gleneagle) - Terms & Conditions,
-                Product Disclosure Statement. (ASIC Regulated)
+                I accept the {general.name} AUS (by Gleneagle) - Terms &
+                Conditions, Product Disclosure Statement. (ASIC Regulated)
               </label>
             </div>
             <SubmitButton loading={loading} />

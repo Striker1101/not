@@ -9,7 +9,7 @@ import { emailLogin } from "../../../firebase/auth";
 import Alert from "../../../components/vendor/alert/Alert";
 
 export default function Login() {
-  const { removeFirebasePrefix, islogged } = useAppState();
+  const { islogged } = useAppState();
   //relogin users when they are already loginin/auth
   if (islogged.status == 200) {
     window.location.href = "/dashboard";
@@ -57,11 +57,7 @@ export default function Login() {
           onSubmit={handleSubmit}
           className="p-9 w-3/5 md:w-3/5  rounded-lg bg-slate-200 dark:bg-slate-400  "
         >
-          <Alert
-            message={removeFirebasePrefix(result.message)}
-            timer={false}
-            type={result.status === 200 ? true : false}
-          />
+          <Alert result={result} setResult={setResult} timer={false} />
 
           <div className="flex items-center flex-col gap-5">
             <h1 className="font-bold text-lg ">{general.name}</h1>

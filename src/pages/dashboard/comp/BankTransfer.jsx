@@ -83,11 +83,7 @@ export default function BankTransfer() {
               <h1 className="">PLEASE PROVIDE YOUR BANK DETAILS</h1>
               {/* <div>&times;</div> */}
             </div>
-            <Alert
-              message={removeFirebasePrefix(result.message)}
-              timer={false}
-              type={result.status === 200 ? true : false}
-            />
+            <Alert result={result} setResult={setResult} timer={false} />
             <div className="flex flex-col gap-3">
               <TextInput
                 handleChange={handleChange}

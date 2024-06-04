@@ -6,7 +6,13 @@ import { ReactComponent as ProfitImg } from "../../resources/images/dashboard/in
 import { ReactComponent as AccountImg } from "../../resources/images/dashboard/index/account-arrows-svgrepo-com.svg";
 import { Link } from "react-router-dom";
 import { datas } from "../../utility/dashboardIndexData";
+import { useAppState } from "../../AppStateContext";
 export default function IndexPage() {
+  const { islogged } = useAppState();
+
+  const userData = islogged.userData.users[0];
+  console.log(islogged);
+  const verify = islogged.user.emailVerified;
   return (
     <Container title="Dashboard Index">
       <div className="mx-6">
@@ -15,7 +21,7 @@ export default function IndexPage() {
             id="wallet"
             className="flex gap-4 justify-evenly items-center"
           >
-            <div>
+            <div className=" p-4 ">
               <h3 className="font-bold">LINK YOUR WALLET</h3>
               <p className="hidden md:block">
                 Get access to your assets, which are held on your blockchain. A
@@ -23,9 +29,12 @@ export default function IndexPage() {
                 transactions.
               </p>
             </div>
-            <div className="border-4 border-white rounded-xl w-fit text-nowrap text-center p-2 flex align-middl justify-center">
+            <Link
+              to={"/dashboard/terms"}
+              className="border-4 border-white rounded-xl w-fit text-nowrap text-center p-2 flex align-middl justify-center"
+            >
               <p> T & C</p>
-            </div>
+            </Link>
           </section>
         </GradientDiv>
       </div>
@@ -37,11 +46,13 @@ export default function IndexPage() {
             col1={"lightblue"}
             col2={"#dbf5b3"}
           >
-            <div className="flex items-center g-4 justify-evenly rounded-2xl">
+            <div className="flex  p-4  items-center g-4 justify-evenly rounded-2xl">
               <div>
                 <div className="mr-4">
                   <span className="font-bold">USD : </span>
-                  <span className="font-bold">amount</span>
+                  <span className="font-bold">
+                    {userData.balance.toFixed(2)}
+                  </span>
                 </div>
                 <h1 className="text-lg">Total Balance</h1>
               </div>
@@ -56,11 +67,13 @@ export default function IndexPage() {
             col1={"lightblue"}
             col2={"#dbf5b3"}
           >
-            <div className="flex items-center g-4 justify-evenly rounded-2xl">
+            <div className="flex  p-4  items-center g-4 justify-evenly rounded-2xl">
               <div>
                 <div className="mr-4">
                   <span className="font-bold">USD : </span>
-                  <span className="font-bold">amount</span>
+                  <span className="font-bold">
+                    {userData.profit.toFixed(2)}
+                  </span>
                 </div>
                 <h1 className="text-lg">Total Profit</h1>
               </div>
@@ -77,14 +90,16 @@ export default function IndexPage() {
           >
             <Link
               to={"/dashboard/profile"}
-              className="flex items-center g-4 justify-evenly rounded-2xl"
+              className="flex p-4 items-center g-4 justify-evenly rounded-2xl"
             >
               <div>
                 <div className="mr-4">
                   <span className="font-bold">Account Status : </span>
-                  <span className="font-bold">unverified</span>
                 </div>
-                <h1 className="text-lg">Total balance</h1>
+                <h1 className="text-lg">
+                  {" "}
+                  {verify ? "Verified" : "Unverified"}
+                </h1>
               </div>
               <AccountImg className="w-10 h-10 rounded-2xl  border-4 p-1 border-blue-500" />
             </Link>

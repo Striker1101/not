@@ -7,18 +7,22 @@ import Deposit from "./Deposit";
 import Withdraw from "./Withdraw";
 import Buy from "./Buy";
 import Profile from "./Profile";
-import MintedCard from "./MintedCard";
+import NFTCard from "./NFTCard";
+import Terms from "./Terms";
+import Wallet from "./Wallet";
 export default function DashboardRoutes() {
   return (
     <Routes>
       <Route path="/" index element={<IndexPage />} />
-      <Route path="/upload" index element={<Upload />} />
-      <Route path="/minted" index element={<Minted />} />
-      <Route path="/minted/:id" element={<MintedCard />} />
-      <Route path="/deposit" index element={<Deposit />} />
-      <Route path="/withdraw" index element={<Withdraw />} />
-      <Route path="/buy" index element={<Buy />} />
-      <Route path="/profile" index element={<Profile />} />
+      <Route path="/upload" element={<Upload />} />
+      <Route path="/minted" element={<Minted />} />
+      <Route path="/nft/:id" element={<NFTCard />} />
+      <Route path="/deposit" element={<Deposit />} />
+      <Route path="/withdraw" element={<Withdraw />} />
+      <Route path="/buy" element={<Buy />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/wallet" element={<Wallet />} />
     </Routes>
   );
 }

@@ -1,5 +1,14 @@
 import React from "react";
+import { datas } from "../../utility/buyData";
+import NFTS from "./comp/NFTS";
 
 export default function Buy() {
-  return <div>buy</div>;
+  return (
+    <NFTS
+      datas={datas}
+      placeholder={"Search Creators Name"}
+      card_holder={"Current Bid"}
+      title={"Buy"}
+    />
+  );
 }

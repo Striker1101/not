@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { datas } from "../../utility/mintedData";
 import { ReactComponent as Alien } from "../../resources/images/dashboard/minted/reddit-alien.svg";
 
-const MintedCard = () => {
+const NFTCard = () => {
   const { id } = useParams();
   const card = datas.find((item) => item.id === parseInt(id));
 
@@ -32,4 +32,4 @@ const MintedCard = () => {
   );
 };
 
-export default MintedCard;
+export default NFTCard;

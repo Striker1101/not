@@ -11,7 +11,7 @@ const getRandomColor = () => {
   return { color1, color2 };
 };
 
-const StyledCard = ({ data }) => {
+const StyledCard = ({ data, card_holder }) => {
   const [bgColors, setBgColors] = useState({ color1: "", color2: "" });
 
   useEffect(() => {
@@ -46,7 +46,7 @@ const StyledCard = ({ data }) => {
       </div>
       <h1 className="pt-5 pb-5 font-bold text-xl">{data.creator}</h1>
       <div className="flex justify-evenly">
-        <p className="font-semibold text-md">Highest Bid</p>
+        <p className="font-semibold text-md">{card_holder}</p>
         <p className="font-semibold text-md">From {data.price} ETH</p>
       </div>
       <div className="flex">
