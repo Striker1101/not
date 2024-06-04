@@ -1,20 +1,29 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Container from "../../components/Container";
-import { ReactComponent as WarningImg } from "../../resources/images/dashboard/trans/triangle-exclamation-solid.svg";
+import { ReactComponent as WarningImg } from "../../resources/images/dashboard/trans/warning.svg";
 import SelectInput from "../../components/vendor/form/SelectInput";
 import TextInput from "../../components/vendor/form/TextInput";
 import FileInput from "../../components/vendor/form/FileInput";
 import SubmitButton from "../../components/vendor/button/SubmitButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
+import {
+  addToCollectionArray,
+  getUpdatedDocument,
+} from "../../firebase/firestore";
+import Alert from "../../components/vendor/alert/Alert";
+import DataTable from "./comp/DataTable";
+import { general } from "../../utility/general";
 
 export default function Deposit() {
   const [formData, setFormData] = useState({
     wallet: "",
     amount: "",
     file: [],
+    status: false,
   });
   const refInput = useRef(null);
+  const [deposit, setDepsoit] = useState({ regions: [] });
   const wallet = useRef(null);
   const [loading, setLoading] = useState(false);
   function handleChange(e) {
@@ -27,10 +36,26 @@ export default function Deposit() {
       [name]: value,
     }));
   }
+
   const [result, setResult] = useState({
     status: 0,
     message: null,
   });
+
+  useEffect(() => {
+    // Callback function to handle updates
+    const handleUpdate = (data) => {
+      setDepsoit(data);
+    };
+
+    // Start listening for updates
+    const unsubscribe = getUpdatedDocument("deposits", handleUpdate);
+
+    // Clean up the listener on component unmount
+    return () => {
+      unsubscribe();
+    };
+  }, [deposit]);
 
   const categoryOptions = [
     {
@@ -89,30 +114,38 @@ export default function Deposit() {
         alert("Address has been copied to clipboard");
       })
       .catch((error) => {
-        console.error("Failed to copy text: ", error);
+        return setResult({
+          status: 0,
+          message: `Failed to copy text: ${error}`,
+        });
       });
   };
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    setLoading(true);
+    const result = await addToCollectionArray("deposits", formData);
+    setResult(result);
+    setLoading(false);
   }
 
   return (
     <Container title="Deposit">
       <div className="flex items-center justify-center flex-col h-screen">
-        <div className="flex gap-3 w-4/5 m-6 bg-purple-600 mx-4 rounded-t-xl p-3">
-          <WarningImg />
+        <div className="flex items-center gap-3 w-4/5 m-6 bg-purple-600 mx-4 rounded-t-xl p-3">
+          <WarningImg width={50} />
           <p>
-            Please the only accepted digital currency is Ethereum(ETH), Rear Sea
-            won't be liable for any loss of funds.
+            Please the only acceptes digital currency , {general.name} won't be
+            liable for any loss of funds.
           </p>
         </div>
         <div className="w-4/5">
           <form
             onSubmit={handleSubmit}
             action=""
-            className="flex items-center justify-center w-full"
+            className="flex flex-col items-center justify-center w-full"
           >
+            <Alert result={result} setResult={setResult} timer={false} />
             <div className=" bg-slate-400 p-5">
               <h1 className="text-xl font-semibold p-2 ">
                 DEPOSIT AND SUBMIT PROOF TO TOP UP YOUR BALANCE
@@ -158,6 +191,9 @@ export default function Deposit() {
               <SubmitButton loading={loading} />
             </div>
           </form>
+        </div>
+        <div className="mb-5 pb-5 flex items-center w-4/5 justify-center">
+          <DataTable data={deposit.regions.slice(1)} />
         </div>
       </div>
     </Container>
