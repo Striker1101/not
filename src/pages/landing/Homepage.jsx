@@ -40,9 +40,13 @@ export default function Homepage() {
             brand and products. Partner showcase and products.
           </p>
           <div className="">
-            <BlueButton>Login</BlueButton>
+            <BlueButton>
+              <Link to={"/auth/login"}>Login</Link>
+            </BlueButton>
 
-            <DefaultButton>Register</DefaultButton>
+            <DefaultButton>
+              <Link to={"/auth/register"}>Register</Link>
+            </DefaultButton>
           </div>
           <div className="pb-7 pt-5 flex items-center align-middle">
             <div>

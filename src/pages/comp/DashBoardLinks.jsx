@@ -18,11 +18,13 @@ export default function DashBoardLinks({ toggleSidebar, isOpen }) {
     <GradientDiv col1="lightgray" col2="#dbf5b3" direction="to bottom">
       <div className=" flex flex-col justify-evenly relative top-0 left-0 rounded-xl align-middle px-3 h-screen z-50 ">
         <div className="flex gap-3 items-center max-h-2 ">
-          <img src={logo} alt="logo" width={50} height={20} />
-          <p className="text-blue-500 text-xl font-bold hidden md:block">
-            {" "}
-            {general.name}
-          </p>
+          <Link to={"/"} className="flex gap-2">
+            <img src={logo} alt="logo" width={50} height={20} />
+            <p className="text-blue-500 text-xl font-bold hidden md:block">
+              {" "}
+              {general.name}
+            </p>
+          </Link>
           <button
             onClick={toggleSidebar}
             className="focus:outline-none hidden md:block"
