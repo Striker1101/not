@@ -1,3 +1,5 @@
+import i1 from "../resources/images/dashboard/index/1.avif";
+import i2 from "../resources/images/dashboard/index/2.jpg.avif";
 export const datas = [
   {
     contact_address: "0x2e80177d429a3e826f417538aa7a48ecd390922f",
@@ -8,5 +10,45 @@ export const datas = [
     total_minted: 317,
     total_volume: 0.9573800000000003,
     NOW: 317,
+  },
+  {
+    contact_address: "0xbb33585d2cacba9bf541aa545aa94511e0ad793c",
+    name: "Trippyland",
+    nft: null,
+    market_cap: 0,
+    floor_price: 0.05,
+    total_minted: 109,
+    total_volume: 1.0957,
+    NOW: 109,
+  },
+  {
+    contact_address: "0xc9a51f72e2fe2fb74ccccd760b929019f680467a",
+    name: "The Bobo Council",
+    nft: null,
+    market_cap: 117.73393971428574,
+    floor_price: 0.055,
+    total_minted: 567,
+    total_volume: 187.15280566963696,
+    NOW: 567,
+  },
+  {
+    contact_address: "0xf54cc94f1f2f5de012b6aa51f1e7ebdc43ef5afc",
+    name: "Project NANOPASS",
+    nft: i1,
+    market_cap: 40.9653475,
+    floor_price: 0.007999,
+    total_minted: 3250,
+    total_volume: 18241.434775585545,
+    NOW: 3250,
+  },
+  {
+    contact_address: "0xde69b08ff2eae4a61498b481007ad5cb88cad20d",
+    name: "OFFICIAL FOMO NOMO (Discontinued)",
+    nft: i2,
+    market_cap: 40.9653475,
+    floor_price: 0.007999,
+    total_minted: 3250,
+    total_volume: 18241.434775585545,
+    NOW: 3250,
   },
 ];

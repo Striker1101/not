@@ -73,7 +73,7 @@ export default function Homepage() {
         </div>
         <AutoCard name={"home_header"} />
       </section>
-      <section id="live_auction" className="mx-6">
+      <section id="live_auction" className="mx-6 text-re">
         <di className="flex items-center ">
           <div className="w-6 h-6 dot m-4 rounded-full"></div>
           <h1 className="font-bold text-3xl">Live Auctions</h1>

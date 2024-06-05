@@ -87,16 +87,16 @@ export default function Footer() {
             <h1 className="font-bold text-xl">Explore</h1>
             <ul>
               <li className="text-blue-400 font-bold m-3">
-                <Link to={"/explore/explore_artworks"}> Explore Artworks</Link>
+                <Link to={"/explore"}> Explore Artworks</Link>
               </li>
               <li className="text-blue-400 font-bold m-3">
-                <Link to={"/explore/single_artworks"}>Single Artworks</Link>
+                <Link to={"/explore"}>Single Artworks</Link>
               </li>
               <li className="text-blue-400 font-bold m-3">
-                <Link to={"/explore/explore_creators"}>Explore Creators</Link>
+                <Link to={"/explore"}>Explore Creators</Link>
               </li>
               <li className="text-blue-400 font-bold m-3">
-                <Link to={"/explore/single_creators"}>Single Creators</Link>
+                <Link to={"/explore"}>Single Creators</Link>
               </li>
             </ul>
           </div>

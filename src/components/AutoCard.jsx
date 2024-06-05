@@ -11,8 +11,10 @@ import {
   explores,
 } from "../utility/homepageData";
 import CreationCard from "./CreationCard";
+import { useAppState } from "../AppStateContext";
 
 export default function AutoCard({ name }) {
+  const { randomSelector } = useAppState();
   if (name === "home_header") {
     return (
       <div className="flex-3">
@@ -24,7 +26,7 @@ export default function AutoCard({ name }) {
   if (name === "auction") {
     return (
       <ul className="overflow-y-auto flex ">
-        {auction.map((item, index) => (
+        {randomSelector(auction, 6).map((item, index) => (
           <li className="m-5">
             <AuctionCard
               key={index}
@@ -42,7 +44,7 @@ export default function AutoCard({ name }) {
     return (
       <div className="min-h-screen p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {creators.map((creator, index) => (
+          {randomSelector(creators, 10).map((creator, index) => (
             <CreatorCard
               key={index}
               imgSrc={creator.content}
@@ -92,7 +94,7 @@ export default function AutoCard({ name }) {
   if (name === "explore") {
     return (
       <ul className=" flex flex-wrap ">
-        {explores.map((item, index) => (
+        {randomSelector(explores, 10).map((item, index) => (
           <li className="m-3">
             <AuctionCard
               key={index}

@@ -59,6 +59,24 @@ export const AppStateProvider = ({ children }) => {
     return string;
   }
 
+  function randomSelector(array, amount) {
+    if (amount > array.length) {
+      throw new Error("Amount cannot be greater than the length of the array");
+    }
+
+    // Create a copy of the array to avoid mutating the original array
+    const arrayCopy = [...array];
+
+    // Fisher-Yates Shuffle
+    for (let i = arrayCopy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arrayCopy[i], arrayCopy[j]] = [arrayCopy[j], arrayCopy[i]];
+    }
+
+    // Return the first 'amount' elements of the shuffled array
+    return arrayCopy.slice(0, amount);
+  }
+
   return (
     <AppStateContext.Provider
       value={{
@@ -68,6 +86,7 @@ export const AppStateProvider = ({ children }) => {
         message,
         setMessage,
         limiter,
+        randomSelector,
       }}
     >
       {children}

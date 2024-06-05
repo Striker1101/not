@@ -11,7 +11,7 @@ const AuctionCard = ({ item, title, bid }) => {
         />
       )}
       {item.type === "video" && (
-        <video className="w-full h-64 object-cover" controls>
+        <video className="w-full h-40 object-cover rounded-lg" autoPlay loop>
           <source src={item.content} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
