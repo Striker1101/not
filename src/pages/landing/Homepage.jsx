@@ -101,7 +101,7 @@ export default function Homepage() {
         </div>
       </section>
       <section id="howrear">
-        <div className="flex items-center align- text-center">
+        <div className="flex items-center flex-col md:flex-row  align-middle text-center">
           <h1 className="text-3xl font-bold  mb-8">HowRear Sea Works</h1>
           <BlueButton>For Creators</BlueButton>
 
@@ -140,7 +140,7 @@ export default function Homepage() {
         </div>
         <div>
           <div className=" rounded-lg bg-gray-300 p-10 m-10 ">
-            <h1 className="font-bold text-5xl pt-12 pb-7 text-gradient w-1/2 md:w-1/3">
+            <h1 className="font-bold text-xl md:text-2xl xl:text-4xl  pt-12 pb-7 text-gradient w-1/2 md:w-1/3">
               Create, Sell & Collect NFTs At Rear Sea
             </h1>
             <p>
