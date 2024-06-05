@@ -10,6 +10,8 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import Spinner from "../../components/Spinner";
 import { useLocation } from "react-router-dom";
+import { useAppState } from "../../AppStateContext";
+import { creators } from "../../utility/homepageData";
 library.add(faCopy);
 function generateRandomString(length = 16) {
   const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -26,9 +28,9 @@ function generateRandomString(length = 16) {
 const NFTCard = () => {
   const { id } = useParams();
   const location = useLocation();
+  const { islogged } = useAppState();
   const queryParams = new URLSearchParams(location.search);
   const path = queryParams.get("path");
-  console.log(path, id);
 
   let datas = [];
 
@@ -37,11 +39,10 @@ const NFTCard = () => {
   } else if (path === "buy") {
     datas = buy;
   } else if (path === "user_nft") {
+    datas = processArray(islogged.userData.nfts[0].regions);
   }
-  console.log(datas);
 
-  const card = datas.find((item) => item.id === parseInt(id));
-
+  const card = datas.find((item) => item.id == id);
   if (!card) {
     return (
       <>
@@ -50,6 +51,66 @@ const NFTCard = () => {
     );
   }
 
+  function processArray(arr) {
+    // Helper function to determine the file type
+    function determineFileType(url) {
+      const imageExtensions = [
+        "jpeg",
+        "jpg",
+        "png",
+        "gif",
+        "bmp",
+        "webp",
+        "tiff",
+      ];
+
+      // Extract the part of the URL before the '?'
+      const baseUrl = url.split("?")[0];
+
+      // Extract the last four characters to get the file extension
+      const fileExtension = baseUrl.slice(-4).toLowerCase();
+
+      // Check if the extension matches any of the known image extensions
+      const isImage = imageExtensions.some((ext) =>
+        fileExtension.includes(ext)
+      );
+
+      return isImage ? "image" : "video";
+    }
+
+    // Process each object in the array
+    return arr.map((obj) => {
+      if (obj.fileUrls && obj.fileUrls.length > 0) {
+        // Randomly pick a file URL
+        const randomIndex = Math.floor(Math.random() * obj.fileUrls.length);
+        const selectedUrl = obj.fileUrls[randomIndex];
+
+        // Determine the file type
+        const fileType = determineFileType(selectedUrl);
+
+        // Add the content and type to the object
+        return {
+          ...obj,
+          content: selectedUrl,
+          type: fileType,
+        };
+      } else {
+        // If there are no file URLs, return the object as is
+        return obj;
+      }
+    });
+  }
+
+  function getRandomObject(array) {
+    if (array.length === 0) {
+      return null; // Return null if the array is empty
+    }
+    const randomIndex = Math.floor(Math.random() * array.length);
+    return array[randomIndex];
+  }
+  console.log(islogged.user);
+  const user = islogged.user;
+  const creator = getRandomObject(creators);
   return (
     <div className="pb-9">
       <Container title={`Card ${card.creator}`}>
@@ -65,7 +126,7 @@ const NFTCard = () => {
                     alt=""
                   />
                 ) : (
-                  <video src={card.content} controls></video>
+                  <video src={card.content} autoPlay></video>
                 )}
               </div>
               <div>
@@ -92,13 +153,21 @@ const NFTCard = () => {
                 </div>
                 <div>
                   <div className="flex gap-3 ">
-                    <p className="text">ETH</p> <p>Highest Bid</p>
+                    <p className="text-green-500">ETH</p> <p>Highest Bid</p>
                   </div>
                   <div className="flex gap-4 items-center">
                     <div className="relative">
-                      {card.type === "image" ? (
+                      {path === "user_nft" ? (
                         <img
-                          src={card.content}
+                          src={user.photoURL}
+                          className="rounded-3xl"
+                          alt=""
+                          width={70}
+                          height={70}
+                        />
+                      ) : creator.type === "image" ? (
+                        <img
+                          src={creator.content}
                           className="rounded-3xl"
                           alt=""
                           width={70}
@@ -107,7 +176,7 @@ const NFTCard = () => {
                       ) : (
                         <video src={card.content} controls></video>
                       )}
-                      <div className="w-6 absolute bg-white rounded-3xl  right-0 top-6">
+                      <div className="w-6 absolute bg-white rounded-3xl  right-0 top-10">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 512 512"
@@ -120,7 +189,10 @@ const NFTCard = () => {
                       </div>
                     </div>
                     <div>
-                      <p className="text-lg">Creator: {card.creator}</p>
+                      <p className="text-lg">
+                        Creator:{" "}
+                        {path === "user_nft" ? user.displayName : creator.title}
+                      </p>
                       <p className="text-lg text-green-700">@{general.name}</p>
                     </div>
                   </div>
@@ -163,7 +235,12 @@ function Holder({ props, value }) {
     <div className="flex gap-3">
       <p className="text-gray-400 text-xl">{props}:</p>
       <span>{"  "}</span>
-      <p className=" text-xl">{value}</p>
+      <p className=" text-xl">
+        {" "}
+        {typeof value === "object"
+          ? new Date(value.seconds).toDateString()
+          : value}
+      </p>
     </div>
   );
 }

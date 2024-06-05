@@ -14,7 +14,7 @@ import { logout } from "../../firebase/auth";
 
 export default function DashboardFooter() {
   return (
-    <div className="fixed w-screen bottom-0 left-0 py-4 bg-inherit">
+    <div className="fixed bottom-0 left-0 py-4 bg-inherit w-full">
       <div className=" flex flex-row justify-evenly align-middle px-3 ">
         <Link
           to="/dashboard/"

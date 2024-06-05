@@ -42,7 +42,7 @@ export const AppStateProvider = ({ children }) => {
     async function checkUser() {
       try {
         const result = await check();
-        console.log(result);
+
         setIsLogged(result);
       } catch (error) {
         setIsLogged({ status: 400, message: error });

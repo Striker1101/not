@@ -38,7 +38,7 @@ export default function IndexPage() {
         </GradientDiv>
       </div>
 
-      <div className="flex gap-4 m-6 flex-wrap items-center justify-center align-middle w-full">
+      <div className="flex gap-4 m-6 flex-wrap items-center justify-center align-middle">
         <div className="rounded-2xl w-fit overflow-hidden">
           <GradientDiv
             direction={"to right"}

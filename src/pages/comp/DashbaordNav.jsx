@@ -30,7 +30,7 @@ const DashboardNav = () => {
   }, [darkMode]);
 
   return (
-    <nav className="bg-transparent backdrop-blur-md text-dark fixed top-0 w-screen max-h-16 ">
+    <nav className="bg-transparent backdrop-blur-md w-full text-dark fixed top-0 max-h-16 ">
       <div className="container mx-auto flex justify-between items-center p-4">
         <div className="flex items-center space-x-2">
           {/* Language selection dropdown */}

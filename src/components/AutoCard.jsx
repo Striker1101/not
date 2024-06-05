@@ -45,7 +45,7 @@ export default function AutoCard({ name }) {
           {creators.map((creator, index) => (
             <CreatorCard
               key={index}
-              imgSrc={creator.imgSrc}
+              imgSrc={creator.content}
               title={creator.title}
               price={creator.price}
             />

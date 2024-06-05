@@ -41,7 +41,7 @@ const StyledCard = ({ data, card_holder }) => {
         {data.type === "image" ? (
           <img src={data.content} className="rounded-xl" alt="" />
         ) : (
-          <video src={data.content} controls className="rounded-xl"></video>
+          <video src={data.content} autoPlay className="rounded-xl"></video>
         )}
       </div>
       <h1 className="pt-5 pb-5 font-bold text-xl">{data.creator}</h1>

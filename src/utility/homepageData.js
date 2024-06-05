@@ -33,8 +33,8 @@ export const auction = [
   },
 ];
 export const creators = [
-  { imgSrc: user1, title: "Meta Boss", price: "0.25ETH" },
-  { imgSrc: "", title: "The Lucky Being", price: "4.10ETH" },
+  { content: user1, title: "Meta Boss", price: "0.25ETH", type: "image" },
+  { content: "", title: "The Lucky Being", price: "4.10ETH", type: "image" },
 ];
 
 export const creations = [
