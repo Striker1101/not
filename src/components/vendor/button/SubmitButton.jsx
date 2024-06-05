@@ -21,7 +21,7 @@ export default function SubmitButton({ loading }) {
   return (
     <div className="flex items-center justify-center align-middle">
       <button
-        className={`px-20 py-3 rounded-2xl flex items-center justify-center
+        className={`px-10 md:px-20 py-3 rounded-2xl flex items-center justify-center
           ${loading ? "cursor-not-allowed opacity-50" : ""}
           bg-blue-700 text-white dark:bg-gray-800 dark:text-white
           hover:bg-blue-600 dark:hover:bg-gray-700

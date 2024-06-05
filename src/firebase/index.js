@@ -5,12 +5,12 @@ import { initializeApp } from "firebase/app";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyD3MmjV6IBG8TWDdEs0s5jcJONSbriwLMQ",
-  authDomain: "blockart-d8baf.firebaseapp.com",
-  projectId: "blockart-d8baf",
-  storageBucket: "blockart-d8baf.appspot.com",
-  messagingSenderId: "498036989004",
-  appId: "1:498036989004:web:c33ee8c87fdd9cf9bda8e9",
+  apiKey: "AIzaSyBBwhdD-xtUsq8nAvkZ9BKAqnPwzMPNjNs",
+  authDomain: "block-art-nft.firebaseapp.com",
+  projectId: "block-art-nft",
+  storageBucket: "block-art-nft.appspot.com",
+  messagingSenderId: "619389856266",
+  appId: "1:619389856266:web:e99fec8fd8cd3eeffd4df3",
 };
 
 // Initialize Firebase

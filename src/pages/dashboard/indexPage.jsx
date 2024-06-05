@@ -9,10 +9,9 @@ import { datas } from "../../utility/dashboardIndexData";
 import { useAppState } from "../../AppStateContext";
 export default function IndexPage() {
   const { islogged } = useAppState();
-
   const userData = islogged.userData.users[0];
-  console.log(islogged);
   const verify = islogged.user.emailVerified;
+
   return (
     <Container title="Dashboard Index">
       <div className="mx-6">

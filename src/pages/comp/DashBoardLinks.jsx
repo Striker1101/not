@@ -11,102 +11,105 @@ import { ReactComponent as BuyImg } from "../../resources/images/dashboard/nav/c
 import { ReactComponent as ProfileImg } from "../../resources/images/dashboard/nav/user-pen-solid.svg";
 import { ReactComponent as LogoutImg } from "../../resources/images/dashboard/nav/right-from-bracket-solid.svg";
 import { logout } from "../../firebase/auth";
+import GradientDiv from "../../components/vendor/Card/GradientDiv";
 
 export default function DashBoardLinks({ toggleSidebar, isOpen }) {
   return (
-    <div className="flex flex-col justify-evenly rounded-xl align-middle px-3 h-screen z-10  ">
-      <div className="flex gap-3 items-center max-h-2 ">
-        <img src={logo} alt="logo" width={50} height={20} />
-        <p className="text-blue-500 text-xl font-bold hidden md:block">
-          {" "}
-          {general.name}
-        </p>
-        <button
-          onClick={toggleSidebar}
-          className="focus:outline-none hidden md:block"
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
+    <GradientDiv col1="lightgray" col2="#dbf5b3" direction="to bottom">
+      <div className=" flex flex-col justify-evenly relative top-0 left-0 rounded-xl align-middle px-3 h-screen z-50 ">
+        <div className="flex gap-3 items-center max-h-2 ">
+          <img src={logo} alt="logo" width={50} height={20} />
+          <p className="text-blue-500 text-xl font-bold hidden md:block">
+            {" "}
+            {general.name}
+          </p>
+          <button
+            onClick={toggleSidebar}
+            className="focus:outline-none hidden md:block"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M6 18L18 6M6 6l12 12"
-            ></path>
-          </svg>
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <hr className="m-0 p-0" />
+        <Link
+          to="/dashboard/"
+          className=" px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
+          title="Home"
+        >
+          <HomeImg className="w-6 h-auto" />
+          <span className="hidden md:block text-xl">Dashboard</span>
+        </Link>
+        <Link
+          to={"/dashboard/upload"}
+          className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
+          title="Upload NFT"
+        >
+          <UploadImg className="w-6 h-auto" />
+          <p className="hidden md:block">Upload NFTs</p>
+        </Link>
+        <Link
+          to={"/dashboard/minted"}
+          className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
+          title="Minted NFTs"
+        >
+          <MintedImg className="w-6 h-auto" />
+          <p className="hidden md:block">Minted NFTs</p>
+        </Link>
+        <Link
+          to={"/dashboard/deposit"}
+          className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
+          title="Deposit"
+        >
+          <DepositImg className="w-6 h-auto" />
+          <p className="hidden md:block">Deposit</p>
+        </Link>
+        <Link
+          to={"/dashboard/withdraw"}
+          className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
+          title="Withdraw"
+        >
+          <WithdrawImg className="w-6 h-auto" />
+          <p className="hidden md:block">Withdraw</p>
+        </Link>
+        <Link
+          to={"/dashboard/buy"}
+          className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
+          title="Buy NFT"
+        >
+          <BuyImg className="w-6 h-auto" />
+          <p className="hidden md:block">BUY NFT</p>
+        </Link>
+        <Link
+          to={"/dashboard/profile"}
+          className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
+          title="My Profile"
+        >
+          <ProfileImg className="w-6 h-auto" />
+          <p className="hidden md:block">My Profile</p>
+        </Link>
+        <hr className="m-0 p-0" />
+        <button
+          onClick={logout}
+          className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
+          title="Log Out"
+        >
+          <LogoutImg className="w-6 h-fit" />
+          <p className="hidden md:block">Log Out</p>
         </button>
       </div>
-      <hr className="m-0 p-0" />
-      <Link
-        to="/dashboard/"
-        className=" px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-        title="Home"
-      >
-        <HomeImg className="w-6 h-auto" />
-        <span className="hidden md:block text-xl">Dashboard</span>
-      </Link>
-      <Link
-        to={"/dashboard/upload"}
-        className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-        title="Upload NFT"
-      >
-        <UploadImg className="w-6 h-auto" />
-        <p className="hidden md:block">Upload NFTs</p>
-      </Link>
-      <Link
-        to={"/dashboard/minted"}
-        className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-        title="Minted NFTs"
-      >
-        <MintedImg className="w-6 h-auto" />
-        <p className="hidden md:block">Minted NFTs</p>
-      </Link>
-      <Link
-        to={"/dashboard/deposit"}
-        className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-        title="Deposit"
-      >
-        <DepositImg className="w-6 h-auto" />
-        <p className="hidden md:block">Deposit</p>
-      </Link>
-      <Link
-        to={"/dashboard/withdraw"}
-        className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-        title="Withdraw"
-      >
-        <WithdrawImg className="w-6 h-auto" />
-        <p className="hidden md:block">Withdraw</p>
-      </Link>
-      <Link
-        to={"/dashboard/buy"}
-        className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-        title="Buy NFT"
-      >
-        <BuyImg className="w-6 h-auto" />
-        <p className="hidden md:block">BUY NFT</p>
-      </Link>
-      <Link
-        to={"/dashboard/profile"}
-        className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-        title="My Profile"
-      >
-        <ProfileImg className="w-6 h-auto" />
-        <p className="hidden md:block">My Profile</p>
-      </Link>
-      <hr className="m-0 p-0" />
-      <button
-        onClick={logout}
-        className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-        title="Log Out"
-      >
-        <LogoutImg className="w-6 h-fit" />
-        <p className="hidden md:block">Log Out</p>
-      </button>
-    </div>
+    </GradientDiv>
   );
 }

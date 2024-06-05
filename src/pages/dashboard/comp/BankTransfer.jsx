@@ -7,14 +7,11 @@ import TextInput from "../../../components/vendor/form/TextInput";
 import TextArea from "../../../components/vendor/form/TextArea";
 import SubmitButton from "../../../components/vendor/button/SubmitButton";
 import DefaultButton from "../../../components/vendor/button/DefaultButton";
-import {
-  addToCollectionArray,
-  getUpdatedDocument,
-} from "../../../firebase/firestore";
+import { addToCollectionArray } from "../../../firebase/firestore";
 import DataTable from "./DataTable";
-export default function BankTransfer() {
+export default function BankTransfer({ filterArray, withdraw }) {
   const [loading, setLoading] = useState(false);
-  const [withdraw, setWithdraw] = useState({ regions: [] });
+
   const [result, setResult] = useState({
     status: 0,
     message: null,
@@ -27,23 +24,9 @@ export default function BankTransfer() {
     bank_address: "",
     withdraw_amount: "",
     additional_info: "",
+    type: "bank",
     status: false,
   });
-
-  useEffect(() => {
-    // Callback function to handle updates
-    const handleUpdate = (data) => {
-      setWithdraw(data);
-    };
-
-    // Start listening for updates
-    const unsubscribe = getUpdatedDocument("withdraws", handleUpdate);
-
-    // Clean up the listener on component unmount
-    return () => {
-      unsubscribe();
-    };
-  }, [withdraw]);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -164,7 +147,7 @@ export default function BankTransfer() {
           </form>
 
           <div className="mb-5 pb-5 flex items-center w-4/5 justify-center">
-            <DataTable data={withdraw.regions.slice(1)} />
+            <DataTable data={withdraw} />
           </div>
         </div>
       </GradientDiv>

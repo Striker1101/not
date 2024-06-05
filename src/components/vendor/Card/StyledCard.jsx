@@ -45,12 +45,12 @@ const StyledCard = ({ data, card_holder }) => {
         )}
       </div>
       <h1 className="pt-5 pb-5 font-bold text-xl">{data.creator}</h1>
-      <div className="flex justify-evenly">
+      <div className="flex justify-evenly py-3">
         <p className="font-semibold text-md">{card_holder}</p>
-        <p className="font-semibold text-md">From {data.price} ETH</p>
+        <p className="font-semibold text-md ">From {data.price} ETH</p>
       </div>
-      <div className="flex">
-        <p className="font-semibold text-xl">Creator: </p>
+      <div className="flex py-3">
+        <p className="font-semibold text-xl ">Creator: </p>
         <span className="font-semibold text-xl">{data.creator}</span>
       </div>
     </div>

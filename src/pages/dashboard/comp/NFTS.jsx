@@ -4,7 +4,7 @@ import StyledCard from "../../../components/vendor/Card/StyledCard";
 import { ReactComponent as Alien } from "../../../resources/images/dashboard/minted/reddit-alien.svg";
 import { Link } from "react-router-dom";
 
-export default function NFTS({ title, placeholder, datas, card_holder }) {
+export default function NFTS({ title, placeholder, datas, card_holder, path }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredData, setFilteredData] = useState(datas);
 
@@ -19,6 +19,7 @@ export default function NFTS({ title, placeholder, datas, card_holder }) {
     setFilteredData(filtered);
   };
 
+  console.log(filteredData, datas);
   return (
     <Container title={title}>
       <div className="minted-component mb-9">
@@ -36,7 +37,7 @@ export default function NFTS({ title, placeholder, datas, card_holder }) {
           <ul className="flex flex-wrap items-center justify-center">
             {filteredData.map((data, index) => (
               <li key={index} className="p-2 ">
-                <Link to={`/dashboard/nft/${index}`}>
+                <Link to={`/dashboard/nft/${index}?path=${path}`}>
                   <StyledCard data={data} card_holder={card_holder} />
                 </Link>
               </li>

@@ -5,10 +5,11 @@ import TextArea from "../../components/vendor/form/TextArea";
 import SelectInput from "../../components/vendor/form/SelectInput";
 import FileInput from "../../components/vendor/form/FileInput";
 import Alert from "../../components/vendor/alert/Alert";
-import { useAppState } from "../../AppStateContext";
 import DefaultButton from "../../components/vendor/button/DefaultButton";
 import SubmitButton from "../../components/vendor/button/SubmitButton";
 import DataTable from "./comp/DataTable";
+import { v4 as uuidv4 } from "uuid";
+
 import {
   addToCollectionArray,
   getUpdatedDocument,
@@ -20,13 +21,15 @@ export default function Upload() {
     status: 0,
     message: null,
   });
+
   const [formData, setFormData] = useState({
-    creator_name: "",
+    id: uuidv4(),
+    creator: "",
     collection_name: "",
     file: [],
     category: "",
     price: "",
-    describe: "",
+    des: "",
     status: false,
   });
 
@@ -142,8 +145,8 @@ export default function Upload() {
             <TextInput
               handleChange={handleChange}
               placeholder={"Creator's Name "}
-              name={"creator_name"}
-              value={formData.creator_name}
+              name={"creator"}
+              value={formData.creator}
               type={"text"}
               required={true}
               bg="gray"
@@ -193,8 +196,8 @@ export default function Upload() {
             <TextArea
               handleChange={handleChange}
               placeholder={"Describe Your unique NFT"}
-              name={"describe"}
-              value={formData.describe}
+              name={"des"}
+              value={formData.des}
               bg="gray"
             />
             <div className="flex justify-center">

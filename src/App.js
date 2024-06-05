@@ -23,10 +23,12 @@ function App() {
     }
   }, [location.pathname]);
   return (
-    <div className="App bg-background-light text-dark dark:bg-background-dark  dark:text-background-light ">
+    <div className="App relative z-10 bg-background-light text-dark dark:bg-background-dark  dark:text-background-light ">
       <AppStateProvider>
-        {containsDashboard ? <DashboardNav /> : <Nav />}
-        <main className="pt-20 z-0">
+        <div className="relative z-50">
+          {containsDashboard ? <DashboardNav /> : <Nav />}
+        </div>
+        <main className="pt-20 -z-10 relative">
           <RouterIndex />
         </main>
         {containsDashboard ? <DashboardFooter /> : <Footer />}

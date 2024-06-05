@@ -11,7 +11,7 @@ import Alert from "../../../components/vendor/alert/Alert";
 export default function Login() {
   const { islogged } = useAppState();
   //relogin users when they are already loginin/auth
-  if (islogged.status == 200) {
+  if (islogged.status === 200) {
     window.location.href = "/dashboard";
   }
 
@@ -81,7 +81,7 @@ export default function Login() {
               required={true}
               password={true}
             />
-            <div className="w-full   m-3 p-0 font-semibold text-blue-500 text-xl relative ">
+            <div className="w-full m-3 p-0 font-semibold text-blue-500 text-sm md:xl relative ">
               <Link
                 className="absolute right-0 bottom-2"
                 to={"/auth/reset_password"}

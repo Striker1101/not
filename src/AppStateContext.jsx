@@ -42,6 +42,7 @@ export const AppStateProvider = ({ children }) => {
     async function checkUser() {
       try {
         const result = await check();
+        console.log(result);
         setIsLogged(result);
       } catch (error) {
         setIsLogged({ status: 400, message: error });
@@ -51,6 +52,13 @@ export const AppStateProvider = ({ children }) => {
     checkUser();
   }, []);
 
+  function limiter(string, length) {
+    if (string.length > length) {
+      return string.substring(0, length) + "...";
+    }
+    return string;
+  }
+
   return (
     <AppStateContext.Provider
       value={{
@@ -59,6 +67,7 @@ export const AppStateProvider = ({ children }) => {
         removeFirebasePrefix,
         message,
         setMessage,
+        limiter,
       }}
     >
       {children}

@@ -26,7 +26,7 @@ export default function ResetPassword() {
   }
   async function handleSubmit(e) {
     e.preventDefault();
-    console.log(formDate);
+
     if (toggle === "reset") {
       //reset password
       const result = await resetPassword(formDate.email);
@@ -36,6 +36,7 @@ export default function ResetPassword() {
       const result = sendVerificationEmail(formDate.email);
       setResult(result);
     }
+    console.log(result, toggle);
   }
   return (
     <Container>

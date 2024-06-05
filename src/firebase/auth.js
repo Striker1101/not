@@ -140,6 +140,7 @@ export async function emailLogin(email, password) {
     );
     const user = userCredential.user;
     // Check if user's email is verified
+    console.log(user);
     if (user.emailVerified) {
       // User is authenticated and email is verified
       localStorage.setItem("user", JSON.stringify(user));
@@ -147,12 +148,13 @@ export async function emailLogin(email, password) {
     } else {
       // User's email is not verified
       return {
-        status: 401,
-        message: "Email not verified. Please verify your email.",
+        status: 200,
+        message: "Email not verified. Please verify your email later.",
       };
     }
   } catch (error) {
     const errorMessage = error.message;
+    console.log(error);
     return { status: 400, message: errorMessage };
   }
 }
@@ -196,6 +198,7 @@ export async function createAccount(name, email, password) {
       message: "Welcome " + name + "! Verification email sent.",
     };
   } catch (error) {
+    console.log(error);
     const errorMessage = error.message || "Unknown error occurred";
     return { status: 500, message: errorMessage };
   }
@@ -230,40 +233,6 @@ export function check() {
                 id: doc.id,
                 ...doc.data(),
               }));
-
-              // Create a real-time listener for the collection
-              const unsubscribeCollectionListener = onSnapshot(
-                query(
-                  collectionRef,
-                  where(firebase.firestore.FieldPath.documentId(), "==", uid)
-                ),
-                (snapshot) => {
-                  const updatedCollectionData = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                  }));
-                  resolve({
-                    status: 200,
-                    message: `User is signed in: ${uid}`,
-                    user,
-                    userData: {
-                      ...userData,
-                      [collectionName]: updatedCollectionData,
-                    },
-                  });
-                },
-                (error) => {
-                  // Handle error if the listener encounters an error
-                  console.error("Error with collection listener:", error);
-                  reject({
-                    status: 400,
-                    message: "Error with collection listener:" + error,
-                  });
-                }
-              );
-
-              // No need to store unsubscribe function explicitly
-
               return { [collectionName]: collectionData };
             });
 
@@ -331,8 +300,8 @@ export async function sendVerificationEmail(email) {
   try {
     // Send a verification email to the user's email address
     await sendEmailVerification(auth, email);
-
     // Return success or some indication of the process
+    console.log("sfdsf");
     return { status: 200, message: "Verification email sent successfully" };
   } catch (error) {
     return { status: 400, message: error.message || "An error occurred" }; // Ensure error message is properly formatted

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppState } from "../../../AppStateContext";
 import Container from "../../../components/Container";
 import GradientDiv from "../../../components/vendor/Card/GradientDiv";
@@ -8,13 +8,18 @@ import TextArea from "../../../components/vendor/form/TextArea";
 import SubmitButton from "../../../components/vendor/button/SubmitButton";
 import DefaultButton from "../../../components/vendor/button/DefaultButton";
 import SelectInput from "../../../components/vendor/form/SelectInput";
-export default function CryptoTransfer() {
-  const { removeFirebasePrefix } = useAppState();
+import DataTable from "./DataTable";
+import {
+  addToCollectionArray,
+  getUpdatedDocument,
+} from "../../../firebase/firestore";
+export default function CryptoTransfer({ filterArray, withdraw }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState({
     status: 0,
     message: null,
   });
+
   const [formData, setFormData] = useState({
     wallet_name: "",
     email: "",
@@ -22,7 +27,9 @@ export default function CryptoTransfer() {
     withdraw_amount: "",
     additional_info: "",
     type: "crypto",
+    status: false,
   });
+
   function handleChange(e) {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
@@ -30,10 +37,15 @@ export default function CryptoTransfer() {
       [name]: value,
     }));
   }
+
   async function handleSubmit(e) {
     e.preventDefault();
-    console.log(formData);
+    setLoading(true);
+    const result = await addToCollectionArray("withdraws", formData);
+    setResult(result);
+    setLoading(false);
   }
+
   function reset() {
     setFormData({
       creator_name: "",
@@ -42,6 +54,7 @@ export default function CryptoTransfer() {
       category: "",
       price: "",
       describe: "",
+      status: false,
     });
   }
 
@@ -67,13 +80,14 @@ export default function CryptoTransfer() {
   return (
     <Container title={"Withdraw"}>
       <GradientDiv direction={"to left"} col1={"skyblue"} col2={"lightygra"}>
-        <div className="w-full flex items-center justify-center">
+        <div className="w-full flex flex-col items-center justify-center">
           <form
             action=""
+            onSubmit={handleSubmit}
             className="w-4/5 flex flex-col gap-3 bg-slate-200 p-4 rounded-2xl"
           >
             <div className="flex gap-4 justify-evenly font-bold text-2xl ">
-              <h1 className="">PLEASE PROVIDE YOUR BANK DETAILS</h1>
+              <h1 className="">PLEASE PROVIDE YOUR WALLET DETAILS</h1>
               {/* <div>&times;</div> */}
             </div>
             <Alert result={result} setResult={setResult} timer={false} />
@@ -134,6 +148,10 @@ export default function CryptoTransfer() {
               </div>
             </div>
           </form>
+
+          <div className="mb-5 pb-5 flex items-center w-4/5 justify-center">
+            <DataTable data={withdraw} />
+          </div>
         </div>
       </GradientDiv>
     </Container>

@@ -92,7 +92,7 @@ const PasswordToggle = ({ type, handlePasswordDisplay }) => {
         handlePasswordDisplay();
         setToggle(!toggle);
       }}
-      className="absolute right-6 bottom-3 px-4"
+      className="absolute right-0 md:right-4 bottom-3 px-4"
     >
       {toggle ? (
         <svg

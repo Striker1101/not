@@ -8,6 +8,7 @@ const Minted = () => {
       placeholder={"Search Creators Name"}
       card_holder={"Highest Bid"}
       title={"Minted NFT"}
+      path="minted"
     />
   );
 };

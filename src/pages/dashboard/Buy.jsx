@@ -9,6 +9,7 @@ export default function Buy() {
       placeholder={"Search Creators Name"}
       card_holder={"Current Bid"}
       title={"Buy"}
+      path={"buy"}
     />
   );
 }

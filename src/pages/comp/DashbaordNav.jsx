@@ -30,7 +30,7 @@ const DashboardNav = () => {
   }, [darkMode]);
 
   return (
-    <nav className="bg-transparent backdrop-blur-md text-dark fixed top-0 w-screen max-h-12 ">
+    <nav className="bg-transparent backdrop-blur-md text-dark fixed top-0 w-screen max-h-16 ">
       <div className="container mx-auto flex justify-between items-center p-4">
         <div className="flex items-center space-x-2">
           {/* Language selection dropdown */}
@@ -70,10 +70,10 @@ const DashboardNav = () => {
 
         <Link
           to={"/dashboard/upload"}
-          className="bg-green-500 flex p-2 rounded-xl gap-3"
+          className="bg-green-500  p-2 rounded-xl gap-3 hidden md:flex"
         >
           <p>+</p>
-          <div>Create new Project</div>
+          <div className="text-xl">Create new Project</div>
         </Link>
         <Link to={"/dashboard/profile"} className="rounded-3xl shadow-md ">
           <svg
@@ -88,6 +88,7 @@ const DashboardNav = () => {
         <div id="google_translate_element"></div>
       </div>
       {/* side bar        */}
+
       <div
         className={`relative border-r-4  border-blue-300 z-10 bottom-16 left-0 h-full w-16  md:w-30vw bg-background-light dark:bg-background-dark   transform ${
           isOpen ? "translate-x-0" : "-translate-x-full"

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useAppState } from "../../../AppStateContext";
 
 const DataTable = ({ data }) => {
+  const { limiter } = useAppState();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState(data);
 
@@ -54,7 +56,7 @@ const DataTable = ({ data }) => {
                   key={header}
                   className="py-2 px-4 border-b border-gray-200 dark:border-gray-600"
                 >
-                  {renderCellContent(row[header])}
+                  {renderCellContent(row[header], limiter)}
                 </td>
               ))}
             </tr>
@@ -67,7 +69,7 @@ const DataTable = ({ data }) => {
 
 export default DataTable;
 
-function renderCellContent(value) {
+function renderCellContent(value, limiter) {
   if (typeof value === "object") {
     if (Array.isArray(value)) {
       return (
@@ -87,6 +89,8 @@ function renderCellContent(value) {
     ) : (
       <span className="text-red-500">Pending</span>
     );
+  } else if (typeof value === "string") {
+    return limiter(value, 10);
   } else {
     return value; // For other types, just display the value as it is
   }
