@@ -94,7 +94,7 @@ const Nav = () => {
             </svg>
           </button>
         </div>
-        <Links toggle={false} />
+        <Links toggle={false} toggleSidebar={toggleSidebar} />
       </div>
     </nav>
   );

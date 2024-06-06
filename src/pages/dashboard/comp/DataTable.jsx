@@ -23,7 +23,7 @@ const DataTable = ({ data }) => {
       <div className="mb-4 flex justify-between items-center">
         <input
           type="text"
-          className="border p-2 rounded"
+          className="border p-2 rounded text-background-dark"
           placeholder="Search..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}

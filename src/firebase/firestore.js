@@ -502,6 +502,7 @@ export function getUpdatedDocument(
     (docSnap) => {
       if (docSnap.exists()) {
         // Call the onUpdate callback with the document data
+        console.log(docSnap.data());
         onUpdate(docSnap.data());
       } else {
         console.log("No such document!");

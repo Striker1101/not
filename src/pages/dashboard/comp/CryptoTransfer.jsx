@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useAppState } from "../../../AppStateContext";
+import React, { useState } from "react";
 import Container from "../../../components/Container";
 import GradientDiv from "../../../components/vendor/Card/GradientDiv";
 import Alert from "../../../components/vendor/alert/Alert";
@@ -9,10 +8,7 @@ import SubmitButton from "../../../components/vendor/button/SubmitButton";
 import DefaultButton from "../../../components/vendor/button/DefaultButton";
 import SelectInput from "../../../components/vendor/form/SelectInput";
 import DataTable from "./DataTable";
-import {
-  addToCollectionArray,
-  getUpdatedDocument,
-} from "../../../firebase/firestore";
+import { addToCollectionArray } from "../../../firebase/firestore";
 export default function CryptoTransfer({ setCheck, withdraw }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState({
@@ -45,32 +41,33 @@ export default function CryptoTransfer({ setCheck, withdraw }) {
     setResult(result);
     setCheck(true);
     setLoading(false);
+    reset();
   }
 
   function reset() {
     setFormData({
-      creator_name: "",
-      collection_name: "",
-      file: [],
-      category: "",
-      price: "",
-      describe: "",
+      wallet_name: "",
+      email: "",
+      wallet_address: "",
+      withdraw_amount: "",
+      additional_info: "",
+      type: "crypto",
       status: false,
     });
   }
 
   const categoryOptions = [
     {
-      content: "Etherum ERC20",
-      value: "Etherum ERC20",
+      content: "Etherum (ETH)",
+      value: "Etherum (ETH)",
     },
     {
-      content: "Bitcoin BTC",
-      value: "Bitcoin BTC",
+      content: "Bitcoin (BTC)",
+      value: "Bitcoin (BTC)",
     },
     {
-      content: "USDT TRC20",
-      value: "USDT TRC20",
+      content: "USDT (TRC20)",
+      value: "USDT (TRC20)",
     },
     {
       content: "BNB",

@@ -21,8 +21,13 @@ import Spinner from "../../components/Spinner";
 export default function Wallet() {
   const [loading, setLoading] = useState(false);
   const [wallet, setWallet] = useState({ regions: [] });
+  const [check, setCheck] = useState(true);
 
   useEffect(() => {
+    if (!check) {
+      return;
+    }
+
     // Callback function to handle updates
     const handleUpdate = (data) => {
       setWallet(data);
@@ -34,8 +39,11 @@ export default function Wallet() {
     // Clean up the listener on component unmount
     return () => {
       unsubscribe();
+      setTimeout(() => {
+        setCheck(false);
+      }, 1000);
     };
-  }, [wallet]);
+  }, [wallet, check]);
 
   const [result, setResult] = useState({
     status: 0,
@@ -63,6 +71,7 @@ export default function Wallet() {
     const result = await addToCollectionArray("wallets", formData);
     setResult(result);
     setLoading(false);
+    setCheck(true);
   }
 
   function reset() {
@@ -78,30 +87,35 @@ export default function Wallet() {
 
   const categoryOptions = [
     {
-      content: "Etherum ERC20",
-      value: "Etherum ERC20",
+      content: "Trust Wallet",
+      value: "Trust Wallet",
     },
     {
-      content: "Bitcoin BTC",
-      value: "Bitcoin BTC",
+      content: "MetaMask",
+      value: "MetaMask",
     },
     {
-      content: "USDT TRC20",
-      value: "USDT TRC20",
+      content: "Atomic Wallet",
+      value: "Atomic Wallet",
     },
     {
-      content: "BNB",
-      value: "BNB",
+      content: "My Ether Wallet",
+      value: "MyEtherWallet",
+    },
+    {
+      content: "Coinbase Wallet",
+      value: "Coinbase Wallet",
     },
   ];
 
-  if (!wallet) {
-    return (
-      <div>
-        <Spinner />
-      </div>
-    );
-  }
+  // if (!wallet) {
+  //   return (
+  //     <div>
+  //       <Spinner />
+  //     </div>
+  //   );
+  // }
+
   return (
     <Container title={"Withdraw"}>
       <GradientDiv direction={"to bottom"} col1={"skyblue"} col2={"lightygray"}>
@@ -144,7 +158,9 @@ export default function Wallet() {
                       />
                     </div>
                   </div>
-                  <h1 className="">ACCEPTED WALLETS</h1>
+                  <h1 className="text-lg md:text-xl lg:text-2xl">
+                    ACCEPTED WALLETS
+                  </h1>
 
                   {/* <div>&times;</div> */}
                 </div>
@@ -198,7 +214,6 @@ export default function Wallet() {
               </div>
             </div>
           </form>
-
           <div className="mb-5 pb-5 flex items-center w-4/5 justify-center">
             <DataTable data={wallet.regions.slice(1)} />
           </div>

@@ -15,12 +15,16 @@ import GradientDiv from "../../components/vendor/Card/GradientDiv";
 
 export default function DashBoardLinks({ toggleSidebar, isOpen }) {
   return (
-    <GradientDiv col1="lightgray" col2="#dbf5b3" direction="to bottom">
-      <div className=" flex flex-col justify-evenly relative top-0 left-0 rounded-xl align-middle px-3 h-screen z-50 ">
+    <GradientDiv col1="darkgray" col2="#dbf5b3" direction="to top">
+      <div className=" flex flex-col justify-evenly w-full relative top-0 left-0 rounded-xl align-middle px-3 h-screen z-50 ">
         <div className="flex gap-3 items-center max-h-2 ">
-          <Link to={"/"} className="flex gap-2">
+          <Link
+            to={"/"}
+            onClick={toggleSidebar}
+            className="flex gap-2 items-center w-full"
+          >
             <img src={logo} alt="logo" width={50} height={20} />
-            <p className="text-blue-500 text-xl font-bold hidden md:block">
+            <p className="text-blue-500 text-xl font-bold block">
               {" "}
               {general.name}
             </p>
@@ -50,57 +54,64 @@ export default function DashBoardLinks({ toggleSidebar, isOpen }) {
           to="/dashboard/"
           className=" px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
           title="Home"
+          onClick={toggleSidebar}
         >
           <HomeImg className="w-6 h-auto" />
-          <span className="hidden md:block text-xl">Dashboard</span>
+          <span className="block">Dashboard</span>
         </Link>
         <Link
           to={"/dashboard/upload"}
           className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
           title="Upload NFT"
+          onClick={toggleSidebar}
         >
           <UploadImg className="w-6 h-auto" />
-          <p className="hidden md:block">Upload NFTs</p>
+          <p className="block">Upload NFTs</p>
         </Link>
         <Link
           to={"/dashboard/minted"}
           className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
           title="Minted NFTs"
+          onClick={toggleSidebar}
         >
           <MintedImg className="w-6 h-auto" />
-          <p className="hidden md:block">Minted NFTs</p>
+          <p className="block">Minted NFTs</p>
         </Link>
         <Link
           to={"/dashboard/deposit"}
           className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
           title="Deposit"
+          onClick={toggleSidebar}
         >
           <DepositImg className="w-6 h-auto" />
-          <p className="hidden md:block">Deposit</p>
+          <p className="block">Deposit</p>
         </Link>
         <Link
           to={"/dashboard/withdraw"}
           className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
           title="Withdraw"
+          onClick={toggleSidebar}
         >
           <WithdrawImg className="w-6 h-auto" />
-          <p className="hidden md:block">Withdraw</p>
+          <p className="block">Withdraw</p>
         </Link>
         <Link
           to={"/dashboard/buy"}
           className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
           title="Buy NFT"
+          onClick={toggleSidebar}
         >
           <BuyImg className="w-6 h-auto" />
-          <p className="hidden md:block">BUY NFT</p>
+          <p className="block">BUY NFT</p>
         </Link>
         <Link
           to={"/dashboard/profile"}
           className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
           title="My Profile"
+          onClick={toggleSidebar}
         >
           <ProfileImg className="w-6 h-auto" />
-          <p className="hidden md:block">My Profile</p>
+          <p className="block">My Profile</p>
         </Link>
         <hr className="m-0 p-0" />
         <button
@@ -109,7 +120,7 @@ export default function DashBoardLinks({ toggleSidebar, isOpen }) {
           title="Log Out"
         >
           <LogoutImg className="w-6 h-fit" />
-          <p className="hidden md:block">Log Out</p>
+          <p className="block">Log Out</p>
         </button>
       </div>
     </GradientDiv>

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Logo from "./Logo";
 import { useLocation } from "react-router-dom";
 
-export default function Links({ toggle }) {
+export default function Links({ toggle, toggleSidebar }) {
   const location = useLocation();
   const [containsAuth, setContainsAuth] = useState(false);
 
@@ -22,6 +22,7 @@ export default function Links({ toggle }) {
           <Link
             to={"/"}
             style={offDisplay}
+            onClick={toggleSidebar}
             className="hover:bg-primary-light font-bold  dark:hover:bg-primary-dark px-3 py-2 rounded-md"
           >
             Home
@@ -29,6 +30,7 @@ export default function Links({ toggle }) {
           <Link
             to={"/explore"}
             style={offDisplay}
+            onClick={toggleSidebar}
             className="hover:bg-primary-light font-bold dark:hover:bg-primary-dark px-3 py-2 rounded-md"
           >
             Explore
@@ -36,6 +38,7 @@ export default function Links({ toggle }) {
           <Link
             to={"/about"}
             style={offDisplay}
+            onClick={toggleSidebar}
             className="hover:bg-primary-light font-bold dark:hover:bg-primary-dark px-3 py-2 rounded-md"
           >
             About
@@ -43,18 +46,21 @@ export default function Links({ toggle }) {
           <Link
             to={"/contact"}
             style={offDisplay}
+            onClick={toggleSidebar}
             className="hover:bg-primary-light font-bold dark:hover:bg-primary-dark px-3 py-2 rounded-md"
           >
             Contact
           </Link>
           <Link
             to={"/auth/login"}
+            onClick={toggleSidebar}
             className="hover:bg-primary-light font-bold dark:hover:bg-primary-dark px-3 py-2 rounded-md"
           >
             Login
           </Link>
           <Link
             to={"/auth/register"}
+            onClick={toggleSidebar}
             className="hover:bg-primary-light font-bold dark:hover:bg-primary-dark px-3 py-2 rounded-md"
           >
             Register
@@ -66,36 +72,42 @@ export default function Links({ toggle }) {
           <Logo />
           <Link
             to={"/"}
+            onClick={toggleSidebar}
             className="block px-4 py-2 hover:bg-primary-light font-bold dark:hover:bg-primary-dark   rounded-md"
           >
             Home
           </Link>
           <Link
             to={"/explore"}
+            onClick={toggleSidebar}
             className="block px-4 py-2 hover:bg-primary-light font-bold dark:hover:bg-primary-dark rounded-md"
           >
             Explore
           </Link>
           <Link
             to={"/about"}
+            onClick={toggleSidebar}
             className="block px-4 py-2 hover:bg-primary-light font-bold dark:hover:bg-primary-dark rounded-md"
           >
             About
           </Link>
           <Link
             to={"/contact"}
+            onClick={toggleSidebar}
             className="block px-4 py-2 hover:bg-primary-light font-bold dark:hover:bg-primary-dark rounded-md"
           >
             Contact
           </Link>
           <Link
             to={"/auth/login"}
+            onClick={toggleSidebar}
             className="block px-4 py-2 bg-blue-400 text-white rounded-md w-100 h-30 "
           >
             Login
           </Link>
           <Link
             to={"/auth/register"}
+            onClick={toggleSidebar}
             className="block px-4 py-2 text-dark border-2 border-blue-400 rounded-md "
           >
             Register

@@ -53,7 +53,6 @@ export default function Deposit() {
       setDepsoit(data);
     };
 
-    console.log("here");
     // Start listening for updates
     const unsubscribe = getUpdatedDocument("deposits", handleUpdate);
 
@@ -68,21 +67,21 @@ export default function Deposit() {
 
   const categoryOptions = [
     {
-      content: "Etherum ERC20",
+      content: "Etherum (ETH)",
       value: "0x3ab73CB5Ebe9Dd092E7Ee43eF9778fC0e8A29e91",
     },
     {
-      content: "Bitcoin BTC",
+      content: "Bitcoin (BTC)",
       value: "34hfes2BmfdnXP74BUZCMnnHfXWPhyYnXz",
     },
-    {
-      content: "USDT TRC20",
-      value: "TPwUeQBX4F74KQ42P1ko2bhqdtMcg8KuT1",
-    },
-    {
-      content: "BNB",
-      value: "0x81a92f6A577dfd88a055951489eC59Ae5253DD6A",
-    },
+    // {
+    //   content: "USDT (TRC20)",
+    //   value: "TPwUeQBX4F74KQ42P1ko2bhqdtMcg8KuT1",
+    // },
+    // {
+    //   content: "BNB",
+    //   value: "0x81a92f6A577dfd88a055951489eC59Ae5253DD6A",
+    // },
   ];
 
   const handleFileChange = () => {
@@ -98,9 +97,7 @@ export default function Deposit() {
       for (const file of refInput.current.files) {
         if (file.size <= maxSize) {
           dt.items.add(file);
-          console.log(dt.files);
         } else {
-          console.log("not");
           return setResult({
             status: 500,
             message: "File size exceeds limit",
@@ -137,6 +134,12 @@ export default function Deposit() {
     setResult(result);
     setCheck(true);
     setLoading(false);
+    setFormData({
+      wallet: "",
+      amount: "",
+      file: [],
+      status: false,
+    });
   }
 
   return (
@@ -203,7 +206,7 @@ export default function Deposit() {
           </form>
         </div>
         <div className="mb-5 pb-5 flex items-center w-4/5 justify-center">
-          <DataTable data={deposit.regions.slice(1)} />
+          <DataTable data={deposit.regions.slice(0)} />
         </div>
       </div>
     </Container>

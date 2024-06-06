@@ -90,9 +90,9 @@ const DashboardNav = () => {
       {/* side bar        */}
 
       <div
-        className={`relative border-r-4  border-blue-300 z-10 bottom-16 left-0 h-full w-16  md:w-30vw bg-background-light dark:bg-background-dark   transform ${
+        className={`relative border-r-4  border-blue-300 z-10 bottom-16 left-0 h-full w-[35vw] bg-background-light dark:bg-background-dark   transform ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 ease-in-out lg:hidden`}
+        } transition-transform duration-300 ease-in-out`}
       >
         <DashBoardLinks toggleSidebar={toggleSidebar} />
       </div>

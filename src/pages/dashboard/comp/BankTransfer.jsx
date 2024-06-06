@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useAppState } from "../../../AppStateContext";
+import React, { useState } from "react";
 import Container from "../../../components/Container";
 import GradientDiv from "../../../components/vendor/Card/GradientDiv";
 import Alert from "../../../components/vendor/alert/Alert";
@@ -43,6 +42,7 @@ export default function BankTransfer({ setCheck, withdraw }) {
     setResult(result);
     setCheck(true);
     setLoading(false);
+    reset();
   }
 
   function reset() {

@@ -35,7 +35,7 @@ export default function Withdraw() {
       }, 1000);
     };
   }, [withdraw, check]);
-  console.log(withdraw);
+
   return (
     <div className="container mx-auto p-4">
       <Tabs>
@@ -54,7 +54,7 @@ export default function Withdraw() {
           }
         >
           <BankTransfer
-            withdraw={filterArray(withdraw.regions.slice(1), "bank")}
+            withdraw={filterArray(withdraw.regions.slice(0), "bank")}
             setCheck={setCheck}
           />
         </Tab>
@@ -71,7 +71,7 @@ export default function Withdraw() {
           }
         >
           <CryptoTransfer
-            withdraw={filterArray(withdraw.regions.slice(1), "crypto")}
+            withdraw={filterArray(withdraw.regions.slice(0), "crypto")}
             setCheck={setCheck}
           />
         </Tab>

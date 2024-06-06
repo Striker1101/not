@@ -122,12 +122,14 @@ export default function Upload() {
 
   function reset() {
     setFormData({
-      creator_name: "",
+      id: uuidv4(),
+      creator: "",
       collection_name: "",
       file: [],
       category: "",
       price: "",
-      describe: "",
+      des: "",
+      status: false,
     });
   }
 
@@ -138,6 +140,7 @@ export default function Upload() {
     setResult(result);
     setCheck(true);
     setLoading(false);
+    reset();
   }
 
   return (
@@ -228,7 +231,7 @@ export default function Upload() {
         </form>
 
         <div className="mb-5 pb-5 flex items-center w-4/5 justify-center">
-          <DataTable data={NFT.regions.slice(1)} />
+          <DataTable data={NFT.regions.slice(0)} />
         </div>
       </div>
     </Container>
