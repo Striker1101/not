@@ -54,7 +54,6 @@ export default function Deposit() {
     };
 
     console.log("here");
-    oõ;
     // Start listening for updates
     const unsubscribe = getUpdatedDocument("deposits", handleUpdate);
 
