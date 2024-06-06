@@ -13,7 +13,7 @@ const CreatorCard = ({ imgSrc, title, price }) => {
           {title}
         </h2>
         <p className="text-lg text-gray-700 dark:text-gray-300">
-          Price: ${price}
+          Price: {price}
         </p>
       </div>
     </div>

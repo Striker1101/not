@@ -19,7 +19,7 @@ const AuctionCard = ({ item, title, bid }) => {
       <h2 className="text-lg font-semibold mb-2">{title}</h2>
       <div className="p-4 w-full">
         <button className=" flex p-5 items-center justify-center align-middle bg-gray-400 hover:bg-blue-500 font-bold rounded-xl transition-colors duration-300 min-w-full">
-          <p className="text-xs  text-nowrap ">Current Bid: ${bid}</p>
+          <p className="text-xs  text-nowrap ">Current Bid: {bid}</p>
         </button>
       </div>
     </div>

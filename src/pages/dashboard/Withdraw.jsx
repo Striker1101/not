@@ -10,9 +10,10 @@ export default function Withdraw() {
   function filterArray(array, value, prop = "type") {
     return array.filter((item) => item[prop] === value);
   }
-  const [withdraw, setWithdraw] = useState([]);
+  const [withdraw, setWithdraw] = useState({ regions: [] });
   const [check, setCheck] = useState(true);
   useEffect(() => {
+    console.log(check);
     if (!check) {
       return;
     }
@@ -22,6 +23,7 @@ export default function Withdraw() {
       setWithdraw(data);
     };
 
+    console.log("here");
     // Start listening for updates
     const unsubscribe = getUpdatedDocument("withdraws", handleUpdate);
 
@@ -33,7 +35,7 @@ export default function Withdraw() {
       }, 1000);
     };
   }, [withdraw, check]);
-
+  console.log(withdraw);
   return (
     <div className="container mx-auto p-4">
       <Tabs>
