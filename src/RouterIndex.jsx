@@ -40,7 +40,7 @@ export default function RouterIndex() {
         <Route
           path="/admin/*"
           element={
-            <ProtecteAdmin>
+            <ProtecteAdmin islogged={islogged}>
               <AdminIndex />
             </ProtecteAdmin>
           }

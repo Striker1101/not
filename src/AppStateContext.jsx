@@ -1,12 +1,9 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { check } from "./firebase/auth";
-import { getUserData } from "./firebase/firestore";
-import axios from "axios";
 
 // Create a context
 export const AppStateContext = createContext();
 
-const monk = process.env.REACT_APP_SPORTMONK;
 // Create a provider component
 export const AppStateProvider = ({ children }) => {
   const [message, setMessage] = useState({
@@ -17,6 +14,7 @@ export const AppStateProvider = ({ children }) => {
   const [islogged, setIsLogged] = useState({
     status: 0,
     message: "",
+    user: { uid: "" },
   });
 
   /**
