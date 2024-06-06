@@ -26,6 +26,7 @@ export default function Deposit() {
   const [deposit, setDepsoit] = useState({ regions: [] });
   const wallet = useRef(null);
   const [loading, setLoading] = useState(false);
+  const [check, setCheck] = useState(true);
   function handleChange(e) {
     const { name, value } = e.target;
     if (name === "wallet") {
@@ -43,19 +44,28 @@ export default function Deposit() {
   });
 
   useEffect(() => {
+    if (!check) {
+      return;
+    }
+
     // Callback function to handle updates
     const handleUpdate = (data) => {
       setDepsoit(data);
     };
 
+    console.log("here");
+    oõ;
     // Start listening for updates
     const unsubscribe = getUpdatedDocument("deposits", handleUpdate);
 
     // Clean up the listener on component unmount
     return () => {
       unsubscribe();
+      setTimeout(() => {
+        setCheck(false);
+      }, 1000);
     };
-  }, [deposit]);
+  }, [deposit, check]);
 
   const categoryOptions = [
     {
@@ -126,6 +136,7 @@ export default function Deposit() {
     setLoading(true);
     const result = await addToCollectionArray("deposits", formData);
     setResult(result);
+    setCheck(true);
     setLoading(false);
   }
 
@@ -135,7 +146,7 @@ export default function Deposit() {
         <div className="flex items-center gap-3 w-4/5 m-6 bg-purple-600 mx-4 rounded-t-xl p-3">
           <WarningImg width={50} />
           <p>
-            Please the only acceptes digital currency , {general.name} won't be
+            Please We only acceptes digital currency , {general.name} won't be
             liable for any loss of funds.
           </p>
         </div>

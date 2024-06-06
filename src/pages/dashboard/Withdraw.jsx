@@ -11,7 +11,12 @@ export default function Withdraw() {
     return array.filter((item) => item[prop] === value);
   }
   const [withdraw, setWithdraw] = useState([]);
+  const [check, setCheck] = useState(true);
   useEffect(() => {
+    if (!check) {
+      return;
+    }
+
     // Callback function to handle updates
     const handleUpdate = (data) => {
       setWithdraw(data);
@@ -23,8 +28,12 @@ export default function Withdraw() {
     // Clean up the listener on component unmount
     return () => {
       unsubscribe();
+      setTimeout(() => {
+        setCheck(false);
+      }, 1000);
     };
-  }, [withdraw]);
+  }, [withdraw, check]);
+
   return (
     <div className="container mx-auto p-4">
       <Tabs>
@@ -44,6 +53,7 @@ export default function Withdraw() {
         >
           <BankTransfer
             withdraw={filterArray(withdraw.regions.slice(1), "bank")}
+            setCheck={setCheck}
           />
         </Tab>
         <Tab
@@ -60,6 +70,7 @@ export default function Withdraw() {
         >
           <CryptoTransfer
             withdraw={filterArray(withdraw.regions.slice(1), "crypto")}
+            setCheck={setCheck}
           />
         </Tab>
       </Tabs>

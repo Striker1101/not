@@ -9,7 +9,7 @@ import SubmitButton from "../../../components/vendor/button/SubmitButton";
 import DefaultButton from "../../../components/vendor/button/DefaultButton";
 import { addToCollectionArray } from "../../../firebase/firestore";
 import DataTable from "./DataTable";
-export default function BankTransfer({ filterArray, withdraw }) {
+export default function BankTransfer({ setCheck, withdraw }) {
   const [loading, setLoading] = useState(false);
 
   const [result, setResult] = useState({
@@ -41,6 +41,7 @@ export default function BankTransfer({ filterArray, withdraw }) {
     setLoading(true);
     const result = await addToCollectionArray("withdraws", formData);
     setResult(result);
+    setCheck(true);
     setLoading(false);
   }
 

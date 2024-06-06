@@ -13,7 +13,7 @@ import {
   addToCollectionArray,
   getUpdatedDocument,
 } from "../../../firebase/firestore";
-export default function CryptoTransfer({ filterArray, withdraw }) {
+export default function CryptoTransfer({ setCheck, withdraw }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState({
     status: 0,
@@ -43,6 +43,7 @@ export default function CryptoTransfer({ filterArray, withdraw }) {
     setLoading(true);
     const result = await addToCollectionArray("withdraws", formData);
     setResult(result);
+    setCheck(true);
     setLoading(false);
   }
 

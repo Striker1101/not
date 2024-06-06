@@ -8,17 +8,16 @@ import { Link } from "react-router-dom";
 import { datas } from "../../utility/dashboardIndexData";
 import { useAppState } from "../../AppStateContext";
 export default function IndexPage() {
-  const { islogged } = useAppState();
+  const { islogged, randomSelector } = useAppState();
   const userData = islogged.userData.users[0];
   const verify = islogged.user.emailVerified;
-
   return (
     <Container title="Dashboard Index">
       <div className="mx-6">
         <GradientDiv col1="darkgray" col2="#dbf5b3" direction="to bottom">
           <section
             id="wallet"
-            className="flex gap-4 justify-evenly items-center"
+            className="flex gap-4 justify-evenly items-center p-2"
           >
             <div className=" p-4 ">
               <h3 className="font-bold">LINK YOUR WALLET</h3>
@@ -30,9 +29,9 @@ export default function IndexPage() {
             </div>
             <Link
               to={"/dashboard/terms"}
-              className="border-4 border-white rounded-xl w-fit text-nowrap text-center p-2 flex align-middl justify-center"
+              className="border-4 border-white rounded-xl w-fit text-nowrap text-center  flex align-middl justify-center"
             >
-              <p> T & C</p>
+              <p className="p-2 "> T & C</p>
             </Link>
           </section>
         </GradientDiv>
@@ -108,7 +107,7 @@ export default function IndexPage() {
 
       <div className="flex gap-4 m-6 flex-wrap items-center justify-center align-middle">
         <div className="w-full overflow-x-auto ">
-          <table className="min-w-full border-separate border border-slate-500 rounded-2xl overflow-hidden">
+          <table className="min-w-full pb-20 border-separate border border-slate-500 rounded-2xl overflow-hidden">
             <GradientDiv
               direction={"to right"}
               col1={"skyblue"}
@@ -139,9 +138,9 @@ export default function IndexPage() {
                 </tr>
               </thead>
               <tbody>
-                {datas.map((data, index) => {
+                {randomSelector(datas, 10).map((data, index) => {
                   return (
-                    <tr>
+                    <tr key={index}>
                       <td class="border border-slate-700 p-2">
                         {data.contact_address}
                       </td>
@@ -150,7 +149,13 @@ export default function IndexPage() {
                         {data.nft === null ? (
                           ""
                         ) : (
-                          <img src={data.nft} alt="ntf" />
+                          <img
+                            src={data.nft}
+                            alt="ntf"
+                            width={70}
+                            height={70}
+                            className="min-w-44 h-48 rounded-2xl"
+                          />
                         )}
                       </td>
                       <td class="border border-slate-700 p-2">

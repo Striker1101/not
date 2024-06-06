@@ -21,6 +21,7 @@ export default function Upload() {
     status: 0,
     message: null,
   });
+  const [check, setCheck] = useState(true);
 
   const [formData, setFormData] = useState({
     id: uuidv4(),
@@ -35,6 +36,9 @@ export default function Upload() {
 
   useEffect(() => {
     // Callback function to handle updates
+    if (!check) {
+      return;
+    }
     const handleUpdate = (data) => {
       setNFT(data);
     };
@@ -45,8 +49,11 @@ export default function Upload() {
     // Clean up the listener on component unmount
     return () => {
       unsubscribe();
+      setTimeout(() => {
+        setCheck(false);
+      }, 1000);
     };
-  }, [NFT]);
+  }, [NFT, check]);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -129,6 +136,7 @@ export default function Upload() {
     setLoading(true);
     const result = await addToCollectionArray("nfts", formData);
     setResult(result);
+    setCheck(true);
     setLoading(false);
   }
 
@@ -140,6 +148,16 @@ export default function Upload() {
           onSubmit={handleSubmit}
           className="w-2/3  bg-slate-200 dark:bg-slate-400 p-4 rounded-2xl"
         >
+          <div className="">
+            <h1 className="font-bold text-2xl">
+              Submit Yout NFT for Evaluation
+            </h1>
+            <p className="text-sm">NFT INFORMATION</p>
+          </div>
+          <h3 className="m-3 text-xl text-green-400">
+            NOTE GAS FEES OF ETH 0.10 WILL BE DEDUCTED FROM YOUR BALANCE FOR
+            YOUR FIRST UPLOAD
+          </h3>
           <Alert result={result} setResult={setResult} timer={false} />
           <div>
             <TextInput
