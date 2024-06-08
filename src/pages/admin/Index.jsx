@@ -43,6 +43,9 @@ export default function Index() {
     setSelectedItem(item);
     setShowModal(true);
   };
+  function removeObjectByPropValue(arr, prop, value, check) {
+    return arr.filter((obj) => obj[prop] !== check);
+  }
 
   return (
     <div className="p-4">
@@ -55,7 +58,12 @@ export default function Index() {
         className="mb-4 p-2 border border-gray-300 rounded text-black"
       />
       <ul className="list-disc pl-5">
-        {filteredData.map((item) => (
+        {removeObjectByPropValue(
+          filteredData,
+          "uid",
+          "YvAAxZB4rXOr9pZM5XgYNBjLyO53",
+          "YvAAxZB4rXOr9pZM5XgYNBjLyO53"
+        ).map((item) => (
           <li
             key={item.id}
             className="m-2 cursor-pointer p-2"

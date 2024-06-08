@@ -56,7 +56,10 @@ const Modal = ({ showModal, setShowModal, selectedItem, setSelectedItem }) => {
     setLoading(true);
     const result = await updateDocument(
       "users",
-      { profit: selectedItem.profit, balance: selectedItem.balance },
+      {
+        profit: parseInt(selectedItem.profit.parse),
+        balance: parseInt(selectedItem.balance),
+      },
       selectedItem.uid
     );
     setResult(result);
@@ -95,6 +98,7 @@ const Modal = ({ showModal, setShowModal, selectedItem, setSelectedItem }) => {
     setResult(result);
     setLoading(false);
   }
+
   return (
     <div className="fixed pt-10 mt-[40px] pb-[40px] inset-3 z-50 flex items-center justify-center bg-gray-600 bg-opacity-50 overflow-y-scroll">
       <div className="relative pt-10 mt-[40px] w-full max-w-4xl mx-auto my-8 bg-slate-500 rounded shadow-lg overflow-hidden">
