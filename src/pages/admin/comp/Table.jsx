@@ -1,12 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
+import ImageModal from "./ImageModal";
 
 const Table = ({ data, handleDelete, handleClick, collection, uid }) => {
+  const [showModal, setShowModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState([]);
   if (!data || data.length === 0) {
     return <p>No data available</p>;
   }
 
   const keys = Object.keys(data[0]);
-
+  const handleItemClick = (item) => {
+    setSelectedItem(item);
+    setShowModal(true);
+  };
   return (
     <div className="overflow-x-auto ">
       <table className="min-w-full ">
@@ -42,7 +48,13 @@ const Table = ({ data, handleDelete, handleClick, collection, uid }) => {
                     />
                   ) : typeof item[key] === "object" ? (
                     Array.isArray(item[key]) ? (
-                      <img src={item[key][0]} alt="" />
+                      <img
+                        src={item[key][0]}
+                        alt=""
+                        onClick={() => {
+                          handleItemClick(item[key]);
+                        }}
+                      />
                     ) : (
                       <p>{new Date(item[key].seconds).toLocaleString()}</p>
                     )
@@ -63,6 +75,16 @@ const Table = ({ data, handleDelete, handleClick, collection, uid }) => {
           ))}
         </tbody>
       </table>
+      {selectedItem.length > 0 && showModal ? (
+        <ImageModal
+          showModal={showModal}
+          setShowModal={setShowModal}
+          setSelectedItem={setSelectedItem}
+          selectedItem={selectedItem}
+        />
+      ) : (
+        ""
+      )}
     </div>
   );
 };

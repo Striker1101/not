@@ -100,7 +100,7 @@ const Modal = ({ showModal, setShowModal, selectedItem, setSelectedItem }) => {
       <div className="relative pt-10 mt-[40px] w-full max-w-4xl mx-auto my-8 bg-slate-500 rounded shadow-lg overflow-hidden">
         <div className="flex justify-end pt-10 mt-[40px]">
           <button
-            className="text-gray-600 hover:text-red-900 font-4xl "
+            className="text-gray-600 hover:text-red-900 text-4xl "
             onClick={close}
           >
             ✕
