@@ -85,7 +85,6 @@ const Modal = ({ showModal, setShowModal, selectedItem, setSelectedItem }) => {
   }
 
   async function handleClick(collection, documentID, index, data) {
-    console.group(collection, documentID, index, data);
     setLoading(true);
     const result = await updateDocumentArray(
       collection,
@@ -98,7 +97,7 @@ const Modal = ({ showModal, setShowModal, selectedItem, setSelectedItem }) => {
   }
   return (
     <div className="fixed pt-10 mt-[40px] pb-[40px] inset-3 z-50 flex items-center justify-center bg-gray-600 bg-opacity-50 overflow-y-scroll">
-      <div className="relative pt-10 mt-[40px] w-full max-w-4xl mx-auto my-8 bg-white rounded shadow-lg overflow-hidden">
+      <div className="relative pt-10 mt-[40px] w-full max-w-4xl mx-auto my-8 bg-slate-500 rounded shadow-lg overflow-hidden">
         <div className="flex justify-end pt-10 mt-[40px]">
           <button
             className="text-gray-600 hover:text-red-900 font-4xl "

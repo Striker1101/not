@@ -1,7 +1,6 @@
 import React from "react";
 
 const Table = ({ data, handleDelete, handleClick, collection, uid }) => {
-  console.log(data);
   if (!data || data.length === 0) {
     return <p>No data available</p>;
   }
