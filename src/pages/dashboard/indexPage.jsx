@@ -47,7 +47,7 @@ export default function IndexPage() {
             <div className="flex  p-4  items-center g-4 justify-evenly rounded-2xl">
               <div>
                 <div className="mr-4">
-                  <span className="font-bold">USD : </span>
+                  <span className="font-bold">ETH : </span>
                   <span className="font-bold">
                     {userData.balance.toFixed(2)}
                   </span>
@@ -68,7 +68,7 @@ export default function IndexPage() {
             <div className="flex  p-4  items-center g-4 justify-evenly rounded-2xl">
               <div>
                 <div className="mr-4">
-                  <span className="font-bold">USD : </span>
+                  <span className="font-bold">ETH: </span>
                   <span className="font-bold">
                     {userData.profit.toFixed(2)}
                   </span>

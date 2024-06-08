@@ -29,7 +29,7 @@ export default function Homepage() {
     <Container title={"HomePage"}>
       <section
         id="homeHeader"
-        className="flex align-middle justify-center flex-wrap md:flex-wrap md:flex-nowrap items-center p-10"
+        className="flex align-middle justify-center flex-wrap md:flex-wrap items-center p-10"
       >
         <div className="flex-1">
           <h1 className="font-bold text-5xl pt-12 pb-7 text-gradient">

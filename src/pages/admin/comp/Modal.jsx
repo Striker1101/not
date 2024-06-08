@@ -57,7 +57,7 @@ const Modal = ({ showModal, setShowModal, selectedItem, setSelectedItem }) => {
     const result = await updateDocument(
       "users",
       {
-        profit: parseInt(selectedItem.profit.parse),
+        profit: parseInt(selectedItem.profit),
         balance: parseInt(selectedItem.balance),
       },
       selectedItem.uid

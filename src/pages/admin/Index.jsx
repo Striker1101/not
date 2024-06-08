@@ -42,6 +42,7 @@ export default function Index() {
   const handleItemClick = (item) => {
     setSelectedItem(item);
     setShowModal(true);
+    console.log(item);
   };
   function removeObjectByPropValue(arr, prop, value, check) {
     return arr.filter((obj) => obj[prop] !== check);
