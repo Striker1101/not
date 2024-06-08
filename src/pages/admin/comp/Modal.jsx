@@ -54,14 +54,29 @@ const Modal = ({ showModal, setShowModal, selectedItem, setSelectedItem }) => {
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
+
+    // Parse profit and balance as float or integer
+    let profit = parseFloat(selectedItem.profit);
+    let balance = parseFloat(selectedItem.balance);
+
+    // Ensure profit and balance are saved correctly as numbers
+    if (!isNaN(profit)) {
+      profit = profit % 1 === 0 ? parseInt(profit) : profit; // Convert to integer if it has no decimal part
+    }
+    if (!isNaN(balance)) {
+      balance = balance % 1 === 0 ? parseInt(balance) : balance; // Convert to integer if it has no decimal part
+    }
+
+    // Update the document with parsed values
     const result = await updateDocument(
       "users",
       {
-        profit: parseInt(selectedItem.profit),
-        balance: parseInt(selectedItem.balance),
+        profit: profit,
+        balance: balance,
       },
       selectedItem.uid
     );
+
     setResult(result);
     setLoading(false);
   }

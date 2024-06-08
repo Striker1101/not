@@ -68,7 +68,7 @@ export default function NFTS({ title, placeholder, datas, card_holder, path }) {
       }
     });
   }
-  console.log(filteredData);
+
   return (
     <Container title={title}>
       <div className="minted-component mb-9">

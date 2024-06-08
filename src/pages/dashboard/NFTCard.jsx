@@ -108,7 +108,6 @@ const NFTCard = () => {
     const randomIndex = Math.floor(Math.random() * array.length);
     return array[randomIndex];
   }
-  console.log(islogged.user);
   const user = islogged.user;
   const creator = getRandomObject(creators);
   return (
