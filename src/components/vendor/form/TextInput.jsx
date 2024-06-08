@@ -50,7 +50,7 @@ const TextInput = ({
           handleChange(e);
         }}
         className={classNames(
-          `w-full px-4 py-2 rounded-t-xl bg-${bg}-300 border-b-2`,
+          `w-full px-4 py-2 rounded-t-xl bg-${bg}-300 border-b-2 text-background-dark`,
           "focus:outline-none",
           {
             "border-gray-300 dark:border-gray-700": !isFocused && isValid,

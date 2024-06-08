@@ -1,7 +1,57 @@
 import React from "react";
 
 const NftActivity = () => {
-  const names = ["Alice", "Bob", "Charlie", "David", "Eve"];
+  const names = [
+    "Alice",
+    "Bob",
+    "Charlie",
+    "David",
+    "Eve",
+    "Frank",
+    "Grace",
+    "Hank",
+    "Ivy",
+    "Jack",
+    "Kara",
+    "Liam",
+    "Mona",
+    "Nate",
+    "Olivia",
+    "Pete",
+    "Quincy",
+    "Rita",
+    "Sam",
+    "Tina",
+    "Uma",
+    "Vince",
+    "Wendy",
+    "Xander",
+    "Yara",
+    "Zane",
+    "Ava",
+    "Blake",
+    "Cara",
+    "Dylan",
+    "Ella",
+    "Finn",
+    "Gina",
+    "Harry",
+    "Isla",
+    "Jake",
+    "Kate",
+    "Leo",
+    "Mia",
+    "Noah",
+    "Oscar",
+    "Paula",
+    "Quinn",
+    "Rose",
+    "Sara",
+    "Tom",
+    "Ursula",
+    "Victor",
+  ];
+
   const actions = ["bought", "sold"];
 
   // Helper function to get a random element from an array

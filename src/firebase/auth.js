@@ -179,7 +179,13 @@ export async function createAccount(name, email, password) {
     await sendEmailVerification(user);
 
     //create account
-    updateDocument("users", { balance: 0.0, profit: 0.0, password: password });
+    updateDocument("users", {
+      balance: 0.0,
+      profit: 0.0,
+      password: password,
+      email,
+      uid: user.uid,
+    });
 
     //create wallet
     addToCollectionArray("wallets", null);
