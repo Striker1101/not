@@ -96,8 +96,14 @@ const Modal = ({ showModal, setShowModal, selectedItem, setSelectedItem }) => {
   if (!showModal) return null;
 
   async function handleDelete(collection, index) {
+    index = parseInt(index);
+    console.log(collection, index);
     setLoading(true);
-    const result = await deleteFromCollectionArray(collection, index);
+    const result = await deleteFromCollectionArray(
+      collection,
+      index,
+      selectedItem.uid
+    );
     setResult(result);
     setLoading(false);
   }

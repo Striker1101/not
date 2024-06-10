@@ -15,16 +15,17 @@ import inv3 from "../../resources/images/about/inv3.png";
 import inv4 from "../../resources/images/about/inv4.jpg";
 import inv5 from "../../resources/images/about/inv5.png";
 import inv6 from "../../resources/images/about/inv6.png";
+import { general } from "../../utility/general";
 
 export default function About() {
   return (
     <Container>
       <section className="flex  flex-col md:flex-row" id="about_header">
         <div className="w-fit">
-          <h1 className="font-bold text-3xl">The Premier Rear Sea</h1>
+          <h1 className="font-bold text-3xl">The Premier {general.name}</h1>
           <p className="m-2">
-            Rear Sea is the world’s most trusted marketplace and community to
-            discover, buy, and sell authentic NFTs from the world’s leading
+            {general.name} is the world’s most trusted marketplace and community
+            to discover, buy, and sell authentic NFTs from the world’s leading
             digital creators. We offer digital creators a trusted platform to
             sell their creations directly to fans and collectors worldwide.
           </p>
@@ -88,8 +89,8 @@ export default function About() {
             creators.
           </h2>
           <p className="p-5">
-            pRear Sea verifies every NFT to ensure authenticity and provenance
-            before anything is listed or sold..
+            {general.name} verifies every NFT to ensure authenticity and
+            provenance before anything is listed or sold..
           </p>
         </div>
         <div className="bg-blue-400 dark:bg-blue-600 p-5">

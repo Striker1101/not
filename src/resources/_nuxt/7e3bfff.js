@@ -1,3 +1,5 @@
+import { general } from "../../utility/general";
+
 (window.webpackJsonp = window.webpackJsonp || []).push([
     [55, 12, 14, 15], {
         669: function(t, e, r) {
@@ -604,13 +606,13 @@
                             return [{
                                 type: "up",
                                 title: "Set Up Your Wallet",
-                                description: "Set up your wallet and then you can create, sell & collect NFTs atRear Sea.",
+                                description: `Set up your wallet and then you can create, sell & collect NFTs at ${general.name}.`,
                                 color: "primary",
                                 icon: "mdi-wallet"
                             }, {
                                 type: "down",
                                 title: "Add Your NFTs",
-                                description: "After setting up your wallet, you can add your NFTs onRear Sea.",
+                                description: `After setting up your wallet, you can add your NFTs on  ${general.name}.`,
                                 color: "lime accent-3",
                                 iconColor: "black",
                                 icon: "mdi-grid-large"
@@ -672,7 +674,7 @@
                     },
                     head: function() {
                         return {
-                            title: "Rear Sea NFT MarketPlace",
+                            title: `${general.name} NFT MarketPlace`,
                             meta: [{
                                 hid: "description",
                                 name: "description"
@@ -951,8 +953,8 @@
                         staticClass: "d-flex align-center"
                     }, [e("span", {
                         staticClass: "text-h5 text-sm-h4 text3--text font-weight-bold ml-4"
-                    }, [t._v("HowRear Sea Works")]), t._v(" "), e("div", {
-                        staticClass: "ml-2 d-flex items-center"
+                    }, [t._v(`How ${general.name} Works")]), t._v(" "), e("div", {
+                        staticClass: "ml-2 d-flex items-center`
                     }, [e(n.a, {
                         staticClass: "ma-2",
                         class: "For Creators" === t.active2 ? "primary text-capitalize" : "grey lighten-3 grey--text text--darken-1",
@@ -1031,8 +1033,8 @@
                             md: "6"
                         }
                     }, [e("div", {
-                        staticClass: "playfair text-h4 text-sm-h3 text-capitalize textGradient font-weight-bold"
-                    }, [t._v("\n            Create, Sell & Collect NFTs at Rear Sea\n          ")]), t._v(" "), e("div", {
+                        staticClass: `playfair text-h4 text-sm-h3 text-capitalize textGradient font-weight-bold"
+                    }, [t._v("\n            Create, Sell & Collect NFTs at ${general.name}\n          `)]), t._v(" "), e("div", {
                         staticClass: "opacity text-subtitle-1 text-sm-h6 text1--text mt-3 font-weight-light"
                     }, [t._v("\n            Aliquam viverra enim commodo sed consequat tempor sit nisl cursus\n            lectus.\n          ")]), t._v(" "), e("div", {
                         staticClass: "mt-10",

@@ -143,14 +143,17 @@ export async function updateDocument(
   }
 }
 
-export async function deleteFromCollectionArray(collectionName, indexToDelete) {
+export async function deleteFromCollectionArray(
+  collectionName,
+  indexToDelete,
+  user = auth.currentUser.uid
+) {
   try {
-    const user = auth.currentUser;
     if (!user) {
       throw new Error("No user found. Please log in.");
     }
 
-    const docRef = doc(db, collectionName, user.uid);
+    const docRef = doc(db, collectionName, user);
 
     // Fetch the document
     const docSnap = await getDoc(docRef);
@@ -163,6 +166,7 @@ export async function deleteFromCollectionArray(collectionName, indexToDelete) {
     // Get the array to update
     const regions = data.regions || [];
 
+    console.log(indexToDelete, regions.length, data);
     // Check if the index is valid
     if (indexToDelete < 0 || indexToDelete >= regions.length) {
       throw new Error("Invalid index.");

@@ -72,7 +72,7 @@ export default function Register() {
 
           <div className="flex items-center flex-col gap-5">
             <h1 className="font-bold text-lg ">{general.name}</h1>
-            <p>Create An Account With Rear Sea NFT Marketplace</p>
+            <p>Create An Account With {general.name} NFT Marketplace</p>
             <TextInput
               handleChange={handleChange}
               placeholder={"Full Name"}

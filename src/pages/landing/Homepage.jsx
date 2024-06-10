@@ -9,6 +9,7 @@ import { faWallet } from "@fortawesome/free-solid-svg-icons/faWallet";
 import { faBorderAll } from "@fortawesome/free-solid-svg-icons";
 import { faCartPlus } from "@fortawesome/free-solid-svg-icons/faCartPlus";
 import { Link } from "react-router-dom";
+import { general } from "../../utility/general";
 
 export default function Homepage() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -102,7 +103,7 @@ export default function Homepage() {
       </section>
       <section id="howrear">
         <div className="flex items-center flex-col md:flex-row  align-middle text-center">
-          <h1 className="text-3xl font-bold  mb-8">HowRear Sea Works</h1>
+          <h1 className="text-3xl font-bold  mb-8">How {general.name} Works</h1>
           <BlueButton>For Creators</BlueButton>
 
           <DefaultButton>For Collections</DefaultButton>
@@ -111,9 +112,7 @@ export default function Homepage() {
         <div className="flex flex-wrap items-center justify-center w-full ">
           <ToggleCard
             toggle={true}
-            desc={
-              "Set up your wallet and then you can create, sell & collect NFTs atRear Sea."
-            }
+            desc={`Set up your wallet and then you can create, sell & collect NFTs at ${general.name} .`}
             title="Set Up Your Wallet"
             bg="blue"
             img={<FontAwesomeIcon icon={faWallet} />}
@@ -121,9 +120,7 @@ export default function Homepage() {
           />
           <ToggleCard
             toggle={false}
-            desc={
-              "After setting up your wallet, you can add your NFTs onRear Sea."
-            }
+            desc={`After setting up your wallet, you can add your NFTs on ${general.name}.`}
             title="Add Your NFTs"
             bg="lightgreen"
             img={<FontAwesomeIcon icon={faBorderAll} />}
@@ -141,7 +138,7 @@ export default function Homepage() {
         <div>
           <div className=" rounded-lg bg-gray-300 p-10 m-10 ">
             <h1 className="font-bold text-xl md:text-2xl xl:text-4xl  pt-12 pb-7 text-gradient w-1/2 md:w-1/3">
-              Create, Sell & Collect NFTs At Rear Sea
+              Create, Sell & Collect NFTs At {general.name}
             </h1>
             <p>
               Aliquam viverra enim commodo sed consequat tempor sit nisl cursus
