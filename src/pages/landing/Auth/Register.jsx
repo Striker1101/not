@@ -44,7 +44,7 @@ export default function Register() {
       });
       return;
     }
-    e.preventDefault();
+
     setLoading(true);
     const { name, email, password } = formData;
     const result = await createAccount(name, email, password);

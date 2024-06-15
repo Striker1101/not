@@ -56,7 +56,9 @@ const Table = ({ data, handleDelete, handleClick, collection, uid }) => {
                         }}
                       />
                     ) : (
-                      <p>{new Date(item[key].seconds).toLocaleString()}</p>
+                      <p>
+                        {new Date(item[key].seconds * 1000).toLocaleString()}
+                      </p>
                     )
                   ) : (
                     item[key]

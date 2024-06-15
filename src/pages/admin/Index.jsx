@@ -63,18 +63,21 @@ export default function Index() {
           "uid",
           "YvAAxZB4rXOr9pZM5XgYNBjLyO53",
           "YvAAxZB4rXOr9pZM5XgYNBjLyO53"
-        ).map((item) => (
-          <li
-            key={item.id}
-            className="m-2 cursor-pointer p-2"
-            onClick={() => handleItemClick(item)}
-          >
-            <div>
-              {item.email} - Updated At:{" "}
-              {new Date(item.updated_at.seconds * 1000).toLocaleString()}
-            </div>
-          </li>
-        ))}
+        ).map((item) => {
+          return (
+            <li
+              key={item.id}
+              className="m-2 cursor-pointer p-2"
+              onClick={() => handleItemClick(item)}
+            >
+              <div>
+                {item.name}
+                {item.email} - Updated At:{" "}
+                {new Date(item.updated_at.seconds * 1000).toLocaleString()}
+              </div>
+            </li>
+          );
+        })}
       </ul>
       {selectedItem.uid ? (
         <Modal

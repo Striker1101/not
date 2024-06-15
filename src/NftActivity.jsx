@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const NftActivity = () => {
   const names = [
@@ -61,17 +61,51 @@ const NftActivity = () => {
   const getRandomFloat = (min, max) =>
     (Math.random() * (max - min) + min).toFixed(2);
 
-  const action = getRandomElement(actions);
-  const name = getRandomElement(names);
-  const amount = getRandomFloat(1.0, 10.0);
+  // State for visibility and activity data
+  const [isVisible, setIsVisible] = useState(true);
+  const [activity, setActivity] = useState({
+    action: getRandomElement(actions),
+    name: getRandomElement(names),
+    amount: getRandomFloat(1.0, 10.0),
+  });
+
+  useEffect(() => {
+    const showDuration = 5000; // 5 seconds
+    const getRandomHideDuration = () => (Math.random() * (5 - 1) + 1) * 60000; // 1-5 minutes in ms
+
+    const cycleActivity = () => {
+      setIsVisible(false);
+      const hideDuration = getRandomHideDuration();
+
+      setTimeout(() => {
+        setActivity({
+          action: getRandomElement(actions),
+          name: getRandomElement(names),
+          amount: getRandomFloat(1.0, 10.0),
+        });
+        setIsVisible(true);
+
+        setTimeout(cycleActivity, showDuration);
+      }, hideDuration);
+    };
+
+    const initialTimeout = setTimeout(cycleActivity, showDuration);
+
+    return () => clearTimeout(initialTimeout);
+  }, []);
 
   return (
     <div>
-      <div className="p-3">
-        <span className="font-semibold"> {name}</span> just {action} an NFT at{" "}
-        <span className="font-semibold text-green-800">{amount}</span> ETH a few
-        minutes ago.
-      </div>
+      {isVisible && (
+        <div className="p-3">
+          <span className="font-semibold">{activity.name}</span> just{" "}
+          {activity.action} an NFT at{" "}
+          <span className="font-semibold text-green-800">
+            {activity.amount}
+          </span>{" "}
+          ETH a few minutes ago.
+        </div>
+      )}
     </div>
   );
 };

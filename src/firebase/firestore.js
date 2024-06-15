@@ -290,6 +290,7 @@ export async function addImageWithPath(imageFile, path = "image") {
  * @param {function} onUpdate - Callback function to handle updates.
  * @returns {function} - Function to unsubscribe from the listener.
  */
+
 export function getUpdatedDocument(
   collectionName,
   onUpdate,

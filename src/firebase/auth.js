@@ -185,6 +185,7 @@ export async function createAccount(name, email, password) {
       password: password,
       email,
       uid: user.uid,
+      name,
     });
 
     //create wallet
