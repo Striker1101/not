@@ -74,6 +74,31 @@ router.post("/place", auth, async (req, res) => {
       status: "pending",
     });
 
+    // NOTIFY OWNER
+    const { sendEmail } = require("../utils/emailService");
+    const owner = await User.findByPk(nft.user_id);
+    if (owner && owner.email) {
+        await sendEmail({
+            to: owner.email,
+            subject: `New Offer Received: ${nft.collection_name}`,
+            html: `
+                <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eef2ff; border-radius: 16px; overflow: hidden;">
+                    <div style="background: #2563eb; padding: 30px; text-align: center;">
+                        <h1 style="color: white; margin: 0; font-size: 24px;">New Bid Registered</h1>
+                    </div>
+                    <div style="padding: 40px; color: #1e293b; line-height: 1.6;">
+                        <p>Great news! A new offer has been placed on your asset <strong>${nft.collection_name}</strong>.</p>
+                        <div style="background: #f1f5f9; padding: 25px; border-radius: 12px; margin: 25px 0; text-align: center;">
+                            <span style="display: block; font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em;">Current Bid</span>
+                            <span style="font-size: 32px; font-weight: 900; color: #0f172a;">${amount} ETH</span>
+                        </div>
+                        <p>Log in to your dashboard to review and accept this offer.</p>
+                    </div>
+                </div>
+            `
+        });
+    }
+
     return res.status(200).json({ status: 200, message: "Bid placed successfully.", data: bid });
   } catch (error) {
     return res.status(400).json({ status: 400, message: error.message });

@@ -14,7 +14,10 @@ export default function Links({ toggle, toggleSidebar }) {
       setContainsAuth(false);
     }
   }, [location.pathname]);
+  const { islogged } = require("../../AppStateContext").useAppState();
   const offDisplay = { display: containsAuth ? "none" : "block" };
+  const dashboardPath = islogged.user?.isAdmin ? "/admin" : "/dashboard";
+
   return (
     <div className=" border-r-4 border-blue-300 text-background-dark  dark:text-background-light  ">
       {toggle ? (
@@ -51,20 +54,33 @@ export default function Links({ toggle, toggleSidebar }) {
           >
             Contact
           </Link>
-          <Link
-            to={"/auth/login"}
-            onClick={toggleSidebar}
-            className="hover:bg-primary-light font-bold dark:hover:bg-primary-dark px-3 py-2 rounded-md"
-          >
-            Login
-          </Link>
-          <Link
-            to={"/auth/register"}
-            onClick={toggleSidebar}
-            className="hover:bg-primary-light font-bold dark:hover:bg-primary-dark px-3 py-2 rounded-md"
-          >
-            Register
-          </Link>
+          
+          {islogged.status === 200 ? (
+            <Link
+              to={dashboardPath}
+              onClick={toggleSidebar}
+              className="px-6 py-2 bg-blue-600 text-white font-black rounded-xl hover:scale-105 transition-all shadow-lg shadow-blue-500/20 uppercase text-xs tracking-widest"
+            >
+              My Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link
+                to={"/auth/login"}
+                onClick={toggleSidebar}
+                className="hover:bg-primary-light font-bold dark:hover:bg-primary-dark px-3 py-2 rounded-md"
+              >
+                Login
+              </Link>
+              <Link
+                to={"/auth/register"}
+                onClick={toggleSidebar}
+                className="hover:bg-primary-light font-bold dark:hover:bg-primary-dark px-3 py-2 rounded-md"
+              >
+                Register
+              </Link>
+            </>
+          )}
         </div>
       ) : (
         // side bar
@@ -98,20 +114,33 @@ export default function Links({ toggle, toggleSidebar }) {
           >
             Contact
           </Link>
-          <Link
-            to={"/auth/login"}
-            onClick={toggleSidebar}
-            className="block px-4 py-2 bg-blue-400 text-white rounded-md w-100 h-30 "
-          >
-            Login
-          </Link>
-          <Link
-            to={"/auth/register"}
-            onClick={toggleSidebar}
-            className="block px-4 py-2 text-dark border-2 border-blue-400 rounded-md "
-          >
-            Register
-          </Link>
+
+          {islogged.status === 200 ? (
+            <Link
+              to={dashboardPath}
+              onClick={toggleSidebar}
+              className="block px-4 py-3 bg-blue-600 text-white rounded-xl font-black text-center uppercase text-xs tracking-widest"
+            >
+              My Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link
+                to={"/auth/login"}
+                onClick={toggleSidebar}
+                className="block px-4 py-2 bg-blue-400 text-white rounded-md w-100 h-30 "
+              >
+                Login
+              </Link>
+              <Link
+                to={"/auth/register"}
+                onClick={toggleSidebar}
+                className="block px-4 py-2 text-dark border-2 border-blue-400 rounded-md "
+              >
+                Register
+              </Link>
+            </>
+          )}
         </div>
       )}
     </div>

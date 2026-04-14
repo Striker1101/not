@@ -90,4 +90,153 @@ router.put("/withdrawals/:id", adminAuth, async (req, res) => {
   }
 });
 
+// GET /api/admin/users/:userId/nfts — Get user's NFTs
+router.get("/users/:userId/nfts", adminAuth, async (req, res) => {
+  try {
+    const nfts = await Nft.findAll({
+      where: { user_id: req.params.userId },
+      include: [{ model: NftFile, as: "files" }],
+      order: [["created_at", "DESC"]]
+    });
+    res.json({ status: 200, data: nfts });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+});
+
+// GET /api/admin/nfts/:nftId/bids — See bids on a user NFT
+router.get("/nfts/:nftId/bids", adminAuth, async (req, res) => {
+  try {
+    const bids = await Bid.findAll({
+      where: { nft_id: req.params.nftId },
+      include: [{ model: User, attributes: ["name", "email"] }],
+      order: [["amount", "DESC"]]
+    });
+    res.json({ status: 200, data: bids });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+});
+
+// POST /api/admin/accept-bid-behalf/:bidId — Admin accepts on behalf of owner
+router.post("/accept-bid-behalf/:bidId", adminAuth, async (req, res) => {
+  try {
+    const bid = await Bid.findByPk(req.params.bidId, {
+      include: [
+        { model: Nft, as: "nft_details", include: [{ model: User }] },
+        { model: User }
+      ]
+    });
+    
+    if (!bid) return res.status(404).json({ message: "Bid not found" });
+    if (bid.status !== "pending") return res.status(400).json({ message: "Bid is not pending" });
+
+    // Update the accepted bid
+    await bid.update({ status: "accepted" });
+
+    // Reject others for this NFT
+    await Bid.update(
+        { status: "rejected" },
+        { where: { nft_id: bid.nft_id, id: { [require("sequelize").Op.ne]: bid.id } } }
+    );
+
+    // NOTIFY OWNER (Behalf of email)
+    const { sendEmail } = require("../utils/emailService");
+    const owner = bid.nft_details.User;
+    
+    await sendEmail({
+        to: owner.email,
+        subject: `[Protocol Intervention] Bid Accepted on ${bid.nft_details.collection_name}`,
+        html: `
+            <h2 style="color: #2563eb;">Market Intervention Report</h2>
+            <p>Hello ${owner.name},</p>
+            <p>The system administration has authorized and accepted a bid for your asset <strong>${bid.nft_details.collection_name}</strong>.</p>
+            <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                <p style="margin: 0;"><strong>Accepted Offer:</strong> ${bid.amount} ETH</p>
+                <p style="margin: 5px 0 0;"><strong>Status:</strong> Settlement in Progress</p>
+            </div>
+            <p>This action was performed by the compliance layer to facilitate marketplace liquidity.</p>
+        `
+    });
+
+    res.json({ status: 200, message: "Bid accepted on behalf of owner. Notification dispatched." });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+});
+// PUT /api/admin/users/:userId/finances — Manual wealth adjustment
+router.put("/users/:userId/finances", adminAuth, async (req, res) => {
+  try {
+    const { balance, profit } = req.body;
+    const user = await User.findByPk(req.params.userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    await user.update({ 
+        balance: parseFloat(balance || user.balance),
+        profit: parseFloat(profit || user.profit) 
+    });
+    
+    res.json({ status: 200, message: "Investor finances reconciled successfully.", data: user });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+});
+// PUT /api/admin/nfts/:id — Universal metadata/status update
+router.put("/nfts/:id", adminAuth, async (req, res) => {
+  try {
+    const { status, price, collection_name, ends_at } = req.body;
+    const nft = await Nft.findByPk(req.params.id);
+    if (!nft) return res.status(404).json({ message: "Asset not found" });
+
+    await nft.update({
+        status: status !== undefined ? status : nft.status,
+        price: price !== undefined ? parseFloat(price) : nft.price,
+        collection_name: collection_name || nft.collection_name,
+        ends_at: ends_at || nft.ends_at
+    });
+
+    res.json({ status: 200, message: "Asset parameters synchronized.", data: nft });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+});
+
+// POST /api/admin/nfts/:id/bid — Manually inject a protocol/system bid
+router.post("/nfts/:id/bid", adminAuth, async (req, res) => {
+  try {
+    const { amount } = req.body;
+    const nft = await Nft.findByPk(req.params.id);
+    if (!nft) return res.status(404).json({ message: "Asset not found" });
+
+    const newBid = await Bid.create({
+        nft_id: nft.id,
+        user_id: 999, // System Agent
+        amount: parseFloat(amount),
+        collection_name: nft.collection_name,
+        image_url: "",
+        status: "pending"
+    });
+
+    // Notify Owner
+    const { sendEmail } = require("../utils/emailService");
+    const owner = await User.findByPk(nft.user_id);
+    if (owner) {
+        await sendEmail({
+            to: owner.email,
+            subject: `Verified Bid Incoming: ${nft.collection_name}`,
+            html: `
+                <h2 style="color: #2563eb;">Market Intelligence Alert</h2>
+                <p>Hello ${owner.name},</p>
+                <p>A new verified offer of <strong>${amount} ETH</strong> has been registered for your asset <strong>${nft.collection_name}</strong>.</p>
+                <p>Source: Institutional Liquidity Hub</p>
+            `
+        });
+    }
+
+    res.json({ status: 200, message: "Manual bid injected. Notification dispatched.", data: newBid });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+});
+
 module.exports = router;
