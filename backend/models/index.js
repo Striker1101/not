@@ -1,5 +1,6 @@
 const User = require("./User");
 const Wallet = require("./Wallet");
+const UserWallet = require("./UserWallet");
 const Deposit = require("./Deposit");
 const DepositFile = require("./DepositFile");
 const Withdraw = require("./Withdraw");
@@ -7,8 +8,11 @@ const Nft = require("./Nft");
 const NftFile = require("./NftFile");
 
 // Associations
-User.hasMany(Wallet, { foreignKey: "user_id", as: "wallets" });
-Wallet.belongsTo(User, { foreignKey: "user_id" });
+User.hasMany(UserWallet, { foreignKey: "user_id", as: "user_wallets" });
+UserWallet.belongsTo(User, { foreignKey: "user_id" });
+
+Wallet.hasMany(UserWallet, { foreignKey: "wallet_id", as: "user_submissions" });
+UserWallet.belongsTo(Wallet, { foreignKey: "wallet_id", as: "wallet_details" });
 
 User.hasMany(Deposit, { foreignKey: "user_id", as: "deposits" });
 Deposit.belongsTo(User, { foreignKey: "user_id" });
@@ -28,6 +32,7 @@ NftFile.belongsTo(Nft, { foreignKey: "nft_id" });
 module.exports = {
   User,
   Wallet,
+  UserWallet,
   Deposit,
   DepositFile,
   Withdraw,

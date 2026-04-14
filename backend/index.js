@@ -61,6 +61,21 @@ async function startServer() {
     await sequelize.sync({ alter: true });
     console.log("✅ Database tables synced successfully");
 
+    // Seed master wallets
+    const { Wallet: WalletModel } = require("./models");
+    const count = await WalletModel.count();
+    if (count === 0) {
+      await WalletModel.bulkCreate([
+        { wallet_name: "MetaMask", wallet_network: "Ethereum" },
+        { wallet_name: "Trust Wallet", wallet_network: "Multi-Chain" },
+        { wallet_name: "Coinbase Wallet", wallet_network: "Ethereum/Polygon" },
+        { wallet_name: "Atomic Wallet", wallet_network: "Multi-Chain" },
+        { wallet_name: "Phantom", wallet_network: "Solana/Ethereum" },
+        { wallet_name: "Binance Chain Wallet", wallet_network: "BSC" },
+      ]);
+      console.log("🌱 Master wallets seeded");
+    }
+
     // Serve Frontend build in production
     const frontendBuildPath = path.join(__dirname, "../frontend/build");
     app.use(express.static(frontendBuildPath));

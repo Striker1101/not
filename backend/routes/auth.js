@@ -1,7 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
-const { User, Wallet, Deposit, Withdraw, Nft, NftFile, DepositFile } = require("../models");
+const { User, Wallet, UserWallet, Deposit, Withdraw, Nft, NftFile, DepositFile } = require("../models");
 const auth = require("../middleware/auth");
 
 const router = express.Router();
@@ -98,7 +98,11 @@ router.get("/check", auth, async (req, res) => {
     const userId = user.id;
 
     // Fetch all related data
-    const wallets = await Wallet.findAll({ where: { user_id: userId }, order: [["created_at", "DESC"]] });
+    const wallets = await UserWallet.findAll({
+      where: { user_id: userId },
+      include: [{ model: Wallet, as: "wallet_details" }],
+      order: [["created_at", "DESC"]],
+    });
     const deposits = await Deposit.findAll({
       where: { user_id: userId },
       include: [{ model: DepositFile, as: "files" }],

@@ -67,13 +67,13 @@ export function check() {
           userData: data.userData,
         });
       } else {
-        resolve({ status: 201, message: "User is signed out" });
+        resolve({ status: 201, message: "User is signed out", user: {} });
       }
     } catch (error) {
       // If token is invalid, user is signed out
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      resolve({ status: 201, message: "User is signed out" });
+      resolve({ status: 201, message: "User is signed out", user: {} });
     }
   });
 }

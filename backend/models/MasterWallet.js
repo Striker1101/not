@@ -1,27 +1,31 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-const Wallet = sequelize.define(
-  "Wallet",
+const MasterWallet = sequelize.define(
+  "MasterWallet",
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-    wallet_name: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    wallet_network: {
+    network: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    icon: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
-    tableName: "wallets",
+    tableName: "master_wallets",
     timestamps: false,
   }
 );
 
-module.exports = Wallet;
+module.exports = MasterWallet;

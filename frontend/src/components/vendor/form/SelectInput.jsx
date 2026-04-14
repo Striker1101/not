@@ -6,70 +6,56 @@ const SelectInput = ({
   handleChange,
   name,
   value,
-  bg = "blue",
   required = false,
   options = [],
+  className = "",
 }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [isValid, setIsValid] = useState(true);
-
-  const handleFocus = () => setIsFocused(true);
-  const handleBlur = (e) => {
-    setIsFocused(false);
-    validateInput(e.target.value);
-  };
-
-  const validateInput = (inputValue) => {
-    // Example validation: input should not be empty
-    setIsValid(inputValue.trim() !== "");
-  };
 
   return (
-    <div className="relative w-full mb-6">
+    <div className="relative w-full">
       <select
-        onFocus={handleFocus}
-        autoComplete
-        autoCorrect
-        rows={5}
-        defaultValue={value}
         name={name}
-        onBlur={handleBlur}
-        onChange={(e) => {
-          validateInput(e.target.value);
-          handleChange(e);
-        }}
+        value={value}
         required={required}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        onChange={handleChange}
         className={classNames(
-          `w-full px-4 py-2 h-10 rounded-t-xl bg-${bg}-300 border-b-2`,
-          "focus:outline-none",
-          {
-            "border-gray-300 dark:border-gray-700": !isFocused && isValid,
-            "border-black dark:border-white": isFocused,
-            "border-red-500": !isValid,
-          }
+          "w-full px-5 py-4 rounded-2xl bg-white/5 border-2 transition-all duration-200 outline-none appearance-none cursor-pointer",
+          "text-gray-900 dark:text-white font-medium",
+          isFocused 
+            ? "border-blue-500 ring-4 ring-blue-500/10" 
+            : "border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700",
+          className
         )}
-        placeholder=" "
       >
-        <option value=""></option>
-        {options.map((option, index) => {
-          return (
-            <option key={index} value={option.value}>
-              {option.content}
-            </option>
-          );
-        })}
+        <option value="" disabled className="bg-white dark:bg-[#0f172a] text-gray-400">
+          {placeholder || "Select an option"}
+        </option>
+        {options.map((option, index) => (
+          <option 
+            key={index} 
+            value={option.value} 
+            className="bg-white dark:bg-[#0f172a] text-gray-900 dark:text-white py-2"
+          >
+            {option.content}
+          </option>
+        ))}
       </select>
-      <label
-        className={classNames(
-          "absolute left-4 bottom-6 text-sm text-gray-500 transition-all",
-          {
-            "top-0 text-xs text-blue-500": isFocused || !isValid,
-            "text-red-500": !isValid,
-          }
-        )}
-      >
-        {placeholder}
-      </label>
+      
+      {/* Custom dropdown arrow */}
+      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+
+      {value && (
+        <label className="absolute -top-2.5 left-4 px-2 bg-white dark:bg-[#0f172a] text-[10px] font-black uppercase tracking-widest text-blue-500 rounded-md">
+          {placeholder}
+        </label>
+      )}
     </div>
   );
 };

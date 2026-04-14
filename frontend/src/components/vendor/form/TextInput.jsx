@@ -10,71 +10,57 @@ const TextInput = ({
   type,
   password = false,
   required = false,
-  bg = "blue",
+  className = "",
 }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [isValid, setIsValid] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleFocus = () => setIsFocused(true);
-  const handleBlur = (e) => {
-    setIsFocused(false);
-    validateInput(e.target.value);
-  };
-
-  const validateInput = (inputValue) => {
-    // Example validation: input should not be empty
-    setIsValid(inputValue.trim() !== "");
-  };
-
-  const handlePasswordDisplay = () => {
-    if (type === "password") {
-      type = "text";
-    } else {
-      type = "password";
-    }
-  };
+  const inputType = password ? (showPassword ? "text" : "password") : type;
 
   return (
-    <div className="relative w-full mb-6">
+    <div className="relative w-full">
       <input
-        type={type}
-        onFocus={handleFocus}
-        autoComplete
-        autoCorrect
-        defaultValue={value}
-        required={required}
+        type={inputType}
         name={name}
-        onBlur={handleBlur}
-        onChange={(e) => {
-          validateInput(e.target.value);
-          handleChange(e);
-        }}
+        value={value}
+        required={required}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        onChange={handleChange}
+        placeholder={placeholder}
         className={classNames(
-          `w-full px-4 py-2 rounded-t-xl bg-${bg}-300 border-b-2 text-background-dark`,
-          "focus:outline-none",
-          {
-            "border-gray-300 dark:border-gray-700": !isFocused && isValid,
-            "border-black dark:border-white": isFocused,
-            "border-red-500": !isValid,
-          }
+          "w-full px-5 py-4 rounded-2xl bg-white/5 border-2 transition-all duration-200 outline-none",
+          "text-gray-900 dark:text-white font-medium placeholder:text-gray-400 dark:placeholder:text-gray-500",
+          isFocused 
+            ? "border-blue-500 ring-4 ring-blue-500/10 shadow-lg" 
+            : "border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700",
+          className
         )}
-        placeholder=" "
       />
-      <PasswordToggle
-        type={password}
-        handlePasswordDisplay={handlePasswordDisplay}
-      />
-      <label
-        className={classNames(
-          "absolute left-4 bottom-6 text-sm text-gray-500 transition-all",
-          {
-            "top-0 text-xs text-blue-500": isFocused || !isValid,
-            "text-red-500": !isValid,
-          }
-        )}
-      >
-        {placeholder}
-      </label>
+      
+      {password && (
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-5 top-1/2 -translate-y-1/2 p-1.5 focus:outline-none text-gray-400 hover:text-blue-500 transition-colors"
+        >
+          {showPassword ? (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          ) : (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+            </svg>
+          )}
+        </button>
+      )}
+
+      {value && (
+        <label className="absolute -top-2.5 left-4 px-2 bg-white dark:bg-[#0f172a] text-[10px] font-black uppercase tracking-widest text-blue-500 rounded-md">
+          {placeholder}
+        </label>
+      )}
     </div>
   );
 };

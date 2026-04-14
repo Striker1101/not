@@ -1,19 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Spinner from "../../components/Spinner";
+import { useNavigate } from "react-router-dom";
 
 export default function ProtecteDashboard({ children, islogged }) {
-  if (islogged.status === 201) {
-    window.location.href = "/auth/login";
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (islogged.status === 201) {
+      navigate("/auth/login");
+    }
+  }, [islogged.status, navigate]);
+
+  if (islogged.status === 0) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
   }
+
+  if (islogged.status === 200) {
+    return <>{children}</>;
+  }
+
   return (
-    <div>
-      {islogged === undefined || islogged === false ? (
-        <Spinner />
-      ) : islogged.status === 200 ? (
-        children
-      ) : (
-        <Spinner />
-      )}
+    <div className="h-screen flex items-center justify-center">
+      <Spinner />
     </div>
   );
 }

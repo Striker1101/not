@@ -8,8 +8,10 @@ import { Link } from "react-router-dom";
 
 export default function IndexPage() {
   const { islogged, randomSelector } = useAppState();
-  const userData = islogged.userData.users[0];
-  const verify = islogged.user.emailVerified;
+  
+  // Safe extraction of user data
+  const userData = islogged.userData?.users?.[0] || { balance: 0, profit: 0 };
+  const verify = islogged.user?.emailVerified || false;
 
   const stats = [
     {

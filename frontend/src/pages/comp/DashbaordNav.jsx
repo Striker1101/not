@@ -72,7 +72,7 @@ const DashboardNav = () => {
           
           <div className="flex items-center gap-2">
              <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-blue-500/30">D</div>
-             <h1 className="text-lg font-bold gradient-text hidden sm:block">Dashboard</h1>
+             <h1 className="text-lg font-bold gradient-text hidden sm:block leading-none">Dashboard</h1>
           </div>
         </div>
 
@@ -97,7 +97,7 @@ const DashboardNav = () => {
               )}
             </button>
 
-            {islogged.user.uid === "YvAAxZB4rXOr9pZM5XgYNBjLyO53" ? (
+            {islogged.user?.uid === "YvAAxZB4rXOr9pZM5XgYNBjLyO53" ? (
               <Link to={"/admin/"} className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
                 <FontAwesomeIcon icon="fa-solid fa-gears" className="text-blue-500 text-lg" spin />
               </Link>
