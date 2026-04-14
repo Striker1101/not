@@ -1,8 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+
 import { ReactComponent as HomeImg } from "../../resources/images/dashboard/nav/house-solid.svg";
-import logo from "../../resources/broken.svg";
-import { general } from "../../utility/general";
 import { ReactComponent as UploadImg } from "../../resources/images/dashboard/nav/file-export-solid.svg";
 import { ReactComponent as MintedImg } from "../../resources/images/dashboard/nav/magnifying-glass-dollar-solid.svg";
 import { ReactComponent as DepositImg } from "../../resources/images/dashboard/nav/money-bill-transfer-solid.svg";
@@ -11,118 +8,44 @@ import { ReactComponent as BuyImg } from "../../resources/images/dashboard/nav/c
 import { ReactComponent as ProfileImg } from "../../resources/images/dashboard/nav/user-pen-solid.svg";
 import { ReactComponent as LogoutImg } from "../../resources/images/dashboard/nav/right-from-bracket-solid.svg";
 import { logout } from "../../api/auth";
-import GradientDiv from "../../components/vendor/Card/GradientDiv";
+import { Link } from "react-router-dom";
 
-export default function DashBoardLinks({ toggleSidebar, isOpen }) {
+export default function DashBoardLinks({ toggleSidebar }) {
+  const links = [
+    { to: "/dashboard/", label: "Dashboard", Icon: HomeImg },
+    { to: "/dashboard/upload", label: "Upload NFTs", Icon: UploadImg },
+    { to: "/dashboard/minted", label: "Minted NFTs", Icon: MintedImg },
+    { to: "/dashboard/deposit", label: "Deposit", Icon: DepositImg },
+    { to: "/dashboard/withdraw", label: "Withdraw", Icon: WithdrawImg },
+    { to: "/dashboard/buy", label: "Buy NFT", Icon: BuyImg },
+    { to: "/dashboard/profile", label: "My Profile", Icon: ProfileImg },
+  ];
+
   return (
-    <GradientDiv col1="darkgray" col2="#dbf5b3" direction="to top">
-      <div className=" flex flex-col justify-evenly w-full relative top-0 left-0 rounded-xl align-middle px-3 h-screen z-50 ">
-        <div className="flex gap-3 items-center max-h-2 ">
+    <div className="flex flex-col h-full bg-white dark:bg-[#0f172a]">
+      <div className="p-6 space-y-2 flex-grow overflow-y-auto">
+        {links.map((link) => (
           <Link
-            to={"/"}
+            key={link.to}
+            to={link.to}
             onClick={toggleSidebar}
-            className="flex gap-2 items-center w-full"
+            className="flex items-center gap-4 px-4 py-3 rounded-2xl text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 group"
           >
-            <img src={logo} alt="logo" width={50} height={20} />
-            <p className="text-blue-500 text-xl font-bold block">
-              {" "}
-              {general.name}
-            </p>
+            <link.Icon className="w-5 h-5 transition-transform group-hover:scale-110" />
+            <span className="font-semibold">{link.label}</span>
           </Link>
-          <button
-            onClick={toggleSidebar}
-            className="focus:outline-none hidden md:block"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              ></path>
-            </svg>
-          </button>
-        </div>
-        <hr className="m-0 p-0" />
-        <Link
-          to="/dashboard/"
-          className=" px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-          title="Home"
-          onClick={toggleSidebar}
-        >
-          <HomeImg className="w-6 h-auto" />
-          <span className="block">Dashboard</span>
-        </Link>
-        <Link
-          to={"/dashboard/upload"}
-          className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-          title="Upload NFT"
-          onClick={toggleSidebar}
-        >
-          <UploadImg className="w-6 h-auto" />
-          <p className="block">Upload NFTs</p>
-        </Link>
-        <Link
-          to={"/dashboard/minted"}
-          className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-          title="Minted NFTs"
-          onClick={toggleSidebar}
-        >
-          <MintedImg className="w-6 h-auto" />
-          <p className="block">Minted NFTs</p>
-        </Link>
-        <Link
-          to={"/dashboard/deposit"}
-          className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-          title="Deposit"
-          onClick={toggleSidebar}
-        >
-          <DepositImg className="w-6 h-auto" />
-          <p className="block">Deposit</p>
-        </Link>
-        <Link
-          to={"/dashboard/withdraw"}
-          className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-          title="Withdraw"
-          onClick={toggleSidebar}
-        >
-          <WithdrawImg className="w-6 h-auto" />
-          <p className="block">Withdraw</p>
-        </Link>
-        <Link
-          to={"/dashboard/buy"}
-          className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-          title="Buy NFT"
-          onClick={toggleSidebar}
-        >
-          <BuyImg className="w-6 h-auto" />
-          <p className="block">BUY NFT</p>
-        </Link>
-        <Link
-          to={"/dashboard/profile"}
-          className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-          title="My Profile"
-          onClick={toggleSidebar}
-        >
-          <ProfileImg className="w-6 h-auto" />
-          <p className="block">My Profile</p>
-        </Link>
-        <hr className="m-0 p-0" />
+        ))}
+      </div>
+
+      <div className="p-6 border-t border-gray-100 dark:border-gray-800">
         <button
           onClick={logout}
-          className="px-1 max-h-2 flex flex-row gap-3 items-center md:justify-center"
-          title="Log Out"
+          className="flex items-center gap-4 w-full px-4 py-3 rounded-2xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors duration-200"
         >
-          <LogoutImg className="w-6 h-fit" />
-          <p className="block">Log Out</p>
+          <LogoutImg className="w-5 h-5" />
+          <span className="font-semibold">Log Out</span>
         </button>
       </div>
-    </GradientDiv>
+    </div>
   );
 }

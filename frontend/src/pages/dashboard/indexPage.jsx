@@ -1,183 +1,165 @@
-import React from "react";
-import GradientDiv from "../../components/vendor/Card/GradientDiv";
+import { datas } from "../../utility/dashboardIndexData";
+import { useAppState } from "../../AppStateContext";
 import Container from "../../components/Container";
 import { ReactComponent as MoneyImg } from "../../resources/images/dashboard/index/money-check-dollar-svgrepo-com.svg";
 import { ReactComponent as ProfitImg } from "../../resources/images/dashboard/index/profit-svgrepo-com.svg";
 import { ReactComponent as AccountImg } from "../../resources/images/dashboard/index/account-arrows-svgrepo-com.svg";
 import { Link } from "react-router-dom";
-import { datas } from "../../utility/dashboardIndexData";
-import { useAppState } from "../../AppStateContext";
-export default function  IndexPage() {
+
+export default function IndexPage() {
   const { islogged, randomSelector } = useAppState();
   const userData = islogged.userData.users[0];
   const verify = islogged.user.emailVerified;
+
+  const stats = [
+    {
+      title: "Total Balance",
+      value: `${userData.balance.toFixed(2)} ETH`,
+      icon: <MoneyImg className="w-6 h-6 text-blue-500" />,
+      color: "from-blue-500/20 to-blue-600/5",
+      borderColor: "border-blue-500/20"
+    },
+    {
+      title: "Total Profit",
+      value: `${userData.profit.toFixed(2)} ETH`,
+      icon: <ProfitImg className="w-6 h-6 text-emerald-500" />,
+      color: "from-emerald-500/20 to-emerald-600/5",
+      borderColor: "border-emerald-500/20"
+    },
+    {
+      title: "Account Status",
+      value: verify ? "Verified" : "Unverified",
+      icon: <AccountImg className="w-6 h-6 text-purple-500" />,
+      color: "from-purple-500/20 to-purple-600/5",
+      borderColor: "border-purple-500/20",
+      link: "/dashboard/profile"
+    }
+  ];
+
   return (
-    <Container title="Dashboard Index">
-      <div className="mx-6">
-        <GradientDiv col1="darkgray" col2="#dbf5b3" direction="to bottom">
-          <section
-            id="wallet"
-            className="flex gap-4 justify-evenly items-center p-2"
-          >
-            <div className=" p-4 ">
-              <h3 className="font-bold">LINK YOUR WALLET</h3>
-              <p className="hidden md:block">
-                Get access to your assets, which are held on your blockchain. A
-                private key to that address, which allows you to authorize
-                transactions.
+    <Container title="Dashboard Overview">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        {/* Header Section / CTA */}
+        <section className="relative overflow-hidden rounded-3xl p-8 glass-card border-none bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-2xl shadow-blue-500/20">
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="space-y-2 text-center md:text-left">
+              <h2 className="text-3xl font-extrabold tracking-tight">Connect Your Wallet</h2>
+              <p className="text-blue-100 max-w-lg">
+                Securely link your blockchain assets to authorize transactions and manage your NFT portfolio directly from your dashboard.
               </p>
             </div>
             <Link
-              to={"/dashboard/terms"}
-              className="border-4 border-white rounded-xl w-fit text-nowrap text-center  flex align-middl justify-center"
+              to="/dashboard/terms"
+              className="px-8 py-3 bg-white text-blue-600 font-bold rounded-2xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-lg"
             >
-              <p className="p-2 "> T & C</p>
+              Sign Terms & Conditions
             </Link>
-          </section>
-        </GradientDiv>
-      </div>
+          </div>
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl"></div>
+        </section>
 
-      <div className="flex gap-4 m-6 flex-wrap items-center justify-center align-middle">
-        <div className="rounded-2xl w-fit overflow-hidden">
-          <GradientDiv
-            direction={"to right"}
-            col1={"lightblue"}
-            col2={"#dbf5b3"}
-          >
-            <div className="flex  p-4  items-center g-4 justify-evenly rounded-2xl">
-              <div>
-                <div className="mr-4">
-                  <span className="font-bold">ETH : </span>
-                  <span className="font-bold">
-                    {userData.balance.toFixed(2)}
-                  </span>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {stats.map((stat, idx) => (
+            <div key={idx} className={`relative overflow-hidden rounded-3xl p-6 glass-card border ${stat.borderColor} group`}>
+              {stat.link ? (
+                <Link to={stat.link} className="block space-y-4">
+                  <div className="flex justify-between items-start">
+                    <div className="p-3 rounded-2xl bg-white/50 dark:bg-gray-800/50 shadow-inner group-hover:scale-110 transition-transform">
+                      {stat.icon}
+                    </div>
+                    <span className={`text-xs font-bold px-3 py-1 rounded-full ${verify ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                      {stat.title === "Account Status" ? (verify ? "ACTIVE" : "PENDING") : "+12.5%"}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{stat.title}</p>
+                    <h3 className="text-2xl font-bold mt-1">{stat.value}</h3>
+                  </div>
+                </Link>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-start">
+                    <div className="p-3 rounded-2xl bg-white/50 dark:bg-gray-800/50 shadow-inner group-hover:scale-110 transition-transform">
+                      {stat.icon}
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-500/10 text-blue-500">
+                      LIVE
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{stat.title}</p>
+                    <h3 className="text-2xl font-bold mt-1">{stat.value}</h3>
+                  </div>
                 </div>
-                <h1 className="text-lg">Total Balance</h1>
-              </div>
-              <MoneyImg className="w-10 h-10 rounded-2xl  border-4 p-1 border-blue-500" />
+              )}
+              {/* Subtle background glow */}
+              <div className={`absolute -right-4 -bottom-4 w-24 h-24 bg-gradient-to-br ${stat.color} rounded-full blur-2xl opacity-50`}></div>
             </div>
-          </GradientDiv>
+          ))}
         </div>
 
-        <div className="rounded-2xl w-fit overflow-hidden">
-          <GradientDiv
-            direction={"to right"}
-            col1={"lightblue"}
-            col2={"#dbf5b3"}
-          >
-            <div className="flex  p-4  items-center g-4 justify-evenly rounded-2xl">
-              <div>
-                <div className="mr-4">
-                  <span className="font-bold">ETH: </span>
-                  <span className="font-bold">
-                    {userData.profit.toFixed(2)}
-                  </span>
-                </div>
-                <h1 className="text-lg">Total Profit</h1>
-              </div>
-              <ProfitImg className="w-10 h-10 rounded-2xl  border-4 p-1 border-blue-500" />
-            </div>
-          </GradientDiv>
-        </div>
-
-        <div className="rounded-2xl w-fit overflow-hidden">
-          <GradientDiv
-            direction={"to right"}
-            col1={"lightblue"}
-            col2={"#dbf5b3"}
-          >
-            <Link
-              to={"/dashboard/profile"}
-              className="flex p-4 items-center g-4 justify-evenly rounded-2xl"
-            >
-              <div>
-                <div className="mr-4">
-                  <span className="font-bold">Account Status : </span>
-                </div>
-                <h1 className="text-lg">
-                  {" "}
-                  {verify ? "Verified" : "Unverified"}
-                </h1>
-              </div>
-              <AccountImg className="w-10 h-10 rounded-2xl  border-4 p-1 border-blue-500" />
-            </Link>
-          </GradientDiv>
-        </div>
-      </div>
-
-      <div className="flex gap-4 m-6 flex-wrap items-center justify-center align-middle">
-        <div className="w-full overflow-x-auto ">
-          <table className="min-w-full pb-20 border-separate border border-slate-500 rounded-2xl overflow-hidden">
-            <GradientDiv
-              direction={"to right"}
-              col1={"skyblue"}
-              col2={"#dbf5b3"}
-            >
+        {/* Market Table Section */}
+        <div className="glass-card rounded-3xl overflow-hidden shadow-sm">
+          <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+            <h3 className="text-lg font-bold">Trending Collections</h3>
+            <button className="text-sm text-blue-500 font-semibold hover:underline">View All Market</button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="dashboard-table">
               <thead>
                 <tr>
-                  <th className="border border-slate-600 px-4 py-2">
-                    Contact Address
-                  </th>
-                  <th className="border border-slate-600 px-4 py-2">Name</th>
-                  <th className="border border-slate-600 px-4 py-2">NFT</th>
-                  <th className="border border-slate-600 px-4 py-2">
-                    Market Capital
-                  </th>
-                  <th className="border border-slate-600 px-4 py-2">
-                    Floor Price
-                  </th>
-                  <th className="border border-slate-600 px-4 py-2">
-                    Total Minted
-                  </th>
-                  <th className="border border-slate-600 px-4 py-2">
-                    Total Volume
-                  </th>
-                  <th className="border border-slate-600 px-4 py-2">
-                    Number of Owners
-                  </th>
+                  <th>Collection</th>
+                  <th>Contact Address</th>
+                  <th>Market Cap</th>
+                  <th>Floor Price</th>
+                  <th>Volume</th>
+                  <th>Owners</th>
                 </tr>
               </thead>
               <tbody>
-                {randomSelector(datas, 10).map((data, index) => {
-                  return (
-                    <tr key={index}>
-                      <td class="border border-slate-700 p-2">
-                        {data.contact_address}
-                      </td>
-                      <td class="border border-slate-700 p-2">{data.name}</td>
-                      <td class="border border-slate-700 p-2">
-                        {data.nft === null ? (
-                          ""
-                        ) : (
-                          <img
-                            src={data.nft}
-                            alt="ntf"
-                            width={70}
-                            height={70}
-                            className="min-w-44 h-48 rounded-2xl"
-                          />
-                        )}
-                      </td>
-                      <td class="border border-slate-700 p-2">
-                        {data.market_cap}
-                      </td>
-                      <td class="border border-slate-700 p-2">
-                        {data.floor_price}
-                      </td>
-                      <td class="border border-slate-700 p-2">
-                        {data.total_minted}
-                      </td>
-                      <td class="border border-slate-700 p-2">
-                        {data.total_volume}
-                      </td>
-                      <td class="border border-slate-700 p-2">{data.NOW}</td>
-                    </tr>
-                  );
-                })}
+                {randomSelector(datas, 10).map((data, index) => (
+                  <tr key={index}>
+                    <td>
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-800">
+                          {data.nft ? (
+                            <img src={data.nft} alt={data.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">NFT</div>
+                          )}
+                        </div>
+                        <span className="font-bold text-gray-900 dark:text-white">{data.name}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className="font-mono text-xs text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                        {data.contact_address.slice(0, 6)}...{data.contact_address.slice(-4)}
+                      </span>
+                    </td>
+                    <td className="font-medium">{data.market_cap}</td>
+                    <td>
+                      <span className="text-emerald-500 font-bold">{data.floor_price}</span>
+                    </td>
+                    <td>{data.total_volume}</td>
+                    <td>
+                      <div className="flex flex-col">
+                        <span>{data.NOW}</span>
+                        <div className="w-16 h-1 bg-gray-100 dark:bg-gray-800 rounded-full mt-1 overflow-hidden">
+                          <div className="h-full bg-blue-500 rounded-full" style={{ width: '65%' }}></div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
-            </GradientDiv>
-          </table>
+            </table>
+          </div>
         </div>
+
       </div>
     </Container>
   );
