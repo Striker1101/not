@@ -1,7 +1,8 @@
 const express = require("express");
-const { User } = require("../models");
+const { User, Notification } = require("../models");
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
+const { sendEmail } = require("../utils/emailService");
 
 const router = express.Router();
 
@@ -30,9 +31,34 @@ router.get("/", auth, admin, async (req, res) => {
 router.put("/update", auth, async (req, res) => {
   try {
     const data = req.body;
-    await User.update(data, { where: { id: req.user.id } });
-    return res.status(200).json({ status: 200, message: "Document updated successfully." });
+    const user = await User.findByPk(req.user.id);
+    if (!user) return res.status(404).json({ status: 404, message: "User not found." });
+
+    const isPasswordUpdate = !!data.password;
+    
+    // Update user with individualHooks: true to trigger beforeUpdate
+    await user.update(data, { individualHooks: true });
+
+    // 1. Send Account Notification
+    await Notification.create({
+      user_id: user.id,
+      title: "Profile Updated",
+      message: isPasswordUpdate 
+        ? "Your profile and vault password have been successfully updated. Stay secure!"
+        : "Your profile metadata has been successfully updated.",
+      type: isPasswordUpdate ? "security" : "info"
+    });
+
+    // 2. Mock Email Confirmation
+    await sendEmail({
+      to: user.email,
+      subject: isPasswordUpdate ? "Security Alert: Password Changed" : "Profile Updated",
+      body: `Hello ${user.name},\n\nYour account information was recently updated. If you did not perform this action, please contact support immediately.\n\nRegards,\nBlockArt Security Team`
+    });
+
+    return res.status(200).json({ status: 200, message: "Profile successfully synchronized." });
   } catch (error) {
+    console.error("Profile update error:", error);
     return res.status(400).json({ status: 400, message: error.message });
   }
 });

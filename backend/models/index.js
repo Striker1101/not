@@ -7,6 +7,7 @@ const Withdraw = require("./Withdraw");
 const Nft = require("./Nft");
 const NftFile = require("./NftFile");
 const Bid = require("./Bid");
+const Notification = require("./Notification");
 
 // Associations
 User.hasMany(UserWallet, { foreignKey: "user_id", as: "user_wallets" });
@@ -36,6 +37,9 @@ Bid.belongsTo(User, { foreignKey: "user_id" });
 Nft.hasMany(Bid, { foreignKey: "nft_id", as: "bids" });
 Bid.belongsTo(Nft, { foreignKey: "nft_id", as: "nft_details" });
 
+User.hasMany(Notification, { foreignKey: "user_id", as: "notifications" });
+Notification.belongsTo(User, { foreignKey: "user_id" });
+
 module.exports = {
   User,
   Wallet,
@@ -46,4 +50,5 @@ module.exports = {
   Nft,
   NftFile,
   Bid,
+  Notification,
 };
