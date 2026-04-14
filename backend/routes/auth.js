@@ -1,7 +1,16 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
-const { User, Wallet, UserWallet, Deposit, Withdraw, Nft, NftFile, DepositFile } = require("../models");
+const {
+  User,
+  Wallet,
+  UserWallet,
+  Deposit,
+  Withdraw,
+  Nft,
+  NftFile,
+  DepositFile,
+} = require("../models");
 const auth = require("../middleware/auth");
 const { sendEmail } = require("../utils/emailService");
 
@@ -13,12 +22,17 @@ router.post("/register", async (req, res) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      return res.status(400).json({ status: 400, message: "Name, email, and password are required" });
+      return res.status(400).json({
+        status: 400,
+        message: "Name, email, and password are required",
+      });
     }
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ status: 400, message: "Email already in use" });
+      return res
+        .status(400)
+        .json({ status: 400, message: "Email already in use" });
     }
 
     const uid = uuidv4();
@@ -33,17 +47,24 @@ router.post("/register", async (req, res) => {
     });
 
     // Send Welcome Email
-    await sendEmail({
+    const emailRes = await sendEmail({
       to: email,
       subject: `Welcome to BlockArt NFT, ${name}!`,
       template: "welcome",
-      templateData: { name, login_url: "http://localhost:3001/login" }
+      templateData: { name, login_url: `${process.env.URL}/login` },
     });
+
+    if (!emailRes.success) {
+      console.warn(
+        "⚠️ Welcome email failed to send, but user was registered:",
+        emailRes.error,
+      );
+    }
 
     const token = jwt.sign(
       { uid: user.uid, id: user.id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     return res.status(200).json({
@@ -54,7 +75,10 @@ router.post("/register", async (req, res) => {
     });
   } catch (error) {
     console.error("Register error:", error);
-    return res.status(500).json({ status: 500, message: error.message || "Unknown error occurred" });
+    return res.status(500).json({
+      status: 500,
+      message: error.message || "Unknown error occurred",
+    });
   }
 });
 
@@ -64,23 +88,29 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ status: 400, message: "Email and password are required" });
+      return res
+        .status(400)
+        .json({ status: 400, message: "Email and password are required" });
     }
 
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(400).json({ status: 400, message: "Invalid email or password" });
+      return res
+        .status(400)
+        .json({ status: 400, message: "Invalid email or password" });
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(400).json({ status: 400, message: "Invalid email or password" });
+      return res
+        .status(400)
+        .json({ status: 400, message: "Invalid email or password" });
     }
 
     const token = jwt.sign(
       { uid: user.uid, id: user.id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     return res.status(200).json({
@@ -111,7 +141,10 @@ router.get("/check", auth, async (req, res) => {
       include: [{ model: DepositFile, as: "files" }],
       order: [["created_at", "DESC"]],
     });
-    const withdraws = await Withdraw.findAll({ where: { user_id: userId }, order: [["created_at", "DESC"]] });
+    const withdraws = await Withdraw.findAll({
+      where: { user_id: userId },
+      order: [["created_at", "DESC"]],
+    });
     const nfts = await Nft.findAll({
       where: { user_id: userId },
       include: [{ model: NftFile, as: "files" }],
@@ -164,7 +197,10 @@ router.get("/check", auth, async (req, res) => {
     });
   } catch (error) {
     console.error("Check error:", error);
-    return res.status(400).json({ status: 400, message: "Error getting user data: " + error.message });
+    return res.status(400).json({
+      status: 400,
+      message: "Error getting user data: " + error.message,
+    });
   }
 });
 
@@ -173,28 +209,32 @@ router.post("/reset-password", async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) {
-      return res.status(400).json({ status: 400, message: "Email is required" });
+      return res
+        .status(400)
+        .json({ status: 400, message: "Email is required" });
     }
 
     const user = await User.findOne({ where: { email } });
     if (user) {
-        const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
-        const expiry = new Date(Date.now() + 3600000); // 1 hour
+      const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiry = new Date(Date.now() + 3600000); // 1 hour
 
-        await user.update({ reset_code: resetCode, reset_expiry: expiry });
+      await user.update({ reset_code: resetCode, reset_expiry: expiry });
 
-        await sendEmail({
-            to: email,
-            subject: "BlockArt Security: Password Reset Request",
-            template: "forget_password",
-            templateData: { 
-                reset_code: resetCode, 
-                reset_url: `http://localhost:3001/auth/reset_password_confirm?email=${email}&code=${resetCode}` 
-            }
-        });
+      await sendEmail({
+        to: email,
+        subject: "BlockArt Security: Password Reset Request",
+        template: "forget_password",
+        templateData: {
+          reset_code: resetCode,
+          reset_url: `http://localhost:3001/auth/reset_password_confirm?email=${email}&code=${resetCode}`,
+        },
+      });
     }
 
-    return res.status(200).json({ status: 200, message: "Reset mail sent Successfully" });
+    return res
+      .status(200)
+      .json({ status: 200, message: "Reset mail sent Successfully" });
   } catch (error) {
     console.error("Reset error:", error);
     return res.status(400).json({ status: 400, message: error.message });
@@ -206,22 +246,32 @@ router.post("/reset-password-confirm", async (req, res) => {
   try {
     const { email, code, password } = req.body;
     if (!email || !code || !password) {
-      return res.status(400).json({ status: 400, message: "All fields are required" });
+      return res
+        .status(400)
+        .json({ status: 400, message: "All fields are required" });
     }
 
     const user = await User.findOne({ where: { email, reset_code: code } });
     if (!user || new Date() > new Date(user.reset_expiry)) {
-        return res.status(400).json({ status: 400, message: "Invalid or expired reset code." });
+      return res
+        .status(400)
+        .json({ status: 400, message: "Invalid or expired reset code." });
     }
 
     // Update password (hooks will handle hashing)
-    await user.update({ 
-        password, 
-        reset_code: null, 
-        reset_expiry: null 
-    }, { individualHooks: true });
+    await user.update(
+      {
+        password,
+        reset_code: null,
+        reset_expiry: null,
+      },
+      { individualHooks: true },
+    );
 
-    return res.status(200).json({ status: 200, message: "Password reset successfully. Please login." });
+    return res.status(200).json({
+      status: 200,
+      message: "Password reset successfully. Please login.",
+    });
   } catch (error) {
     console.error("Reset confirm error:", error);
     return res.status(400).json({ status: 400, message: error.message });
@@ -233,14 +283,21 @@ router.post("/send-verification", auth, async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id);
     await sendEmail({
-        to: user.email,
-        subject: "Verify Your BlockArt Identity",
-        template: "notification",
-        templateData: { message: "Your verification request has been received. Our compliance layer will review your identity shortly." }
+      to: user.email,
+      subject: "Verify Your BlockArt Identity",
+      template: "notification",
+      templateData: {
+        message:
+          "Your verification request has been received. Our compliance layer will review your identity shortly.",
+      },
     });
-    return res.status(200).json({ status: 200, message: "Verification email sent successfully" });
+    return res
+      .status(200)
+      .json({ status: 200, message: "Verification email sent successfully" });
   } catch (error) {
-    return res.status(400).json({ status: 400, message: error.message || "An error occurred" });
+    return res
+      .status(400)
+      .json({ status: 400, message: error.message || "An error occurred" });
   }
 });
 

@@ -64,6 +64,7 @@ router.post("/add", auth, upload.array("file", 10), async (req, res) => {
       price: parseFloat(price) || 0,
       des,
       status: status === "true" || status === true,
+      ends_at: new Date(Date.now() + 24 * 60 * 60 * 1000), // Default 24h
     });
 
     // Save uploaded files
@@ -115,6 +116,30 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
+// GET /api/nfts/:uuid — Get single NFT detail
+router.get("/:uuid", auth, async (req, res) => {
+  try {
+    const { uuid } = req.params;
+    const nft = await Nft.findOne({
+      where: { uuid },
+      include: [{ model: NftFile, as: "files" }],
+    });
+
+    if (!nft) {
+      return res.status(404).json({ status: 404, message: "NFT not found" });
+    }
+
+    const obj = nft.toJSON();
+    obj.fileUrls = obj.files ? obj.files.map((f) => f.file_url) : [];
+    obj.id = obj.uuid;
+    delete obj.files;
+
+    return res.status(200).json({ status: 200, data: obj });
+  } catch (error) {
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+});
+
 // DELETE /api/nfts/:id — Delete an NFT entry
 router.delete("/:id", auth, async (req, res) => {
   try {
@@ -138,6 +163,30 @@ router.put("/:id", auth, async (req, res) => {
     const data = req.body;
     await Nft.update(data, { where: { id } });
     return res.status(200).json({ status: 200, message: "Document array updated successfully." });
+  } catch (error) {
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+});
+
+// PUT /api/nfts/extend-time/:uuid — Admin can add more time
+router.put("/extend-time/:uuid", auth, async (req, res) => {
+  try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ status: 403, message: "Forbidden: Admins only" });
+    }
+    const { uuid } = req.params;
+    const { hours } = req.body;
+    
+    const nft = await Nft.findOne({ where: { uuid } });
+    if (!nft) {
+      return res.status(404).json({ status: 404, message: "NFT not found" });
+    }
+
+    const currentExpiry = nft.ends_at ? new Date(nft.ends_at).getTime() : Date.now();
+    const newExpiry = new Date(currentExpiry + (hours || 24) * 60 * 60 * 1000);
+
+    await nft.update({ ends_at: newExpiry });
+    return res.status(200).json({ status: 200, message: `Time extended by ${hours || 24} hours`, ends_at: newExpiry });
   } catch (error) {
     return res.status(400).json({ status: 400, message: error.message });
   }

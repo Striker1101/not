@@ -44,12 +44,13 @@ router.post("/place", auth, async (req, res) => {
        nft = await Nft.create({
           id: nft_id, // Force the ID to match the mock ID
           uuid: crypto.randomUUID(),
-          user_id: req.user.id,
+          user_id: 999, // System/Market address
           collection_name: collection_name || "Nexus Asset",
           creator: creator || "System",
           price: price || 0,
           category: "MARKETPLACE",
-          status: true
+          status: true,
+          ends_at: new Date(Date.now() + 24 * 60 * 60 * 1000)
        });
        
        // Create a dummy file entry so it doesn't crash on retrieval
@@ -57,6 +58,11 @@ router.post("/place", auth, async (req, res) => {
           nft_id: nft.id,
           file_url: image_url || "https://via.placeholder.com/400"
        });
+    }
+
+    // BLOCK OWNERS FROM BIDDING ON THEIR OWN NFT
+    if (nft.user_id === req.user.id) {
+       return res.status(400).json({ status: 400, message: "You cannot bid on your own project." });
     }
 
     const bid = await Bid.create({
@@ -69,6 +75,60 @@ router.post("/place", auth, async (req, res) => {
     });
 
     return res.status(200).json({ status: 200, message: "Bid placed successfully.", data: bid });
+  } catch (error) {
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+});
+
+// GET /api/bids/nft/:nftId — Get all bids for a specific NFT (for the owner)
+router.get("/nft/:nftId", auth, async (req, res) => {
+  try {
+    const { nftId } = req.params;
+    const nft = await Nft.findByPk(nftId);
+    if (!nft) return res.status(404).json({ status: 404, message: "NFT not found" });
+
+    // Show all bids to the owner, only pending/accepted ones? Or all.
+    const bids = await Bid.findAll({
+      where: { nft_id: nftId },
+      include: [{ model: User, as: "User", attributes: ["name", "email", "uid"] }],
+      order: [["amount", "DESC"]]
+    });
+
+    return res.status(200).json({ status: 200, data: bids });
+  } catch (error) {
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+});
+
+// POST /api/bids/accept/:id — Owner accepts a bid
+router.post("/accept/:id", auth, async (req, res) => {
+  try {
+    const bid = await Bid.findByPk(req.params.id);
+    if (!bid) return res.status(404).json({ status: 404, message: "Bid not found" });
+
+    const nft = await Nft.findByPk(bid.nft_id);
+    if (nft.user_id !== req.user.id) {
+       return res.status(403).json({ status: 403, message: "Only the owner can accept a bid." });
+    }
+
+    // Check if any bid is already accepted for this NFT
+    const alreadyAccepted = await Bid.findOne({ where: { nft_id: nft.id, status: ["accepted", "paid"] } });
+    if (alreadyAccepted) {
+       return res.status(400).json({ status: 400, message: "A bid has already been accepted for this NFT." });
+    }
+
+    await bid.update({ status: "accepted" });
+    
+    // Optionally reject all other pending bids
+    await Bid.update({ status: "rejected" }, { 
+        where: { 
+            nft_id: nft.id, 
+            status: "pending",
+            id: { [require("sequelize").Op.ne]: bid.id }
+        } 
+    });
+
+    return res.status(200).json({ status: 200, message: "Bid accepted successfully." });
   } catch (error) {
     return res.status(400).json({ status: 400, message: error.message });
   }

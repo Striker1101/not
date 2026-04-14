@@ -42,6 +42,10 @@ const Nft = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    ends_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     tableName: "nfts",
