@@ -18,6 +18,7 @@ export default function DashBoardLinks({ toggleSidebar }) {
     { to: "/dashboard/deposit", label: "Deposit", Icon: DepositImg },
     { to: "/dashboard/withdraw", label: "Withdraw", Icon: WithdrawImg },
     { to: "/dashboard/buy", label: "Buy NFT", Icon: BuyImg },
+    { to: "/dashboard/wallet/view", label: "Linked Wallets", Icon: MintedImg },
     { to: "/dashboard/profile", label: "My Profile", Icon: ProfileImg },
   ];
 
