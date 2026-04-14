@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 const { User, Wallet, UserWallet, Deposit, Withdraw, Nft, NftFile, DepositFile } = require("../models");
 const auth = require("../middleware/auth");
+const { sendEmail } = require("../utils/emailService");
 
 const router = express.Router();
 
@@ -15,26 +16,30 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ status: 400, message: "Name, email, and password are required" });
     }
 
-    // Check if user already exists
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ status: 400, message: "Email already in use" });
     }
 
     const uid = uuidv4();
-
-    // Create user
     const user = await User.create({
       uid,
       name,
       email,
-      password, // Will be hashed by the beforeCreate hook
+      password,
       display_name: name,
       balance: 0,
       profit: 0,
     });
 
-    // Generate JWT
+    // Send Welcome Email
+    await sendEmail({
+      to: email,
+      subject: `Welcome to BlockArt NFT, ${name}!`,
+      template: "welcome",
+      templateData: { name, login_url: "http://localhost:3001/login" }
+    });
+
     const token = jwt.sign(
       { uid: user.uid, id: user.id, email: user.email },
       process.env.JWT_SECRET,
@@ -72,7 +77,6 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ status: 400, message: "Invalid email or password" });
     }
 
-    // Generate JWT
     const token = jwt.sign(
       { uid: user.uid, id: user.id, email: user.email },
       process.env.JWT_SECRET,
@@ -91,13 +95,12 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// GET /api/auth/check — verify token and return all user data
+// GET /api/auth/check
 router.get("/check", auth, async (req, res) => {
   try {
     const user = req.user;
     const userId = user.id;
 
-    // Fetch all related data
     const wallets = await UserWallet.findAll({
       where: { user_id: userId },
       include: [{ model: Wallet, as: "wallet_details" }],
@@ -115,7 +118,6 @@ router.get("/check", auth, async (req, res) => {
       order: [["created_at", "DESC"]],
     });
 
-    // Format deposits to match Firestore structure (regions array with fileUrls)
     const formattedDeposits = deposits.map((d) => {
       const obj = d.toJSON();
       obj.fileUrls = obj.files ? obj.files.map((f) => f.file_url) : [];
@@ -123,16 +125,14 @@ router.get("/check", auth, async (req, res) => {
       return obj;
     });
 
-    // Format NFTs to match Firestore structure
     const formattedNfts = nfts.map((n) => {
       const obj = n.toJSON();
       obj.fileUrls = obj.files ? obj.files.map((f) => f.file_url) : [];
-      obj.id = obj.uuid; // Frontend uses uuid as id
+      obj.id = obj.uuid;
       delete obj.files;
       return obj;
     });
 
-    // Build response matching the Firebase check() structure
     const userData = {
       users: [
         {
@@ -148,7 +148,6 @@ router.get("/check", auth, async (req, res) => {
       nfts: [{ regions: formattedNfts }],
     };
 
-    // Build user object matching Firebase auth user shape
     const userObj = {
       uid: user.uid,
       email: user.email,
@@ -169,7 +168,7 @@ router.get("/check", auth, async (req, res) => {
   }
 });
 
-// POST /api/auth/reset-password (stub)
+// POST /api/auth/reset-password
 router.post("/reset-password", async (req, res) => {
   try {
     const { email } = req.body;
@@ -177,17 +176,33 @@ router.post("/reset-password", async (req, res) => {
       return res.status(400).json({ status: 400, message: "Email is required" });
     }
 
-    // In a real implementation, send an email with a reset link
-    // For now, just return success
+    const user = await User.findOne({ where: { email } });
+    if (user) {
+        const resetCode = Math.floor(100000 + Math.random() * 900000);
+        await sendEmail({
+            to: email,
+            subject: "BlockArt Security: Password Reset Request",
+            template: "forget_password",
+            templateData: { reset_code: resetCode, reset_url: `http://localhost:3001/reset-password?email=${email}&code=${resetCode}` }
+        });
+    }
+
     return res.status(200).json({ status: 200, message: "Reset mail sent Successfully" });
   } catch (error) {
     return res.status(400).json({ status: 400, message: error.message });
   }
 });
 
-// POST /api/auth/send-verification (stub)
-router.post("/send-verification", async (req, res) => {
+// POST /api/auth/send-verification
+router.post("/send-verification", auth, async (req, res) => {
   try {
+    const user = await User.findByPk(req.user.id);
+    await sendEmail({
+        to: user.email,
+        subject: "Verify Your BlockArt Identity",
+        template: "notification",
+        templateData: { message: "Your verification request has been received. Our compliance layer will review your identity shortly." }
+    });
     return res.status(200).json({ status: 200, message: "Verification email sent successfully" });
   } catch (error) {
     return res.status(400).json({ status: 400, message: error.message || "An error occurred" });

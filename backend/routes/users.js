@@ -49,11 +49,16 @@ router.put("/update", auth, async (req, res) => {
       type: isPasswordUpdate ? "security" : "info"
     });
 
-    // 2. Mock Email Confirmation
+    // 2. Real Email Confirmation
     await sendEmail({
       to: user.email,
       subject: isPasswordUpdate ? "Security Alert: Password Changed" : "Profile Updated",
-      body: `Hello ${user.name},\n\nYour account information was recently updated. If you did not perform this action, please contact support immediately.\n\nRegards,\nBlockArt Security Team`
+      template: "notification",
+      templateData: { 
+        message: isPasswordUpdate 
+          ? `Hello ${user.name}, your account vault has been successfully re-secured with a new password. If you did not authorize this change, please contact our relay support immediately.`
+          : `Hello ${user.name}, your profile metadata has been successfully synchronized with the BlockArt network.`
+      }
     });
 
     return res.status(200).json({ status: 200, message: "Profile successfully synchronized." });
