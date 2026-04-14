@@ -10,7 +10,11 @@ import { useState } from "react";
 export default function Login() {
   const { islogged } = useAppState();
   if (islogged.status === 200) {
-    window.location.href = "/dashboard";
+    if (islogged.user?.isAdmin) {
+      window.location.href = "/admin";
+    } else {
+      window.location.href = "/dashboard";
+    }
   }
 
   const [formData, setFormData] = useState({
@@ -42,7 +46,11 @@ export default function Login() {
 
     if (result.status === 200) {
       setTimeout(() => {
-        window.location.href = "/dashboard";
+        if (result.user?.isAdmin) {
+          window.location.href = "/admin";
+        } else {
+          window.location.href = "/dashboard";
+        }
       }, 2000);
     }
   }

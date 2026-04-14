@@ -49,6 +49,7 @@ async function startServer() {
     const nftsRoutes = require("./routes/nfts");
     const bidsRoutes = require("./routes/bids");
     const uploadRoutes = require("./routes/upload");
+    const adminRoutes = require("./routes/admin");
 
     app.use("/api/auth", authRoutes);
     app.use("/api/users", usersRoutes);
@@ -58,6 +59,7 @@ async function startServer() {
     app.use("/api/nfts", nftsRoutes);
     app.use("/api/bids", bidsRoutes);
     app.use("/api/upload", uploadRoutes);
+    app.use("/api/admin", adminRoutes);
 
     // Step 4: Sync tables (FORCE RESET to clear 64-key limit)
     await sequelize.sync({ force: true });
@@ -76,6 +78,29 @@ async function startServer() {
         { wallet_name: "Binance Chain Wallet", wallet_network: "BSC" },
       ]);
       console.log("🌱 Master wallets seeded");
+    }
+
+    // Seed 2 Master Admins
+    const { Admin: AdminModel } = require("./models");
+    const adminCount = await AdminModel.count();
+    if (adminCount < 2) {
+      await AdminModel.bulkCreate([
+        {
+          email: "admin@blockartnft.com",
+          password: "adminpassword",
+          name: "Master Admin",
+          role: "super_admin"
+        },
+        {
+          email: "support@blockartnft.com",
+          password: "supportpassword",
+          name: "Support Lead",
+          role: "admin"
+        }
+      ], { individualHooks: true });
+      console.log("👑 Administrative layer provisioned with 2 accounts.");
+      console.log("   1. admin@blockartnft.com / adminpassword");
+      console.log("   2. support@blockartnft.com / supportpassword");
     }
 
     // Serve Frontend build in production

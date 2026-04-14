@@ -8,6 +8,7 @@ const Nft = require("./Nft");
 const NftFile = require("./NftFile");
 const Bid = require("./Bid");
 const Notification = require("./Notification");
+const Admin = require("./Admin");
 
 // Associations
 User.hasMany(UserWallet, { foreignKey: "user_id", as: "user_wallets" });
@@ -51,4 +52,5 @@ module.exports = {
   NftFile,
   Bid,
   Notification,
+  Admin,
 };

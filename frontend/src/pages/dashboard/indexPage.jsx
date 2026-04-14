@@ -10,7 +10,12 @@ export default function IndexPage() {
   const { islogged, randomSelector } = useAppState();
   
   // Safe extraction of user data
-  const userData = islogged.userData?.users?.[0] || { balance: 0, profit: 0 };
+  // Safe extraction of user data
+  const rawUser = islogged.userData?.users?.[0] || {};
+  const userData = {
+    balance: Number(rawUser.balance || 0),
+    profit: Number(rawUser.profit || 0)
+  };
   const verify = islogged.user?.emailVerified || false;
 
   const stats = [

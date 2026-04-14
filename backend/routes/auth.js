@@ -93,11 +93,34 @@ router.post("/login", async (req, res) => {
         .json({ status: 400, message: "Email and password are required" });
     }
 
+    // POST /api/auth/login
+    const { Admin } = require("../models");
+    
+    // Check Admin table first
+    let admin = await Admin.findOne({ where: { email } });
+    if (admin) {
+        const isMatch = await admin.comparePassword(password);
+        if (isMatch) {
+            const token = jwt.sign(
+                { id: admin.id, email: admin.email, isAdmin: true, role: admin.role },
+                process.env.JWT_SECRET,
+                { expiresIn: "7d" }
+            );
+            return res.status(200).json({
+                status: 200,
+                message: `Master Logic Engaged: Welcome ${admin.name}`,
+                token,
+                user: { ...admin.toJSON(), isAdmin: true },
+            });
+        }
+    }
+
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res
-        .status(400)
-        .json({ status: 400, message: "Invalid email or password" });
+      return res.status(400).json({
+        status: 400,
+        message: "Invalid email or password",
+      });
     }
 
     const isMatch = await user.comparePassword(password);
@@ -108,7 +131,7 @@ router.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { uid: user.uid, id: user.id, email: user.email },
+      { uid: user.uid, id: user.id, email: user.email, isAdmin: false },
       process.env.JWT_SECRET,
       { expiresIn: "7d" },
     );
@@ -117,11 +140,11 @@ router.post("/login", async (req, res) => {
       status: 200,
       message: `Welcome ${user.display_name || user.name}`,
       token,
-      user: user.toSafeJSON(),
+      user: { ...user.toSafeJSON(), isAdmin: false },
     });
   } catch (error) {
     console.error("Login error:", error);
-    return res.status(400).json({ status: 400, message: error.message });
+    return res.status(500).json({ status: 500, message: "Server error occurred during authentication." });
   }
 });
 
@@ -129,6 +152,25 @@ router.post("/login", async (req, res) => {
 router.get("/check", auth, async (req, res) => {
   try {
     const user = req.user;
+    
+    // ADMIN BIFURCATION for /check
+    if (user.isAdmin) {
+        return res.status(200).json({
+            status: 200,
+            message: `Admin session verified: ${user.name}`,
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                isAdmin: true,
+                role: user.role
+            },
+            userData: {
+                users: [{ ...user.get(), isAdmin: true }]
+            }
+        });
+    }
+
     const userId = user.id;
 
     const wallets = await UserWallet.findAll({

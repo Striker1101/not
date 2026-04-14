@@ -9,12 +9,12 @@ export default function ProtecteAdmin({ children, islogged }) {
     if (islogged.status === 201) {
       navigate("/auth/login");
     } else if (islogged.status === 200) {
-      const isAdmin = islogged.userData?.users?.[0]?.role === "admin" || islogged.user?.uid === "YvAAxZB4rXOr9pZM5XgYNBjLyO53";
+      const isAdmin = islogged.user?.isAdmin === true;
       if (!isAdmin) {
         navigate("/dashboard");
       }
     }
-  }, [islogged.status, islogged.user?.uid, islogged.userData?.users, navigate]);
+  }, [islogged.status, islogged.user?.isAdmin, navigate]);
 
   if (islogged.status === 0) {
     return (
@@ -24,7 +24,7 @@ export default function ProtecteAdmin({ children, islogged }) {
     );
   }
 
-  const isAdmin = islogged.userData?.users?.[0]?.role === "admin" || islogged.user?.uid === "YvAAxZB4rXOr9pZM5XgYNBjLyO53";
+  const isAdmin = islogged.user?.isAdmin === true;
 
   if (islogged.status === 200 && isAdmin) {
     return <>{children}</>;

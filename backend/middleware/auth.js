@@ -11,12 +11,22 @@ const auth = async (req, res, next) => {
     const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await User.findOne({ where: { uid: decoded.uid } });
-    if (!user) {
-      return res.status(401).json({ status: 401, message: "User not found" });
+    const { User, Admin } = require("../models");
+    let identity = null;
+
+    if (decoded.isAdmin) {
+        identity = await Admin.findByPk(decoded.id);
+        if (identity) identity.isAdmin = true;
+    } else {
+        identity = await User.findOne({ where: { uid: decoded.uid } });
+        if (identity) identity.isAdmin = false;
     }
 
-    req.user = user;
+    if (!identity) {
+      return res.status(401).json({ status: 401, message: "Identity not found" });
+    }
+
+    req.user = identity;
     req.token = token;
     next();
   } catch (error) {

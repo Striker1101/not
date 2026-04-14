@@ -16,10 +16,7 @@ function App() {
   const [showActivity, setShowActivity] = useState(false);
 
   useEffect(() => {
-    if (
-      location.pathname.includes("dashboard") ||
-      location.pathname.includes("admin")
-    ) {
+    if (location.pathname.includes("dashboard")) {
       setContainsDashboard(true);
     } else {
       setContainsDashboard(false);
