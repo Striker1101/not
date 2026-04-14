@@ -47,6 +47,7 @@ async function startServer() {
     const depositsRoutes = require("./routes/deposits");
     const withdrawsRoutes = require("./routes/withdraws");
     const nftsRoutes = require("./routes/nfts");
+    const bidsRoutes = require("./routes/bids");
     const uploadRoutes = require("./routes/upload");
 
     app.use("/api/auth", authRoutes);
@@ -55,6 +56,7 @@ async function startServer() {
     app.use("/api/deposits", depositsRoutes);
     app.use("/api/withdraws", withdrawsRoutes);
     app.use("/api/nfts", nftsRoutes);
+    app.use("/api/bids", bidsRoutes);
     app.use("/api/upload", uploadRoutes);
 
     // Step 4: Sync tables

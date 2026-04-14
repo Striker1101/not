@@ -11,6 +11,7 @@ import NFTCard from "./NFTCard";
 import Terms from "./Terms";
 import Wallet from "./Wallet";
 import WalletView from "./WalletView";
+import Bids from "./Bids";
 import UserNFT from "./UserNFT";
 export default function DashboardRoutes() {
   return (
@@ -26,6 +27,7 @@ export default function DashboardRoutes() {
       <Route path="/terms" element={<Terms />} />
       <Route path="/wallet" element={<Wallet />} />
       <Route path="/wallet/view" element={<WalletView />} />
+      <Route path="/bids" element={<Bids />} />
       <Route path="/user_nft" element={<UserNFT />} />
     </Routes>
   );

@@ -1,245 +1,204 @@
-import React from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useLocation, Link } from "react-router-dom";
+import Container from "../../components/Container";
+import StyledCard from "../../components/vendor/Card/StyledCard";
+import Spinner from "../../components/Spinner";
+import { useAppState } from "../../AppStateContext";
 import { datas as minted } from "../../utility/mintedData";
 import { datas as buy } from "../../utility/buyData";
-import Container from "../../components/Container";
-import GradientDiv from "../../components/vendor/Card/GradientDiv";
-import { general } from "../../utility/general";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faCopy } from "@fortawesome/free-solid-svg-icons";
-import Spinner from "../../components/Spinner";
-import { useLocation } from "react-router-dom";
-import { useAppState } from "../../AppStateContext";
 import { creators } from "../../utility/homepageData";
-library.add(faCopy);
-function generateRandomString(length = 16) {
-  const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    result += characters[randomIndex];
-  }
-
-  return result;
-}
+import Alert from "../../components/vendor/alert/Alert";
+import api from "../../api/config";
 
 const NFTCard = () => {
   const { id } = useParams();
   const location = useLocation();
-  const { islogged } = useAppState();
+  const { islogged, randomSelector } = useAppState();
   const queryParams = new URLSearchParams(location.search);
   const path = queryParams.get("path");
 
+  const [bidAmount, setBidAmount] = useState("");
+  const [result, setResult] = useState({ status: 0, message: null });
+  const [loading, setLoading] = useState(false);
+
   let datas = [];
-
-  if (path === "minted") {
-    datas = minted;
-  } else if (path === "buy") {
-    datas = buy;
-  } else if (path === "user_nft") {
-    datas = processArray(islogged.userData.nfts[0].regions);
-  }
-
-  const card = datas.find((item) => item.id == id);
-  if (!card) {
-    return (
-      <>
-        <Spinner />
-      </>
-    );
-  }
-
-  function processArray(arr) {
-    // Helper function to determine the file type
-    function determineFileType(url) {
-      const imageExtensions = [
-        "jpeg",
-        "jpg",
-        "png",
-        "gif",
-        "bmp",
-        "webp",
-        "tiff",
-      ];
-
-      // Extract the part of the URL before the '?'
-      const baseUrl = url.split("?")[0];
-
-      // Extract the last four characters to get the file extension
-      const fileExtension = baseUrl.slice(-4).toLowerCase();
-
-      // Check if the extension matches any of the known image extensions
-      const isImage = imageExtensions.some((ext) =>
-        fileExtension.includes(ext)
-      );
-
-      return isImage ? "image" : "video";
-    }
-
-    // Process each object in the array
-    return arr.map((obj) => {
-      if (obj.fileUrls && obj.fileUrls.length > 0) {
-        // Randomly pick a file URL
-        const randomIndex = Math.floor(Math.random() * obj.fileUrls.length);
-        const selectedUrl = obj.fileUrls[randomIndex];
-
-        // Determine the file type
-        const fileType = determineFileType(selectedUrl);
-
-        // Add the content and type to the object
-        return {
-          ...obj,
-          content: selectedUrl,
-          type: fileType,
-        };
-      } else {
-        // If there are no file URLs, return the object as is
-        return obj;
-      }
+  if (path === "minted") datas = minted;
+  else if (path === "buy") datas = buy;
+  else if (path === "user_nft" && islogged.userData?.nfts?.[0]) {
+    datas = islogged.userData.nfts[0].regions.map(obj => {
+        if (obj.fileUrls?.length > 0) {
+            return { ...obj, content: obj.fileUrls[0], type: "image", id: obj.uuid };
+        }
+        return { ...obj, id: obj.uuid };
     });
   }
 
-  function getRandomObject(array) {
-    if (array.length === 0) {
-      return null; // Return null if the array is empty
-    }
-    const randomIndex = Math.floor(Math.random() * array.length);
-    return array[randomIndex];
-  }
-  const user = islogged.user;
-  const creator = getRandomObject(creators);
-  return (
-    <div className="pb-9">
-      <Container title={`Card ${card.creator}`}>
-        <div className="card-detail flex flex-col gap-5">
-          <GradientDiv col1="lightgray" col2="#dbf5b3" direction="to bottom">
-            <h1 className="text-2xl font-bold p-4 pb-16">{card.creator}</h1>
-            <div className=" py-6 px-3 rounded-lg shadow-lg flex flex-col md:flex-row gap-8">
-              <div className="min-h-44 mb-4 md:w-4/5 flex-grow-2">
-                {card.type === "image" ? (
-                  <img
-                    src={card.content}
-                    className="rounded-3xl  md:min-h-96 w-full"
-                    alt=""
-                  />
-                ) : (
-                  <video src={card.content} autoPlay></video>
-                )}
-              </div>
-              <div>
-                <div className="flex gap-3 items-center">
-                  <p className="border-2 border-blue-400 rounded-xl py-2 px-4 bg-inherit text-blue-400">
-                    {" "}
-                    {card.creator}
-                  </p>
+  const card = datas.find((item) => (item.id || item.uuid) == id);
+  const recommendations = randomSelector([...minted, ...buy], 4);
 
-                  <div className="w-5">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 512 512"
-                    >
-                      <path
-                        fill="#77bb41"
-                        d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
-                      />
-                    </svg>
-                  </div>
-                </div>
-                <div className="flex ">
-                  <h1 className="font-bold text-2xl">{card.creator}</h1>
-                </div>
-                <div>
-                  <div className="flex gap-3 ">
-                    <p className="text-green-500">ETH</p> <p>Highest Bid</p>
-                  </div>
-                  <div className="flex gap-4 items-center">
-                    <div className="relative">
-                      {path === "user_nft" ? (
-                        <img
-                          src={user.photoURL}
-                          className="rounded-3xl"
-                          alt=""
-                          width={70}
-                          height={70}
-                        />
-                      ) : creator.type === "image" ? (
-                        <img
-                          src={creator.content}
-                          className="rounded-3xl"
-                          alt=""
-                          width={70}
-                          height={70}
-                        />
-                      ) : (
-                        <video src={card.content} controls></video>
-                      )}
-                      <div className="w-6 absolute bg-white rounded-3xl  right-0 top-10">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 512 512"
-                        >
-                          <path
-                            fill="#77bb41"
-                            d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-lg">
-                        Creator:{" "}
-                        {path === "user_nft" ? user.displayName : creator.title}
-                      </p>
-                      <p className="text-lg text-green-700">@{general.name}</p>
-                    </div>
-                  </div>
+  if (!card) return <div className="h-screen flex items-center justify-center"><Spinner /></div>;
+
+  const handlePlaceBid = async (e) => {
+    e.preventDefault();
+    if (!bidAmount || (card.price && parseFloat(bidAmount) <= parseFloat(card.price))) {
+        setResult({ status: 400, message: "Bid must be higher than current floor price." });
+        return;
+    }
+    setLoading(true);
+    try {
+        const response = await api.post("/bids/place", {
+            nft_id: card.id,
+            amount: bidAmount,
+            // Pass extra info for mock NFTs so backend can auto-create metadata
+            collection_name: card.collection_name || card.creator,
+            creator: card.creator,
+            price: card.price,
+            image_url: card.content || (card.files?.[0]?.file_url)
+        });
+        setResult(response.data);
+        if (response.data.status === 200) {
+            setBidAmount("");
+        }
+    } catch (error) {
+        setResult({ status: 400, message: error.response?.data?.message || "Failed to place bid." });
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  return (
+    <Container title={card.collection_name || "Asset Details"}>
+      <div className="max-w-7xl mx-auto px-4 py-12 space-y-20">
+        
+        {/* Detail Hero Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          
+          {/* Main Display */}
+          <div className="space-y-6">
+            <div className="glass-card rounded-[3rem] p-6 shadow-2xl border-white/5 overflow-hidden group">
+              <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-white/5">
+                {card.type === "image" || !card.type ? (
+                   <img 
+                    src={card.content || card.fileUrls?.[0]} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" 
+                    alt={card.collection_name} 
+                   />
+                ) : (
+                   <video src={card.content} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+                )}
+                <div className="absolute top-6 left-6 px-4 py-2 bg-black/40 backdrop-blur-xl rounded-2xl border border-white/10">
+                   <span className="text-xs font-black text-white uppercase tracking-widest">{card.category || "LEGENDARY"}</span>
                 </div>
               </div>
             </div>
-            <button className="flex gap-2 pl-4">
-              <FontAwesomeIcon
-                icon="fa-solid fa-copy"
-                bounce
-                style={{ color: "#669c35" }}
-              />
-              <h2 className="font-bold text-2xl"> DETAILS</h2>
-            </button>
-          </GradientDiv>
-          <div className="flex flex-col gap-5 px-4 shadow-2xl">
-            <div className="flex gap-3">
-              <p className="text-gray-400 text-lg">Contact Address: </p>
-              <div className="border-2 border-gray-700 text-green-600 px-3 flex items-center rounded-2xl ">
-                <h1 className="space-x-5">{generateRandomString(32)}</h1>
+          </div>
+
+          {/* Info Side */}
+          <div className="flex flex-col justify-center space-y-8">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                 <div className="w-8 h-8 rounded-full bg-blue-600/20 flex items-center justify-center text-blue-500">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                 </div>
+                 <span className="text-xs font-black text-blue-500 uppercase tracking-[0.3em]">Verified Origin</span>
               </div>
+              <h1 className="text-5xl font-black text-white uppercase tracking-tighter leading-none">
+                {card.collection_name || "Quantum Shard"}
+              </h1>
+              <p className="text-gray-400 text-lg leading-relaxed max-w-lg">
+                {card.des || "An ethereal masterpiece captured from the deep layers of the blockchain. Part of a limited-edition descent into digital abstraction."}
+              </p>
             </div>
-            <Holder props={"Creator:"} value={card.creator} />
-            <Holder props={"BlockChain:"} value={"Ethereum"} />
-            <Holder props={"Created At:"} value={card.created_at} />
-            <Holder props={"Description:"} value={card.des} />
-            <hr />
-            <h1 className="text-xl font-bold p-4 pb-16">{card.creator}</h1>
+
+            {/* Price & Bid Card */}
+            <div className="glass-card rounded-[2.5rem] p-8 space-y-6 border-blue-500/10 shadow-2xl shadow-blue-500/5">
+               <div className="flex justify-between items-end border-b border-white/5 pb-6">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Current Floor</span>
+                    <p className="text-4xl font-black text-white mt-1">{card.price} <span className="text-blue-500 text-xl italic uppercase">ETH</span></p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Ends In</span>
+                    <p className="text-xl font-black text-emerald-400 mt-1 uppercase">12h : 45m : 02s</p>
+                  </div>
+               </div>
+
+               <form onSubmit={handlePlaceBid} className="space-y-4 pt-2">
+                  <Alert result={result} setResult={setResult} timer={5000} />
+                  <div className="relative group">
+                    <input 
+                       type="number" 
+                       value={bidAmount}
+                       onChange={(e) => setBidAmount(e.target.value)}
+                       placeholder={`Min Bid ${parseFloat(card.price) + 0.01} ETH`}
+                       className="w-full bg-white/5 border-2 border-white/10 rounded-2xl py-4 px-6 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-white font-bold"
+                    />
+                    <div className="absolute right-6 top-1/2 -translate-y-1/2 text-xs font-black text-gray-500">ETH</div>
+                  </div>
+                  <button 
+                    disabled={loading}
+                    className="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl font-black shadow-xl shadow-blue-500/20 hover:scale-[1.02] active:scale-95 transition-all text-sm tracking-widest flex items-center justify-center gap-3"
+                  >
+                    {loading ? "PROCESSING..." : "PLACE SECURE BID"}
+                    {!loading && <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
+                  </button>
+               </form>
+            </div>
+
+            {/* Creator Info */}
+            <div className="flex items-center gap-4 p-4 bg-white/5 rounded-3xl border border-white/5 w-fit pr-10">
+               <div className="w-14 h-14 rounded-2xl overflow-hidden border border-white/10 shadow-lg">
+                  <img src={creators[0].content} className="w-full h-full object-cover" alt="Artist" />
+               </div>
+               <div>
+                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Master Artist</span>
+                  <p className="text-white font-black uppercase tracking-tight">{card.creator}</p>
+               </div>
+            </div>
           </div>
         </div>
-      </Container>
-    </div>
+
+        {/* Details & Specs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+           <DetailTile label="Protocol" value="ERC-721" />
+           <DetailTile label="Blockchain" value="Ethereum Mainnet" />
+           <DetailTile label="IPFS CID" value="QmX...f8zH" />
+           <DetailTile label="Evaluation" value={card.status ? "Verified" : "Pending"} status={card.status} />
+        </div>
+
+        {/* Recommendations */}
+        <div className="space-y-10 pt-10">
+           <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-6">
+              <div>
+                <h2 className="text-3xl font-black uppercase tracking-tighter text-white">More From This Frontier</h2>
+                <p className="text-gray-500 font-medium">Curated assets similar to your recent discovery.</p>
+              </div>
+              <Link to="/dashboard/minted" className="px-6 py-2 rounded-xl bg-white/5 text-xs font-black uppercase tracking-widest hover:bg-white/10 transition-all border border-white/5">
+                View All
+              </Link>
+           </div>
+           
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
+              {recommendations.map((data, index) => (
+                <Link key={index} to={`/dashboard/nft/${data.id || data.uuid}?path=minted`} className="w-full flex justify-center">
+                   <StyledCard data={data} card_holder="Highest Bid" />
+                </Link>
+              ))}
+           </div>
+        </div>
+
+      </div>
+    </Container>
   );
 };
 
-export default NFTCard;
+const DetailTile = ({ label, value, status }) => (
+  <div className="glass-card rounded-[2rem] p-6 border-white/5 space-y-1">
+    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">{label}</span>
+    <p className={`text-lg font-black truncate uppercase tracking-tight ${status === false ? "text-amber-500" : status === true ? "text-emerald-400" : "text-white"}`}>
+      {value}
+    </p>
+  </div>
+);
 
-function Holder({ props, value }) {
-  return (
-    <div className="flex gap-3">
-      <p className="text-gray-400 text-xl">{props}:</p>
-      <span>{"  "}</span>
-      <p className=" text-xl">
-        {" "}
-        {typeof value === "object"
-          ? new Date(value.seconds).toDateString()
-          : value}
-      </p>
-    </div>
-  );
-}
+export default NFTCard;
