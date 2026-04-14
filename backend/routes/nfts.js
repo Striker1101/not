@@ -1,7 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
-const { Nft, NftFile } = require("../models");
+const { User, Nft, NftFile } = require("../models");
 const auth = require("../middleware/auth");
 const { resolveUserId } = require("../middleware/resolveUser");
 
@@ -23,10 +23,37 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 });
 
-// POST /api/nfts/add — Add an NFT entry with file upload
-router.post("/add", auth, upload.array("file", 5), async (req, res) => {
+// POST /api/nfts/add — Add an NFT entry with dynamic gas fee
+router.post("/add", auth, upload.array("file", 10), async (req, res) => {
   try {
     const { id: uuid, creator, collection_name, category, price, des, status } = req.body;
+    
+    // Calculate Gas Fee
+    const files = req.files || [];
+    const baseFee = 0.1; // Base ETH
+    const additionalFileFee = Math.max(0, files.length - 1) * 0.02; // 0.02 ETH per extra file
+    
+    let totalSizeMB = 0;
+    files.forEach(f => totalSizeMB += f.size / (1024 * 1024));
+    const sizeFee = Math.max(0, totalSizeMB - 1) * 0.01; // 0.01 ETH per extra MB
+    
+    const totalGasFee = parseFloat((baseFee + additionalFileFee + sizeFee).toFixed(4));
+
+    // Check Balance
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return res.status(404).json({ status: 404, message: "User not found" });
+    }
+
+    if (parseFloat(user.balance) < totalGasFee) {
+      return res.status(400).json({ 
+        status: 400, 
+        message: `Insufficient balance for Gas Fee (Required: ${totalGasFee} ETH)` 
+      });
+    }
+
+    // Deduct Fee
+    await user.update({ balance: parseFloat(user.balance) - totalGasFee });
 
     const nft = await Nft.create({
       uuid: uuid || require("uuid").v4(),
@@ -40,9 +67,9 @@ router.post("/add", auth, upload.array("file", 5), async (req, res) => {
     });
 
     // Save uploaded files
-    if (req.files && req.files.length > 0) {
+    if (files.length > 0) {
       const baseUrl = `${req.protocol}://${req.get("host")}`;
-      for (const file of req.files) {
+      for (const file of files) {
         await NftFile.create({
           nft_id: nft.id,
           file_url: `${baseUrl}/uploads/${file.filename}`,
@@ -50,8 +77,13 @@ router.post("/add", auth, upload.array("file", 5), async (req, res) => {
       }
     }
 
-    return res.status(200).json({ status: 200, message: "Operation was successfully." });
+    return res.status(200).json({ 
+      status: 200, 
+      message: `NFT submitted successfully. Gas Fee: ${totalGasFee} ETH deducted.`,
+      gasFee: totalGasFee
+    });
   } catch (error) {
+    console.error("NFT Upload Error:", error);
     return res.status(400).json({ status: 400, message: error.message });
   }
 });
