@@ -52,35 +52,39 @@ router.post("/add", auth, upload.array("file", 10), async (req, res) => {
       });
     }
 
-    // Deduct Fee
+    // DEDUCT GAS FEE
     await user.update({ balance: parseFloat(user.balance) - totalGasFee });
 
-    const nft = await Nft.create({
-      uuid: uuid || require("uuid").v4(),
-      user_id: req.user.id,
-      creator,
-      collection_name,
-      category,
-      price: parseFloat(price) || 0,
-      des,
-      status: status === "true" || status === true,
-      ends_at: new Date(Date.now() + 24 * 60 * 60 * 1000), // Default 24h
-    });
-
-    // Save uploaded files
-    if (files.length > 0) {
-      const baseUrl = `${req.protocol}://${req.get("host")}`;
-      for (const file of files) {
-        await NftFile.create({
-          nft_id: nft.id,
-          file_url: `${baseUrl}/uploads/${file.filename}`,
+    // DUAL MINT LOGIC: Split price and create 2 separate NFTs
+    const totalTotalPrice = parseFloat(price) || 0;
+    const splitPrice = totalTotalPrice / 2;
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    
+    // We expect exactly 2 files from frontend for Dual Mint
+    for (let i = 0; i < Math.min(files.length, 2); i++) {
+        const file = files[i];
+        const newNft = await Nft.create({
+            uuid: require("uuid").v4(),
+            user_id: req.user.id,
+            creator,
+            collection_name: `${collection_name} #${i + 1}`,
+            category,
+            price: splitPrice,
+            des,
+            status: status === "true" || status === true,
+            ends_at: new Date(Date.now() + 24 * 60 * 60 * 1000), 
         });
-      }
+
+        // Attach its specific file
+        await NftFile.create({
+            nft_id: newNft.id,
+            file_url: `${baseUrl}/uploads/${file.filename}`,
+        });
     }
 
     return res.status(200).json({ 
       status: 200, 
-      message: `NFT submitted successfully. Gas Fee: ${totalGasFee} ETH deducted.`,
+      message: `Twin Assets successfully minted. Total Gas: ${totalGasFee} ETH.`,
       gasFee: totalGasFee
     });
   } catch (error) {

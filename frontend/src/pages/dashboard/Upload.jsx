@@ -77,8 +77,8 @@ export default function Upload() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.files.length === 0) {
-      setResult({ status: 400, message: "Please select at least one file." });
+    if (formData.files.length !== 2) {
+      setResult({ status: 400, message: "Dual-Mint Protocol requires exactly 2 images to initialize." });
       return;
     }
 
@@ -117,8 +117,8 @@ export default function Upload() {
           {/* Form Side */}
           <div className="space-y-8">
             <div className="space-y-2">
-              <h1 className="text-4xl font-black tracking-tight gradient-text uppercase">Create Collection</h1>
-              <p className="text-gray-500 font-medium">Deploy your unique assets to the blockchain marketplace.</p>
+              <h1 className="text-4xl font-black tracking-tight gradient-text uppercase">Dual Minting Protocol</h1>
+              <p className="text-gray-500 font-medium">Every initialization creates a twin-set of assets with a 50/50 price split.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="glass-card rounded-[2.5rem] p-8 md:p-12 space-y-6 shadow-2xl border-white/10">
@@ -133,7 +133,7 @@ export default function Upload() {
                   required 
                 />
                 <TextInput 
-                  placeholder="Collection Title" 
+                  placeholder="Asset Pair Title" 
                   name="collection_name" 
                   value={formData.collection_name} 
                   handleChange={handleChange} 
