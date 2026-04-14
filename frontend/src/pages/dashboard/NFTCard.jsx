@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import Container from "../../components/Container";
 import StyledCard from "../../components/vendor/Card/StyledCard";
