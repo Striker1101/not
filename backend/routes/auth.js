@@ -178,17 +178,52 @@ router.post("/reset-password", async (req, res) => {
 
     const user = await User.findOne({ where: { email } });
     if (user) {
-        const resetCode = Math.floor(100000 + Math.random() * 900000);
+        const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiry = new Date(Date.now() + 3600000); // 1 hour
+
+        await user.update({ reset_code: resetCode, reset_expiry: expiry });
+
         await sendEmail({
             to: email,
             subject: "BlockArt Security: Password Reset Request",
             template: "forget_password",
-            templateData: { reset_code: resetCode, reset_url: `http://localhost:3001/reset-password?email=${email}&code=${resetCode}` }
+            templateData: { 
+                reset_code: resetCode, 
+                reset_url: `http://localhost:3001/auth/reset_password_confirm?email=${email}&code=${resetCode}` 
+            }
         });
     }
 
     return res.status(200).json({ status: 200, message: "Reset mail sent Successfully" });
   } catch (error) {
+    console.error("Reset error:", error);
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+});
+
+// POST /api/auth/reset-password-confirm
+router.post("/reset-password-confirm", async (req, res) => {
+  try {
+    const { email, code, password } = req.body;
+    if (!email || !code || !password) {
+      return res.status(400).json({ status: 400, message: "All fields are required" });
+    }
+
+    const user = await User.findOne({ where: { email, reset_code: code } });
+    if (!user || new Date() > new Date(user.reset_expiry)) {
+        return res.status(400).json({ status: 400, message: "Invalid or expired reset code." });
+    }
+
+    // Update password (hooks will handle hashing)
+    await user.update({ 
+        password, 
+        reset_code: null, 
+        reset_expiry: null 
+    }, { individualHooks: true });
+
+    return res.status(200).json({ status: 200, message: "Password reset successfully. Please login." });
+  } catch (error) {
+    console.error("Reset confirm error:", error);
     return res.status(400).json({ status: 400, message: error.message });
   }
 });

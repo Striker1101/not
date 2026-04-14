@@ -126,3 +126,18 @@ export function facebookLogin() {
 export function twitterLogin() {
   // Social login not available in Express backend
 }
+export async function resetPasswordConfirm(email, code, password) {
+  try {
+    const response = await api.post("/auth/reset-password-confirm", {
+      email,
+      code,
+      password,
+    });
+    return { status: response.data.status, message: response.data.message };
+  } catch (error) {
+    return {
+      status: 400,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+}

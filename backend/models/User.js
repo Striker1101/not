@@ -52,6 +52,14 @@ const User = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    reset_code: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    reset_expiry: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     tableName: "users",
