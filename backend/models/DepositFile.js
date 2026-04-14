@@ -12,10 +12,6 @@ const DepositFile = sequelize.define(
     deposit_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: "deposits",
-        key: "id",
-      },
     },
     file_url: {
       type: DataTypes.TEXT,

@@ -12,10 +12,6 @@ const NftFile = sequelize.define(
     nft_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: "nfts",
-        key: "id",
-      },
     },
     file_url: {
       type: DataTypes.TEXT,

@@ -12,10 +12,6 @@ const Withdraw = sequelize.define(
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: "users",
-        key: "id",
-      },
     },
     type: {
       type: DataTypes.ENUM("bank", "crypto"),

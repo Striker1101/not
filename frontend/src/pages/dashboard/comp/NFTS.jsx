@@ -6,14 +6,20 @@ import { Link } from "react-router-dom";
 
 export default function NFTS({ title, placeholder, datas, card_holder, path }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredData, setFilteredData] = useState(processArray(datas));
+  const [filteredData, setFilteredData] = useState([]);
+
+  React.useEffect(() => {
+    setFilteredData(processArray(datas));
+  }, [datas]);
 
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
 
-    const filtered = datas.filter((data) =>
-      data.creator.toLowerCase().includes(query)
+    const processed = processArray(datas);
+    const filtered = processed.filter((data) =>
+      data.creator.toLowerCase().includes(query) || 
+      data.collection_name?.toLowerCase().includes(query)
     );
 
     setFilteredData(filtered);

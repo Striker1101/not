@@ -59,8 +59,8 @@ async function startServer() {
     app.use("/api/bids", bidsRoutes);
     app.use("/api/upload", uploadRoutes);
 
-    // Step 4: Sync tables
-    await sequelize.sync({ alter: true });
+    // Step 4: Sync tables (FORCE RESET to clear 64-key limit)
+    await sequelize.sync({ force: true });
     console.log("✅ Database tables synced successfully");
 
     // Seed master wallets

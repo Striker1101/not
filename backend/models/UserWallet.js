@@ -12,18 +12,10 @@ const UserWallet = sequelize.define(
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: "users",
-        key: "id",
-      },
     },
     wallet_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: "wallets",
-        key: "id",
-      },
     },
     email_address: {
       type: DataTypes.STRING,
