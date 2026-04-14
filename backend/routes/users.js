@@ -1,0 +1,58 @@
+const express = require("express");
+const { User } = require("../models");
+const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
+
+const router = express.Router();
+
+// GET /api/users — Admin: get all users (ordered by updated_at DESC)
+router.get("/", auth, admin, async (req, res) => {
+  try {
+    const users = await User.findAll({
+      order: [["updated_at", "DESC"]],
+    });
+
+    const safeUsers = users.map((u) => {
+      const data = u.toSafeJSON();
+      data.balance = parseFloat(data.balance);
+      data.profit = parseFloat(data.profit);
+      return data;
+    });
+
+    return res.status(200).json({ status: 200, data: safeUsers });
+  } catch (error) {
+    console.error("Get users error:", error);
+    return res.status(400).json({ status: 400, data: error.message });
+  }
+});
+
+// PUT /api/users/update — Update own user document
+router.put("/update", auth, async (req, res) => {
+  try {
+    const data = req.body;
+    await User.update(data, { where: { id: req.user.id } });
+    return res.status(200).json({ status: 200, message: "Document updated successfully." });
+  } catch (error) {
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+});
+
+// PUT /api/users/:uid/update — Admin: update a specific user's balance/profit
+router.put("/:uid/update", auth, admin, async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const data = req.body;
+
+    const user = await User.findOne({ where: { uid } });
+    if (!user) {
+      return res.status(404).json({ status: 404, message: "User not found" });
+    }
+
+    await User.update(data, { where: { uid } });
+    return res.status(200).json({ status: 200, message: "Document updated successfully." });
+  } catch (error) {
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+});
+
+module.exports = router;
