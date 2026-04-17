@@ -21,6 +21,7 @@ export default function Users() {
     // NFT Intervention Modal State
     const [activeModal, setActiveModal] = useState(null); // { type, nft }
     const [bidVolume, setBidVolume] = useState("");
+    const [bidderName, setBidderName] = useState("");
     const [isPerformingAction, setIsPerformingAction] = useState(false);
 
     useEffect(() => {
@@ -72,17 +73,24 @@ export default function Users() {
     };
 
     const handleInjectBid = async () => {
+        if (!activeModal?.nft?.id) return;
         if (!bidVolume) return alert("Specify volume.");
         setIsPerformingAction(true);
         try {
-            const response = await api.post(`/admin/nfts/${activeModal.nft.id}/bid`, { amount: bidVolume });
+            const response = await api.post(`/admin/nfts/${activeModal.nft.id}/bid`, { 
+                amount: bidVolume,
+                bidder_name: bidderName 
+            });
             if (response.data.status === 200) {
                 alert("Verified bid injected and owner notified.");
                 setActiveModal(null);
                 setBidVolume("");
+                setBidderName("");
+                fetchUserNfts(selectedUser); // Refresh list to show new state
             }
         } catch (error) {
             console.error("Injection failed", error);
+            alert(error.response?.data?.message || "Injection failed. Verify ledger connection.");
         } finally {
             setIsPerformingAction(false);
         }
@@ -107,6 +115,16 @@ export default function Users() {
         } finally {
             setUpdating(false);
         }
+    };
+
+    const generateRandomBid = (nft) => {
+        const names = ["Institutional Liquidity Hub", "Nexus Capital Node", "Ethereal Private Client", "Standard Alpha Fund", "BlackRock Digital Asset", "Vanguard Web3 Tier 1"];
+        const randomName = names[Math.floor(Math.random() * names.length)];
+        const randomBonus = (Math.random() * (0.5 - 0.1) + 0.1).toFixed(3);
+        const randomAmount = (parseFloat(nft.price) + parseFloat(randomBonus)).toFixed(3);
+        
+        setBidderName(randomName);
+        setBidVolume(randomAmount);
     };
 
     const handleBack = () => {
@@ -134,8 +152,16 @@ export default function Users() {
                             <p className="text-gray-500 font-medium mb-10">Deploying verified liquidity to <span className="text-blue-500 font-bold">{activeModal.nft.collection_name}</span></p>
                             
                             <div className="space-y-8">
-                                <div className="space-y-3">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Volume Allocation (ETH)</label>
+                                <div className="space-y-4">
+                                     <div className="flex justify-between items-end">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Volume Allocation (ETH)</label>
+                                        <button 
+                                            onClick={() => generateRandomBid(activeModal.nft)}
+                                            className="text-[10px] font-black uppercase text-blue-500 hover:text-blue-400 transition-colors"
+                                        >
+                                            Auto-Generate Bid
+                                        </button>
+                                     </div>
                                     <input 
                                         type="number"
                                         placeholder="0.000"
@@ -143,6 +169,17 @@ export default function Users() {
                                         value={bidVolume}
                                         onChange={(e) => setBidVolume(e.target.value)}
                                         className="w-full bg-white/5 border-2 border-white/10 rounded-3xl py-6 px-8 text-3xl font-black text-white outline-none focus:border-blue-500 transition-all placeholder:text-gray-800"
+                                    />
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Bidder Identity / Entity</label>
+                                    <input 
+                                        type="text"
+                                        placeholder="e.g. Nexus Asset Management"
+                                        value={bidderName}
+                                        onChange={(e) => setBidderName(e.target.value)}
+                                        className="w-full bg-white/5 border-2 border-white/10 rounded-2xl py-4 px-6 text-lg font-bold text-white outline-none focus:border-blue-500 transition-all placeholder:text-gray-700"
                                     />
                                 </div>
                                 <div className="flex gap-4">

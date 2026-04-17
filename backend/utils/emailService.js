@@ -40,11 +40,11 @@ const loadTemplate = async (templateName, data = {}) => {
   return html;
 };
 
-const sendEmail = async ({ to, subject, body, template, templateData }) => {
+const sendEmail = async ({ to, subject, body, html, template, templateData }) => {
   try {
     const mailServer = getTransporter();
     
-    let htmlContent = body;
+    let htmlContent = html || body;
     if (template) {
       htmlContent = await loadTemplate(template, templateData);
     }

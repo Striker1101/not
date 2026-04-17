@@ -299,7 +299,7 @@ const NFTCard = () => {
                                             {bid.User?.name?.charAt(0) || "U"}
                                         </div>
                                         <div>
-                                            <p className="text-sm font-black text-gray-900 dark:text-white">{bid.User?.name || "Anonymous"}</p>
+                                            <p className="text-sm font-black text-gray-900 dark:text-white">{bid.bidder_name || bid.User?.name || "Anonymous"}</p>
                                             <p className="text-[10px] text-gray-500 font-mono italic">{bid.User?.uid?.slice(0, 8)}...</p>
                                         </div>
                                     </div>

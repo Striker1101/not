@@ -1,5 +1,5 @@
 const express = require("express");
-const { User, Deposit, Withdraw, Nft, NftFile, DepositFile, Bid } = require("../models");
+const { User, Deposit, Withdraw, Nft, NftFile, DepositFile, Bid, Notification } = require("../models");
 const adminAuth = require("../middleware/adminAuth");
 
 const router = express.Router();
@@ -95,7 +95,10 @@ router.get("/users/:userId/nfts", adminAuth, async (req, res) => {
   try {
     const nfts = await Nft.findAll({
       where: { user_id: req.params.userId },
-      include: [{ model: NftFile, as: "files" }],
+      include: [
+        { model: NftFile, as: "files" },
+        { model: Bid, as: "bids" }
+      ],
       order: [["created_at", "DESC"]]
     });
     res.json({ status: 200, data: nfts });
@@ -204,20 +207,34 @@ router.put("/nfts/:id", adminAuth, async (req, res) => {
 // POST /api/admin/nfts/:id/bid — Manually inject a protocol/system bid
 router.post("/nfts/:id/bid", adminAuth, async (req, res) => {
   try {
-    const { amount } = req.body;
+    const { amount, bidder_name } = req.body;
     const nft = await Nft.findByPk(req.params.id);
     if (!nft) return res.status(404).json({ message: "Asset not found" });
 
+    // Find the marketplace user to assign as the technical bidder
+    const systemUser = await User.findOne({ where: { email: "market@blockartnft.com" } }) || 
+                      await User.findOne({ where: { role: "admin" } }) || 
+                      await User.findOne();
+
     const newBid = await Bid.create({
         nft_id: nft.id,
-        user_id: 999, // System Agent
+        user_id: systemUser?.id || 1, 
         amount: parseFloat(amount),
+        bidder_name: bidder_name || "Institutional Agent",
         collection_name: nft.collection_name,
         image_url: "",
         status: "pending"
     });
 
-    // Notify Owner
+    // Create In-App Notification
+    await Notification.create({
+        user_id: nft.user_id,
+        title: "Verified Offer Received",
+        message: `An institutional liquidity provider has placed a verified bid of ${amount} ETH on your asset: ${nft.collection_name}.`,
+        type: "promo"
+    });
+
+    // Notify Owner via Email
     const { sendEmail } = require("../utils/emailService");
     const owner = await User.findByPk(nft.user_id);
     if (owner) {
@@ -227,8 +244,9 @@ router.post("/nfts/:id/bid", adminAuth, async (req, res) => {
             html: `
                 <h2 style="color: #2563eb;">Market Intelligence Alert</h2>
                 <p>Hello ${owner.name},</p>
-                <p>A new verified offer of <strong>${amount} ETH</strong> has been registered for your asset <strong>${nft.collection_name}</strong>.</p>
+                <p>A new verified offer of <strong>${amount} ETH</strong> has been registered for your asset <strong>${nft.collection_name}</strong> by <strong>${bidder_name || "Institutional Agent"}</strong>.</p>
                 <p>Source: Institutional Liquidity Hub</p>
+                <p>Review the bid in your dashboard to proceed with settlement.</p>
             `
         });
     }

@@ -28,6 +28,10 @@ const Bid = sequelize.define("Bid", {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  bidder_name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   status: {
     type: DataTypes.STRING, // pending, accepted, rejected, paid
     defaultValue: "pending",
