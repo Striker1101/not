@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "node --watch index.js"
+    "dev": "node --watch index.js",
+    "seed": "node runSeeder.js"
+
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

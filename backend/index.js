@@ -61,47 +61,14 @@ async function startServer() {
     app.use("/api/upload", uploadRoutes);
     app.use("/api/admin", adminRoutes);
 
-    // Step 4: Sync tables (FORCE RESET to clear 64-key limit)
-    await sequelize.sync({ force: true });
+    // Step 4: Sync tables
+    await sequelize.sync({ alter: true });
     console.log("✅ Database tables synced successfully");
 
-    // Seed master wallets
-    const { Wallet: WalletModel } = require("./models");
-    const count = await WalletModel.count();
-    if (count === 0) {
-      await WalletModel.bulkCreate([
-        { wallet_name: "MetaMask", wallet_network: "Ethereum" },
-        { wallet_name: "Trust Wallet", wallet_network: "Multi-Chain" },
-        { wallet_name: "Coinbase Wallet", wallet_network: "Ethereum/Polygon" },
-        { wallet_name: "Atomic Wallet", wallet_network: "Multi-Chain" },
-        { wallet_name: "Phantom", wallet_network: "Solana/Ethereum" },
-        { wallet_name: "Binance Chain Wallet", wallet_network: "BSC" },
-      ]);
-      console.log("🌱 Master wallets seeded");
-    }
+    // Run comprehensive seeder
+    const { seedDatabase } = require("./utils/seeder");
+    await seedDatabase();
 
-    // Seed 2 Master Admins
-    const { Admin: AdminModel } = require("./models");
-    const adminCount = await AdminModel.count();
-    if (adminCount < 2) {
-      await AdminModel.bulkCreate([
-        {
-          email: "admin@blockartnft.com",
-          password: "adminpassword",
-          name: "Master Admin",
-          role: "super_admin"
-        },
-        {
-          email: "support@blockartnft.com",
-          password: "supportpassword",
-          name: "Support Lead",
-          role: "admin"
-        }
-      ], { individualHooks: true });
-      console.log("👑 Administrative layer provisioned with 2 accounts.");
-      console.log("   1. admin@blockartnft.com / adminpassword");
-      console.log("   2. support@blockartnft.com / supportpassword");
-    }
 
     // Serve Frontend build in production
     const frontendBuildPath = path.join(__dirname, "../frontend/build");
