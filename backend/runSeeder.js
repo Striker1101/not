@@ -12,6 +12,8 @@ async function run() {
     await sequelize.sync({ alter: true });
 
 
+
+
     
     await seedDatabase();
     

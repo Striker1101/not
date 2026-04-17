@@ -189,7 +189,7 @@ const NFTCard = () => {
                  </div>
                  <span className="text-xs font-black text-blue-500 uppercase tracking-[0.3em] font-mono">Verified Hash</span>
               </div>
-              <h1 className="text-5xl font-black text-white uppercase tracking-tighter leading-none break-words">
+              <h1 className="text-5xl font-black text-gray-900 dark:text-white uppercase tracking-tighter leading-none break-words">
                 {nft.collection_name || "Quantum Shard"}
               </h1>
               <p className="text-gray-400 text-lg leading-relaxed max-w-lg">
@@ -207,7 +207,7 @@ const NFTCard = () => {
                <div className="flex justify-between items-end border-b border-white/5 pb-6">
                   <div>
                     <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">Floor Reservation</span>
-                    <p className="text-4xl font-black text-white mt-1">{nft.price} <span className="text-blue-500 text-xl italic uppercase">ETH</span></p>
+                    <p className="text-4xl font-black text-gray-900 dark:text-white mt-1">{nft.price} <span className="text-blue-500 text-xl italic uppercase">ETH</span></p>
                   </div>
                   <div className="text-right">
                     <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500/50">Auction Pulse</span>
@@ -243,7 +243,7 @@ const NFTCard = () => {
                         value={bidAmount}
                         onChange={(e) => setBidAmount(e.target.value)}
                         placeholder={`Min Bid ${parseFloat(nft.price) + 0.01} ETH`}
-                        className="w-full bg-white/5 border-2 border-white/10 rounded-2xl py-4 px-6 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-white font-bold"
+                        className="w-full bg-black/5 dark:bg-white/5 border-2 border-black/10 dark:border-white/10 rounded-2xl py-4 px-6 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900 dark:text-white font-bold placeholder:text-gray-400"
                         />
                         <div className="absolute right-6 top-1/2 -translate-y-1/2 text-xs font-black text-gray-500">ETH</div>
                     </div>
@@ -263,9 +263,9 @@ const NFTCard = () => {
                <div className="w-14 h-14 rounded-2xl overflow-hidden border border-white/10 shadow-lg bg-blue-600 flex items-center justify-center text-white font-black text-xl">
                   {nft.creator?.charAt(0).toUpperCase() || "B"}
                </div>
-               <div>
+                <div>
                   <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Master Artist</span>
-                  <p className="text-white font-black uppercase tracking-tight">{nft.creator || "BlockArt Resident"}</p>
+                  <p className="text-gray-900 dark:text-white font-black uppercase tracking-tight">{nft.creator || "BlockArt Resident"}</p>
                </div>
             </div>
           </div>
@@ -274,7 +274,7 @@ const NFTCard = () => {
         {/* Bids Table for Owner & Public Visibility */}
         <div className="space-y-8">
             <div className="flex items-center justify-between">
-                <h2 className="text-3xl font-black uppercase tracking-tighter text-white">Live Bidding History</h2>
+                <h2 className="text-3xl font-black uppercase tracking-tighter text-gray-900 dark:text-white">Live Bidding History</h2>
                 <div className="px-4 py-1 bg-white/5 rounded-full border border-white/10 text-[10px] font-black text-gray-400 uppercase tracking-widest">
                     {bids.length} Offers Pending
                 </div>
@@ -299,7 +299,7 @@ const NFTCard = () => {
                                             {bid.User?.name?.charAt(0) || "U"}
                                         </div>
                                         <div>
-                                            <p className="text-sm font-black text-white">{bid.User?.name || "Anonymous"}</p>
+                                            <p className="text-sm font-black text-gray-900 dark:text-white">{bid.User?.name || "Anonymous"}</p>
                                             <p className="text-[10px] text-gray-500 font-mono italic">{bid.User?.uid?.slice(0, 8)}...</p>
                                         </div>
                                     </div>
@@ -354,7 +354,7 @@ const NFTCard = () => {
         <div className="space-y-10 pt-10">
            <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-6">
               <div>
-                <h2 className="text-3xl font-black uppercase tracking-tighter text-white">More From This Frontier</h2>
+                <h2 className="text-3xl font-black uppercase tracking-tighter text-gray-900 dark:text-white">More From This Frontier</h2>
                 <p className="text-gray-500 font-medium">Curated assets similar to your recent discovery.</p>
               </div>
               <Link to="/dashboard/minted" className="px-6 py-2 rounded-xl bg-white/5 text-xs font-black uppercase tracking-widest hover:bg-white/10 transition-all border border-white/5">
@@ -379,7 +379,7 @@ const NFTCard = () => {
 const DetailTile = ({ label, value, status }) => (
   <div className="glass-card rounded-[2rem] p-6 border-white/5 space-y-1">
     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">{label}</span>
-    <p className={`text-lg font-black truncate uppercase tracking-tight ${status === false ? "text-amber-500" : status === true ? "text-emerald-400" : "text-white"}`}>
+    <p className={`text-lg font-black truncate uppercase tracking-tight ${status === false ? "text-amber-500" : status === true ? "text-emerald-400" : "text-gray-900 dark:text-white"}`}>
       {value}
     </p>
   </div>

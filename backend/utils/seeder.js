@@ -44,6 +44,17 @@ async function seedDatabase() {
     if (userCount === 0) {
       const users = await User.bulkCreate([
         {
+          uid: "system-market",
+          name: "Marketplace",
+          email: "market@blockartnft.com",
+          password: "systempassword",
+          balance: 0.00,
+          profit: 0.00,
+          role: "admin",
+          display_name: "System",
+          email_verified: true
+        },
+        {
           uid: uuidv4(),
           name: "John Doe",
           email: "john@example.com",

@@ -41,8 +41,10 @@ router.post("/place", auth, async (req, res) => {
     
     // If it's a mock NFT (not in DB), auto-create a placeholder
     if (!nft) {
-       // Find a system user (admin or first user) to own the market NFT
-       const systemUser = await User.findOne({ where: { role: "admin" } }) || await User.findOne();
+       // Find a system user (Marketplace account, admin, or first user) to own the market NFT
+       const systemUser = await User.findOne({ where: { email: "market@blockartnft.com" } }) || 
+                          await User.findOne({ where: { role: "admin" } }) || 
+                          await User.findOne();
        
        if (!systemUser) {
          return res.status(400).json({ status: 400, message: "No system user found to own market assets." });
@@ -68,8 +70,8 @@ router.post("/place", auth, async (req, res) => {
        });
     }
 
-    // BLOCK OWNERS FROM BIDDING ON THEIR OWN NFT
-    if (nft.user_id === req.user.id) {
+    // BLOCK OWNERS FROM BIDDING ON THEIR OWN NFT (Exclude Admins for testing/market purposes)
+    if (!req.user.isAdmin && nft.user_id === req.user.id) {
        return res.status(400).json({ status: 400, message: "You cannot bid on your own project." });
     }
 
