@@ -41,10 +41,17 @@ router.post("/place", auth, async (req, res) => {
     
     // If it's a mock NFT (not in DB), auto-create a placeholder
     if (!nft) {
+       // Find a system user (admin or first user) to own the market NFT
+       const systemUser = await User.findOne({ where: { role: "admin" } }) || await User.findOne();
+       
+       if (!systemUser) {
+         return res.status(400).json({ status: 400, message: "No system user found to own market assets." });
+       }
+
        nft = await Nft.create({
           id: nft_id, // Force the ID to match the mock ID
           uuid: crypto.randomUUID(),
-          user_id: 999, // System/Market address
+          user_id: systemUser.id, 
           collection_name: collection_name || "Nexus Asset",
           creator: creator || "System",
           price: price || 0,
@@ -52,6 +59,7 @@ router.post("/place", auth, async (req, res) => {
           status: true,
           ends_at: new Date(Date.now() + 24 * 60 * 60 * 1000)
        });
+
        
        // Create a dummy file entry so it doesn't crash on retrieval
        await NftFile.create({

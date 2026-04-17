@@ -50,8 +50,10 @@ async function seedDatabase() {
           password: "password123",
           balance: 1500.50,
           profit: 250.00,
+          role: "admin",
           display_name: "JohnD",
           email_verified: true
+
         },
         {
           uid: uuidv4(),
@@ -134,16 +136,13 @@ async function seedDatabase() {
       await Deposit.bulkCreate([
         {
           user_id: users[0].id,
-          amount: 500,
-          currency: "ETH",
-          status: "completed",
-          tx_hash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+          amount: 500.00,
+          status: true
         },
         {
           user_id: users[1].id,
-          amount: 1000,
-          currency: "USDT",
-          status: "pending"
+          amount: 1000.00,
+          status: false
         }
       ]);
       console.log("✅ Deposits seeded");
@@ -152,10 +151,11 @@ async function seedDatabase() {
       await Withdraw.bulkCreate([
         {
           user_id: users[1].id,
-          amount: 200,
-          currency: "ETH",
+          type: "crypto",
+          wallet_name: "MetaMask",
           wallet_address: "0xAddress123",
-          status: "completed"
+          withdraw_amount: 200.00,
+          status: true
         }
       ]);
       console.log("✅ Withdrawals seeded");

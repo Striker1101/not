@@ -10,6 +10,8 @@ async function run() {
     // Sync models
     require("./models");
     await sequelize.sync({ alter: true });
+
+
     
     await seedDatabase();
     
