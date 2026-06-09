@@ -15,7 +15,7 @@ export default function AdminLayout({ children }) {
     ];
 
     return (
-        <div className="min-h-screen bg-[#0b0f19] text-white flex">
+        <div className="dark min-h-screen bg-[#0b0f19] text-white flex">
             {/* Sidebar */}
             <div className="w-72 bg-[#111827] border-r border-white/5 flex flex-col fixed h-full z-20">
                 <div className="p-10 flex items-center gap-3">

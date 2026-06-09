@@ -86,4 +86,18 @@ router.put("/:uid/update", auth, admin, async (req, res) => {
   }
 });
 
+// GET /api/users/notifications — Get authenticated user's notifications
+router.get("/notifications", auth, async (req, res) => {
+  try {
+    const notifications = await Notification.findAll({
+      where: { user_id: req.user.id },
+      order: [["created_at", "DESC"]],
+      limit: 50
+    });
+    return res.status(200).json({ status: 200, data: notifications });
+  } catch (error) {
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+});
+
 module.exports = router;

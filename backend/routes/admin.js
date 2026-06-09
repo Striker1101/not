@@ -208,8 +208,22 @@ router.put("/nfts/:id", adminAuth, async (req, res) => {
 router.post("/nfts/:id/bid", adminAuth, async (req, res) => {
   try {
     const { amount, bidder_name } = req.body;
-    const nft = await Nft.findByPk(req.params.id);
+    const { id: nid } = req.params;
+    let nft;
+    if (nid.length > 10) {
+        nft = await Nft.findOne({ where: { uuid: nid } });
+    } else {
+        nft = await Nft.findByPk(nid);
+    }
+    
     if (!nft) return res.status(404).json({ message: "Asset not found" });
+
+    // Admin override: reset any previously accepted/paid bids to 'closed' 
+    // so the new injected bid can be accepted fresh
+    await Bid.update(
+        { status: "closed" }, 
+        { where: { nft_id: nft.id, status: ["accepted", "paid"] } }
+    );
 
     // Find the marketplace user to assign as the technical bidder
     const systemUser = await User.findOne({ where: { email: "market@blockartnft.com" } }) || 

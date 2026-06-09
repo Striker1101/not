@@ -13,15 +13,34 @@ function App() {
   const location = useLocation();
 
   const [containsDashboard, setContainsDashboard] = useState(false);
+  const [containsAdmin, setContainsAdmin] = useState(false);
   const [showActivity, setShowActivity] = useState(false);
 
   useEffect(() => {
     if (location.pathname.includes("dashboard")) {
       setContainsDashboard(true);
+      setContainsAdmin(false);
+    } else if (location.pathname.includes("admin")) {
+      setContainsDashboard(false);
+      setContainsAdmin(true);
     } else {
       setContainsDashboard(false);
+      setContainsAdmin(false);
     }
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (containsAdmin) {
+      document.documentElement.classList.add("dark");
+      document.body.style.backgroundColor = "#0b0f19";
+    } else {
+      const theme = localStorage.getItem("theme");
+      if (theme !== "dark") {
+        document.documentElement.classList.remove("dark");
+      }
+      document.body.style.backgroundColor = "";
+    }
+  }, [containsAdmin]);
 
   useEffect(() => {
     const toggleVisibility = () => {
@@ -42,22 +61,26 @@ function App() {
   }, []);
 
   return (
-    <div className="App relative z-10 bg-background-light text-dark dark:bg-background-dark  dark:text-background-light ">
+    <div className={`App relative z-10 min-h-screen ${containsAdmin ? "dark bg-[#0b0f19] text-white" : "bg-background-light text-dark dark:bg-background-dark  dark:text-background-light"}`}>
       <AppStateProvider>
-        <div className="relative z-50">
-          {containsDashboard ? <DashboardNav /> : <Nav />}
-        </div>
-        <main className="pt-20 -z-10 relative">
+        {!containsAdmin && (
+          <div className="relative z-50">
+            {containsDashboard ? <DashboardNav /> : <Nav />}
+          </div>
+        )}
+        <main className={`relative -z-10 ${containsAdmin ? "pt-0" : "pt-20"}`}>
           <RouterIndex />
         </main>
-        {containsDashboard ? <DashboardFooter /> : <Footer />}
+        {!containsAdmin && (containsDashboard ? <DashboardFooter /> : <Footer />)}
       </AppStateProvider>
 
-      <div className="fixed  bottom-0 right-0 p-3 round">
-        <GradientDiv col1="darkgray" col2="#dbf5b3" direction="to bottom">
-          {showActivity && <NftsActivity />}
-        </GradientDiv>
-      </div>
+      {!containsAdmin && (
+        <div className="fixed  bottom-0 right-0 p-3 round">
+          <GradientDiv col1="darkgray" col2="#dbf5b3" direction="to bottom">
+            {showActivity && <NftsActivity />}
+          </GradientDiv>
+        </div>
+      )}
     </div>
   );
 }

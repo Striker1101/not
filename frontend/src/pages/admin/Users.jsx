@@ -77,7 +77,8 @@ export default function Users() {
         if (!bidVolume) return alert("Specify volume.");
         setIsPerformingAction(true);
         try {
-            const response = await api.post(`/admin/nfts/${activeModal.nft.id}/bid`, { 
+            const bidTargetId = activeModal.nft.uuid || activeModal.nft.id;
+            const response = await api.post(`/admin/nfts/${bidTargetId}/bid`, { 
                 amount: bidVolume,
                 bidder_name: bidderName 
             });
@@ -214,9 +215,11 @@ export default function Users() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
-                    {userNfts.map((nft) => (
-                        <div key={nft.id} className="glass-card rounded-[3.5rem] overflow-hidden border-white/5 shadow-2xl group flex flex-col relative">
-                            <div className="aspect-[4/5] relative overflow-hidden bg-gray-900">
+                    {userNfts.map((nft) => {
+                        console.log("NFT inside map:", nft);
+                        return (
+                            <div key={nft.id} className="glass-card rounded-[3.5rem] overflow-hidden border-white/5 shadow-2xl group flex flex-col relative">
+                                <div className="aspect-[4/5] relative overflow-hidden bg-gray-900">
                                 <img src={nft.files?.[0]?.file_url || nft.content} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
                                 
@@ -271,7 +274,7 @@ export default function Users() {
                                 </div>
                             </div>
                         </div>
-                    ))}
+                    ); })}
                 </div>
             </div>
         );
@@ -300,98 +303,100 @@ export default function Users() {
             </div>
 
             <div className="glass-card rounded-[4rem] overflow-hidden border-white/5 shadow-3xl">
-                <table className="w-full text-left">
-                    <thead>
-                        <tr className="bg-white/5 border-b border-white/5">
-                            <th className="px-12 py-8 text-[11px] font-black uppercase tracking-[0.3em] text-gray-600">Identity</th>
-                            <th className="px-12 py-8 text-[11px] font-black uppercase tracking-[0.3em] text-gray-600">Portfolio ETH</th>
-                            <th className="px-12 py-8 text-[11px] font-black uppercase tracking-[0.3em] text-gray-600">Growth ETH</th>
-                            <th className="px-12 py-8 text-[11px] font-black uppercase tracking-[0.3em] text-gray-600 text-right">Nexus Action</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                        {filteredUsers.map((user) => (
-                            <tr key={user.id} className="hover:bg-white/5 transition-all group">
-                                <td className="px-12 py-8">
-                                    <div className="flex items-center gap-6">
-                                        <div className="w-16 h-16 rounded-[1.5rem] bg-gray-900 flex items-center justify-center text-white font-black group-hover:bg-blue-600 transition-all border-2 border-white/5 shadow-2xl uppercase">
-                                            {user.name.charAt(0)}
+                <div className="overflow-x-auto w-full">
+                    <table className="w-full text-left min-w-[900px]">
+                        <thead>
+                            <tr className="bg-white/5 border-b border-white/5">
+                                <th className="px-12 py-8 text-[11px] font-black uppercase tracking-[0.3em] text-gray-400">Identity</th>
+                                <th className="px-12 py-8 text-[11px] font-black uppercase tracking-[0.3em] text-gray-400">Portfolio ETH</th>
+                                <th className="px-12 py-8 text-[11px] font-black uppercase tracking-[0.3em] text-gray-400">Growth ETH</th>
+                                <th className="px-12 py-8 text-[11px] font-black uppercase tracking-[0.3em] text-gray-400 text-right">Nexus Action</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {filteredUsers.map((user) => (
+                                <tr key={user.id} className="hover:bg-white/5 transition-all group">
+                                    <td className="px-12 py-8">
+                                        <div className="flex items-center gap-6">
+                                            <div className="w-16 h-16 rounded-[1.5rem] bg-gray-900 flex items-center justify-center text-white font-black group-hover:bg-blue-600 transition-all border-2 border-white/5 shadow-2xl uppercase">
+                                                {user.name.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <p className="font-black text-xl text-white uppercase tracking-tight leading-none mb-1">{user.name}</p>
+                                                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">{user.email}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="font-black text-xl text-white uppercase tracking-tight leading-none mb-1">{user.name}</p>
-                                            <p className="text-xs text-gray-600 font-bold uppercase tracking-widest">{user.email}</p>
+                                    </td>
+                                    <td className="px-12 py-8">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-blue-500 shadow-lg shadow-blue-500/50" />
+                                            {editMode === user.id ? (
+                                                <input 
+                                                    type="number"
+                                                    step="0.001"
+                                                    value={editData.balance}
+                                                    onChange={(e) => setEditData({...editData, balance: e.target.value})}
+                                                    className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white font-black w-24 outline-none focus:border-blue-500"
+                                                />
+                                            ) : (
+                                                <p className="font-black text-2xl text-white italic">{parseFloat(user.balance || 0).toFixed(2)}</p>
+                                            )}
                                         </div>
-                                    </div>
-                                </td>
-                                <td className="px-12 py-8">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-blue-500 shadow-lg shadow-blue-500/50" />
+                                    </td>
+                                    <td className="px-12 py-8">
                                         {editMode === user.id ? (
                                             <input 
                                                 type="number"
                                                 step="0.001"
-                                                value={editData.balance}
-                                                onChange={(e) => setEditData({...editData, balance: e.target.value})}
-                                                className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white font-black w-24 outline-none focus:border-blue-500"
+                                                value={editData.profit}
+                                                onChange={(e) => setEditData({...editData, profit: e.target.value})}
+                                                className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-emerald-400 font-black w-24 outline-none focus:border-blue-500"
                                             />
                                         ) : (
-                                            <p className="font-black text-2xl text-white italic">{parseFloat(user.balance || 0).toFixed(2)}</p>
+                                            <p className="font-black text-2xl text-emerald-500 italic">+{parseFloat(user.profit || 0).toFixed(2)}</p>
                                         )}
-                                    </div>
-                                </td>
-                                <td className="px-12 py-8">
-                                    {editMode === user.id ? (
-                                        <input 
-                                            type="number"
-                                            step="0.001"
-                                            value={editData.profit}
-                                            onChange={(e) => setEditData({...editData, profit: e.target.value})}
-                                            className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-emerald-400 font-black w-24 outline-none focus:border-blue-500"
-                                        />
-                                    ) : (
-                                        <p className="font-black text-2xl text-emerald-500 italic">+{parseFloat(user.profit || 0).toFixed(2)}</p>
-                                    )}
-                                </td>
-                                <td className="px-12 py-8 text-right">
-                                    <div className="flex justify-end gap-3">
-                                        {editMode === user.id ? (
-                                            <>
-                                                <button 
-                                                    onClick={() => handleUpdateFinances(user.id)}
-                                                    disabled={updating}
-                                                    className="px-8 py-3 bg-emerald-600 text-white text-[11px] font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all"
-                                                >
-                                                    {updating ? "Syncing..." : "Save"}
-                                                </button>
-                                                <button 
-                                                    onClick={() => setEditMode(null)}
-                                                    className="px-8 py-3 bg-white/5 text-gray-500 text-[11px] font-black uppercase tracking-widest rounded-2xl border border-white/10 transition-all shadow-lg"
-                                                >
-                                                    Cancel
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <button 
-                                                    onClick={() => handleStartEdit(user)}
-                                                    className="px-8 py-3 bg-white/5 hover:bg-white/10 text-white text-[11px] font-black uppercase tracking-widest rounded-2xl border border-white/10 transition-all opacity-40 hover:opacity-100"
-                                                >
-                                                    Adjust Metrics
-                                                </button>
-                                                <button 
-                                                    onClick={() => fetchUserNfts(user)}
-                                                    className="px-8 py-3 bg-blue-600 text-white text-[11px] font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all"
-                                                >
-                                                    Nexus Inventory
-                                                </button>
-                                            </>
-                                        )}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                                    </td>
+                                    <td className="px-12 py-8 text-right">
+                                        <div className="flex justify-end gap-3">
+                                            {editMode === user.id ? (
+                                                <>
+                                                    <button 
+                                                        onClick={() => handleUpdateFinances(user.id)}
+                                                        disabled={updating}
+                                                        className="px-8 py-3 bg-emerald-600 text-white text-[11px] font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all"
+                                                    >
+                                                        {updating ? "Syncing..." : "Save"}
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => setEditMode(null)}
+                                                        className="px-8 py-3 bg-white/5 text-gray-500 text-[11px] font-black uppercase tracking-widest rounded-2xl border border-white/10 transition-all shadow-lg"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <button 
+                                                        onClick={() => handleStartEdit(user)}
+                                                        className="px-8 py-3 bg-white/5 hover:bg-white/10 text-white text-[11px] font-black uppercase tracking-widest rounded-2xl border border-white/10 transition-all opacity-40 hover:opacity-100"
+                                                    >
+                                                        Adjust Metrics
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => fetchUserNfts(user)}
+                                                        className="px-8 py-3 bg-blue-600 text-white text-[11px] font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all"
+                                                    >
+                                                        Nexus Inventory
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

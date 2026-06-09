@@ -1,6 +1,6 @@
 const express = require("express");
 const crypto = require("crypto");
-const { Bid, User, Nft, NftFile } = require("../models");
+const { Bid, User, Nft, NftFile, Notification } = require("../models");
 const auth = require("../middleware/auth");
 const { resolveUserId } = require("../middleware/resolveUser");
 
@@ -119,13 +119,20 @@ router.post("/place", auth, async (req, res) => {
 router.get("/nft/:nftId", auth, async (req, res) => {
   try {
     const { nftId } = req.params;
-    const nft = await Nft.findByPk(nftId);
+    
+    let nft;
+    if (nftId.length > 10) { // Likely a UUID
+        nft = await Nft.findOne({ where: { uuid: nftId } });
+    } else {
+        nft = await Nft.findByPk(nftId);
+    }
+    
     if (!nft) return res.status(404).json({ status: 404, message: "NFT not found" });
 
     // Show all bids to the owner, only pending/accepted ones? Or all.
     const bids = await Bid.findAll({
-      where: { nft_id: nftId },
-      include: [{ model: User, as: "User", attributes: ["name", "email", "uid"] }],
+      where: { nft_id: nft.id },
+      include: [{ model: User, attributes: ["name", "email", "uid"] }],
       order: [["amount", "DESC"]]
     });
 
@@ -154,7 +161,7 @@ router.post("/accept/:id", auth, async (req, res) => {
 
     await bid.update({ status: "accepted" });
     
-    // Optionally reject all other pending bids
+    // Reject all other pending bids
     await Bid.update({ status: "rejected" }, { 
         where: { 
             nft_id: nft.id, 
@@ -163,7 +170,46 @@ router.post("/accept/:id", auth, async (req, res) => {
         } 
     });
 
-    return res.status(200).json({ status: 200, message: "Bid accepted successfully." });
+    // Create in-app notification about 24h deposit
+    await Notification.create({
+        user_id: nft.user_id,
+        title: "Bid Accepted — Settlement in 24 Hours",
+        message: `You accepted a bid of ${bid.amount} ETH on "${nft.collection_name}". The amount will be deposited to your account within 24 hours.`,
+        type: "promo"
+    });
+
+    // Send email to owner about 24h deposit
+    const { sendEmail } = require("../utils/emailService");
+    const owner = await User.findByPk(nft.user_id);
+    if (owner) {
+        await sendEmail({
+            to: owner.email,
+            subject: `Bid Accepted — ${nft.collection_name}`,
+            html: `
+                <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eef2ff; border-radius: 16px; overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, #059669, #10b981); padding: 30px; text-align: center;">
+                        <h1 style="color: white; margin: 0; font-size: 24px;">Bid Accepted ✓</h1>
+                    </div>
+                    <div style="padding: 40px; color: #1e293b; line-height: 1.6;">
+                        <p>Hello ${owner.name},</p>
+                        <p>You have successfully accepted a bid on your asset <strong>${nft.collection_name}</strong>.</p>
+                        <div style="background: #f0fdf4; padding: 25px; border-radius: 12px; margin: 25px 0; text-align: center; border: 1px solid #bbf7d0;">
+                            <span style="display: block; font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em;">Accepted Amount</span>
+                            <span style="font-size: 32px; font-weight: 900; color: #059669;">${bid.amount} ETH</span>
+                            <span style="display: block; font-size: 12px; color: #64748b; margin-top: 8px;">Settlement within 24 hours</span>
+                        </div>
+                        <p>The accepted amount will be deposited into your account balance within <strong>24 hours</strong>. You will receive a confirmation once the settlement is complete.</p>
+                    </div>
+                </div>
+            `
+        });
+    }
+
+    return res.status(200).json({ 
+        status: 200, 
+        message: `Bid of ${bid.amount} ETH accepted. The amount will be deposited to your account within 24 hours.`,
+        accepted_amount: bid.amount
+    });
   } catch (error) {
     return res.status(400).json({ status: 400, message: error.message });
   }

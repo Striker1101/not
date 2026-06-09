@@ -22,9 +22,13 @@ const NFTCard = () => {
   const [bidAmount, setBidAmount] = useState("");
   const [result, setResult] = useState({ status: 0, message: null });
   const [loading, setLoading] = useState(false);
+  const [acceptToast, setAcceptToast] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState("");
   const [isFetching, setIsFetching] = useState(true);
+  const [showExtendModal, setShowExtendModal] = useState(false);
+  const [extendHours, setExtendHours] = useState("24");
+  const [isExtending, setIsExtending] = useState(false);
 
   const currentUser = islogged.userData?.users?.[0];
   const recommendations = randomSelector([...minted, ...buy], 4);
@@ -34,7 +38,7 @@ const NFTCard = () => {
   }, [id]);
 
   useEffect(() => {
-    if (nft?.id) {
+    if (nft?.uuid || nft?.id) {
         fetchBids();
     }
   }, [nft]);
@@ -79,7 +83,8 @@ const NFTCard = () => {
 
   const fetchBids = async () => {
     try {
-      const response = await api.get(`/bids/nft/${nft.id}`);
+      const bidTargetId = nft.uuid || nft.id || id;
+      const response = await api.get(`/bids/nft/${bidTargetId}`);
       if (response.data.status === 200) {
         setBids(response.data.data);
       }
@@ -121,9 +126,11 @@ const NFTCard = () => {
     setActionLoading(true);
     try {
         const response = await api.post(`/bids/accept/${bidId}`);
-        setResult(response.data);
         if (response.data.status === 200) {
+            setAcceptToast(response.data.message);
             fetchBids();
+            // Auto-dismiss toast after 10 seconds
+            setTimeout(() => setAcceptToast(null), 10000);
         }
     } catch (error) {
         setResult({ status: 400, message: error.response?.data?.message || "Failed to accept bid." });
@@ -132,18 +139,21 @@ const NFTCard = () => {
     }
   };
 
-  const handleExtendTime = async () => {
-    const hours = prompt("How many hours to add?", "24");
-    if (!hours || isNaN(hours)) return;
-    
+  const handleExtendTimeSubmit = async (e) => {
+    e.preventDefault();
+    if (!extendHours || isNaN(extendHours)) return;
+    setIsExtending(true);
     try {
-        const response = await api.put(`/nfts/extend-time/${nft.uuid}`, { hours: parseInt(hours) });
+        const response = await api.put(`/nfts/extend-time/${nft.uuid}`, { hours: parseInt(extendHours) });
         if (response.data.status === 200) {
             setResult({ status: 200, message: response.data.message });
             setNft({ ...nft, ends_at: response.data.ends_at });
+            setShowExtendModal(false);
         }
     } catch (error) {
         setResult({ status: 400, message: "Failed to extend time. Admins only." });
+    } finally {
+        setIsExtending(false);
     }
   };
 
@@ -152,6 +162,7 @@ const NFTCard = () => {
 
   const isOwner = currentUser && (nft.user_id === currentUser.id || nft.creator === currentUser.name);
   const isAdmin = currentUser?.role === "admin";
+  const hasAcceptedBid = bids.some(b => b.status === "accepted" || b.status === "paid");
 
   return (
     <Container title={nft.collection_name || "Asset Details"}>
@@ -217,16 +228,44 @@ const NFTCard = () => {
                   </div>
                </div>
 
+               {/* Accept Toast */}
+               {acceptToast && (
+                 <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-start gap-3 animate-fade-in">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                    </div>
+                    <div className="flex-1">
+                        <p className="text-emerald-400 text-xs font-black uppercase tracking-widest">Settlement Confirmed</p>
+                        <p className="text-emerald-300/80 text-xs font-bold leading-relaxed mt-1">{acceptToast}</p>
+                    </div>
+                    <button onClick={() => setAcceptToast(null)} className="text-emerald-500/50 hover:text-emerald-400 transition-colors">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                 </div>
+               )}
+
+               {/* Accepted Bid Banner */}
+               {hasAcceptedBid && (
+                 <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl">
+                    <p className="text-emerald-400 text-xs font-black uppercase tracking-widest mb-1">Offer Accepted</p>
+                    <p className="text-emerald-300/70 text-xs font-bold leading-relaxed">
+                        A bid has been accepted on this asset. The settlement amount will be deposited within 24 hours. No further actions are available until the admin posts a new offer.
+                    </p>
+                 </div>
+               )}
+
                {isOwner ? (
                  <div className="space-y-4 pt-2">
-                    <div className="p-4 bg-blue-600/10 border border-blue-600/20 rounded-2xl">
-                        <p className="text-blue-400 text-xs font-bold leading-relaxed">
-                            You are the master of this asset. You can review open offers from the market below. 15% marketplace commission applies on acceptance.
-                        </p>
-                    </div>
+                    {!hasAcceptedBid && (
+                      <div className="p-4 bg-blue-600/10 border border-blue-600/20 rounded-2xl">
+                          <p className="text-blue-400 text-xs font-bold leading-relaxed">
+                              You are the master of this asset. You can review open offers from the market below. 15% marketplace commission applies on acceptance.
+                          </p>
+                      </div>
+                    )}
                     {isAdmin && (
                         <button 
-                            onClick={handleExtendTime}
+                            onClick={() => setShowExtendModal(true)}
                             className="w-full py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-black tracking-widest border border-white/10 transition-all uppercase"
                         >
                             Extend Auction Duration (Admin)
@@ -242,17 +281,18 @@ const NFTCard = () => {
                         step="0.0001"
                         value={bidAmount}
                         onChange={(e) => setBidAmount(e.target.value)}
-                        placeholder={`Min Bid ${parseFloat(nft.price) + 0.01} ETH`}
-                        className="w-full bg-black/5 dark:bg-white/5 border-2 border-black/10 dark:border-white/10 rounded-2xl py-4 px-6 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900 dark:text-white font-bold placeholder:text-gray-400"
+                        placeholder={hasAcceptedBid ? "Bidding closed — offer accepted" : `Min Bid ${parseFloat(nft.price) + 0.01} ETH`}
+                        disabled={hasAcceptedBid}
+                        className="w-full bg-black/5 dark:bg-white/5 border-2 border-black/10 dark:border-white/10 rounded-2xl py-4 px-6 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900 dark:text-white font-bold placeholder:text-gray-400 disabled:opacity-40"
                         />
                         <div className="absolute right-6 top-1/2 -translate-y-1/2 text-xs font-black text-gray-500">ETH</div>
                     </div>
                     <button 
-                        disabled={loading || timeLeft === "AUCTION ENDED"}
+                        disabled={loading || timeLeft === "AUCTION ENDED" || hasAcceptedBid}
                         className="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl font-black shadow-xl shadow-blue-500/20 hover:scale-[1.02] active:scale-95 transition-all text-sm tracking-widest flex items-center justify-center gap-3 disabled:opacity-50 disabled:grayscale"
                     >
-                        {loading ? "PROCESSING..." : timeLeft === "AUCTION ENDED" ? "AUCTION CLOSED" : "PLACE SECURE BID"}
-                        {!loading && timeLeft !== "AUCTION ENDED" && <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
+                        {hasAcceptedBid ? "OFFER ACCEPTED — BIDDING CLOSED" : loading ? "PROCESSING..." : timeLeft === "AUCTION ENDED" ? "AUCTION CLOSED" : "PLACE SECURE BID"}
+                        {!loading && !hasAcceptedBid && timeLeft !== "AUCTION ENDED" && <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
                     </button>
                  </form>
                )}
@@ -275,8 +315,12 @@ const NFTCard = () => {
         <div className="space-y-8">
             <div className="flex items-center justify-between">
                 <h2 className="text-3xl font-black uppercase tracking-tighter text-gray-900 dark:text-white">Live Bidding History</h2>
-                <div className="px-4 py-1 bg-white/5 rounded-full border border-white/10 text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                    {bids.length} Offers Pending
+                <div className={`px-4 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${
+                    hasAcceptedBid 
+                        ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
+                        : "bg-white/5 border-white/10 text-gray-400"
+                }`}>
+                    {hasAcceptedBid ? "Offer Accepted" : `${bids.filter(b => b.status === "pending").length} Offers Pending`}
                 </div>
             </div>
             
@@ -318,7 +362,7 @@ const NFTCard = () => {
                                 </td>
                                 {isOwner && (
                                     <td className="px-8 py-6 text-right">
-                                        {bid.status === "pending" && (
+                                        {bid.status === "pending" && !hasAcceptedBid && (
                                             <button 
                                                 onClick={() => handleAcceptBid(bid.id)}
                                                 disabled={actionLoading}
@@ -326,6 +370,9 @@ const NFTCard = () => {
                                             >
                                                 Accept Offer
                                             </button>
+                                        )}
+                                        {bid.status === "accepted" && (
+                                            <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">✓ Accepted</span>
                                         )}
                                     </td>
                                 )}
@@ -372,6 +419,49 @@ const NFTCard = () => {
         </div>
 
       </div>
+
+      {/* Extend Auction Modal Overlay */}
+      {showExtendModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-black/85 backdrop-blur-xl" onClick={() => !isExtending && setShowExtendModal(false)}/>
+          <div className="relative w-full max-w-md glass-card rounded-[2.5rem] p-10 border-white/10 shadow-3xl animate-modal-in dark text-white bg-[#111827]/95">
+            <h3 className="text-2xl font-black uppercase tracking-tighter mb-2">Extend Auction</h3>
+            <p className="text-gray-400 text-xs font-medium mb-8">Add additional hours of bidding duration for <span className="text-blue-500 font-bold">{nft.collection_name}</span></p>
+            
+            <form onSubmit={handleExtendTimeSubmit} className="space-y-6">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Hours to Add</label>
+                <input 
+                  type="number"
+                  min="1"
+                  value={extendHours}
+                  onChange={(e) => setExtendHours(e.target.value)}
+                  autoFocus
+                  className="w-full bg-white/5 border-2 border-white/10 rounded-2xl py-4 px-6 text-2xl font-black text-white outline-none focus:border-blue-500 transition-all"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button 
+                  type="submit"
+                  disabled={isExtending}
+                  className="flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-xl shadow-blue-500/20 active:scale-95 transition-all disabled:opacity-50"
+                >
+                  {isExtending ? "Extending..." : "Confirm"}
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => setShowExtendModal(false)}
+                  disabled={isExtending}
+                  className="px-6 py-4 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white rounded-xl text-xs font-black uppercase tracking-widest border border-white/10 transition-all"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </Container>
   );
 };

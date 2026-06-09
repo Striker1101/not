@@ -62,7 +62,7 @@ async function startServer() {
     app.use("/api/admin", adminRoutes);
 
     // Step 4: Sync tables
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
     console.log("✅ Database tables synced successfully");
 
     // Run comprehensive seeder
@@ -95,4 +95,4 @@ async function startServer() {
   }
 }
 
-startServer();
+startServer(); // restart to recreate database v3

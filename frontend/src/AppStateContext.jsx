@@ -58,9 +58,10 @@ export const AppStateProvider = ({ children }) => {
   }
 
   function randomSelector(array, amount) {
-    if (amount > array.length) {
-      throw new Error("Amount cannot be greater than the length of the array");
+    if (!Array.isArray(array)) {
+      return [];
     }
+    const limit = Math.min(amount, array.length);
 
     // Create a copy of the array to avoid mutating the original array
     const arrayCopy = [...array];
@@ -71,8 +72,8 @@ export const AppStateProvider = ({ children }) => {
       [arrayCopy[i], arrayCopy[j]] = [arrayCopy[j], arrayCopy[i]];
     }
 
-    // Return the first 'amount' elements of the shuffled array
-    return arrayCopy.slice(0, amount);
+    // Return the first 'limit' elements of the shuffled array
+    return arrayCopy.slice(0, limit);
   }
 
   return (
