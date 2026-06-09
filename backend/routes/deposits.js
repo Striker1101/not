@@ -46,7 +46,7 @@ router.post("/add", auth, upload.array("file", 5), async (req, res) => {
       }
     }
 
-    return res.status(200).json({ status: 200, message: "Operation was successfully." });
+    return res.status(200).json({ status: 200, message: "the operation was successful and that verified within an hour" });
   } catch (error) {
     return res.status(400).json({ status: 400, message: error.message });
   }

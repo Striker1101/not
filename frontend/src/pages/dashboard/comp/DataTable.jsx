@@ -70,15 +70,19 @@ const DataTable = ({ data }) => {
 export default DataTable;
 
 function renderCellContent(value, limiter) {
+  if (value == null) return null;
   if (typeof value === "object") {
     if (Array.isArray(value)) {
+      if (!value.length) return null;
       return (
-        <img
-          src={value[0]} // Assuming the first element of the array is the image URL
-          alt=""
-          width={50}
-          className="rounded-2xl"
-        />
+        <a href={value[0]} target="_blank" rel="noopener noreferrer" className="block w-fit">
+          <img
+            src={value[0]} // Assuming the first element of the array is the image URL
+            alt=""
+            width={50}
+            className="rounded-2xl cursor-pointer hover:opacity-80 transition-opacity"
+          />
+        </a>
       );
     } else {
     return typeof value === 'object' && value.seconds

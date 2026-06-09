@@ -24,8 +24,10 @@ export default function Deposit() {
   const [fetching, setFetching] = useState(true);
   const [result, setResult] = useState({ status: 0, message: null });
   const [method, setMethod] = useState("direct"); // direct or linked
+  const [userWallets, setUserWallets] = useState([]);
 
-  const hasWallet = islogged.userData?.user_wallets?.length > 0;
+  const activeWallets = userWallets.filter(w => !w.deleted_at);
+  const hasWallet = activeWallets.length > 0;
 
   const fetchDeposits = async () => {
     try {
@@ -40,8 +42,20 @@ export default function Deposit() {
     }
   };
 
+  const fetchUserWallets = async () => {
+    try {
+      const response = await api.get("/wallets/user");
+      if (response.data.status === 200) {
+        setUserWallets(response.data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user wallets", error);
+    }
+  };
+
   useEffect(() => {
     fetchDeposits();
+    fetchUserWallets();
   }, []);
 
   const handleChange = (e) => {
@@ -83,6 +97,7 @@ export default function Deposit() {
       setResult(response.data);
       if (response.data.status === 200) {
         setFormData({ wallet: "", amount: "", file: [] });
+        if (refInput.current) refInput.current.value = "";
         fetchDeposits();
       }
     } catch (error) {
@@ -201,14 +216,57 @@ export default function Deposit() {
                             )}
                           </>
                         ) : (
-                          <SelectInput
-                            handleChange={handleChange}
-                            placeholder="Select Linked Source"
-                            name="wallet"
-                            value={formData.wallet}
-                            options={linkedWalletOptions}
-                            required
-                          />
+                          <div className="space-y-4">
+                            <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest px-2">Select Linked Source</label>
+                            <div className="grid grid-cols-1 gap-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                              {activeWallets.map(w => (
+                                <div 
+                                  key={w.id}
+                                  onClick={() => {
+                                      if (w.status === "verified") {
+                                          setFormData(prev => ({ ...prev, wallet: w.id }))
+                                      }
+                                  }}
+                                  className={`p-5 rounded-[1.5rem] border transition-all ${
+                                      w.status !== "verified" ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+                                  } ${
+                                    formData.wallet === w.id 
+                                    ? "bg-blue-600/10 border-blue-500 shadow-xl shadow-blue-500/10" 
+                                    : "bg-white/5 border-white/5 hover:border-white/20"
+                                  }`}
+                                >
+                                  <div className="flex justify-between items-center">
+                                    <div>
+                                      <p className="font-black text-white text-sm uppercase tracking-tight">{w.wallet_details?.wallet_name || "Custom Wallet"}</p>
+                                      <p className="text-[10px] text-gray-500 font-mono mt-1">{w.recovery_phrase.substring(0, 15)}...</p>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-2">
+                                      <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${
+                                          w.status === "verified" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                                          w.status === "rejected" ? "bg-red-500/10 text-red-500 border-red-500/20" :
+                                          "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                                      }`}>
+                                          {w.status || "pending"}
+                                      </span>
+                                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${formData.wallet === w.id ? "border-blue-500" : "border-white/20"}`}>
+                                        {formData.wallet === w.id && <div className="w-2 h-2 rounded-full bg-blue-500" />}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="pt-2">
+                               <Link 
+                                 to="/dashboard/wallet" 
+                                 className="w-full flex items-center justify-center gap-2 py-4 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest border border-white/5 hover:border-white/20 transition-all border-dashed"
+                               >
+                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                                 Link Additional Wallet
+                               </Link>
+                            </div>
+                          </div>
                         )}
 
                         <TextInput
@@ -233,6 +291,7 @@ export default function Deposit() {
                         <div className="pt-4">
                           <SubmitButton 
                             loading={loading} 
+                            disabled={!formData.wallet || !formData.amount}
                             text={method === "direct" ? "SUBMIT DEPOSIT PROOF" : "PROCESS BRIDGE REQUEST"} 
                           />
                         </div>

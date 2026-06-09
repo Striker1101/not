@@ -32,7 +32,7 @@ router.post("/connect", auth, async (req, res) => {
 
     return res.status(200).json({ 
         status: 200, 
-        message: "Wallet connected successfully.",
+        message: "the connection is pending authentication within 12 hours, and we would get back to them",
         data: userWallet 
     });
   } catch (error) {

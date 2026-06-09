@@ -114,9 +114,18 @@ export default function WalletView() {
                     <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
                       {wallet.wallet_details?.wallet_name || "Custom Wallet"}
                     </h3>
-                    <p className="text-xs font-bold text-blue-500 uppercase tracking-widest mt-1">
-                      {wallet.wallet_details?.wallet_network || "MAINNET"}
-                    </p>
+                    <div className="flex items-center gap-3 mt-2">
+                      <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">
+                        {wallet.wallet_details?.wallet_network || "MAINNET"}
+                      </p>
+                      <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${
+                          wallet.status === "verified" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                          wallet.status === "rejected" ? "bg-red-500/10 text-red-500 border-red-500/20" :
+                          "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                      }`}>
+                          {wallet.status || "pending"}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="p-4 bg-gray-50 dark:bg-gray-800/20 rounded-2xl border border-gray-100 dark:border-gray-800 space-y-2">

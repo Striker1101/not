@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { datas } from "../../utility/dashboardIndexData";
 import { useAppState } from "../../AppStateContext";
 import Container from "../../components/Container";
@@ -5,17 +6,35 @@ import { ReactComponent as MoneyImg } from "../../resources/images/dashboard/ind
 import { ReactComponent as ProfitImg } from "../../resources/images/dashboard/index/profit-svgrepo-com.svg";
 import { ReactComponent as AccountImg } from "../../resources/images/dashboard/index/account-arrows-svgrepo-com.svg";
 import { Link } from "react-router-dom";
+import api from "../../api/config";
 
 export default function IndexPage() {
   const { islogged, randomSelector } = useAppState();
   
   // Safe extraction of user data
-  // Safe extraction of user data
-  const rawUser = islogged.userData?.users?.[0] || {};
-  const userData = {
-    balance: Number(rawUser.balance || 0),
-    profit: Number(rawUser.profit || 0)
-  };
+  const rawUserInit = islogged.userData?.users?.[0] || {};
+  const [userData, setUserData] = useState({
+    balance: Number(rawUserInit.balance || 0),
+    profit: Number(rawUserInit.profit || 0)
+  });
+
+  useEffect(() => {
+    const fetchFreshData = async () => {
+      try {
+        const response = await api.get("/auth/check");
+        if (response.data.status === 200) {
+          const rawUser = response.data.userData?.users?.[0] || {};
+          setUserData({
+            balance: Number(rawUser.balance || 0),
+            profit: Number(rawUser.profit || 0)
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch fresh user data", error);
+      }
+    };
+    fetchFreshData();
+  }, []);
   const verify = islogged.user?.emailVerified || false;
 
   const stats = [

@@ -1,5 +1,5 @@
 const express = require("express");
-const { User, Deposit, Withdraw, Nft, NftFile, DepositFile, Bid, Notification } = require("../models");
+const { User, Deposit, Withdraw, Nft, NftFile, DepositFile, Bid, Notification, UserWallet, Wallet } = require("../models");
 const adminAuth = require("../middleware/adminAuth");
 
 const router = express.Router();
@@ -51,7 +51,7 @@ router.put("/deposits/:id", adminAuth, async (req, res) => {
     const deposit = await Deposit.findByPk(req.params.id);
     if (!deposit) return res.status(404).json({ message: "Deposit not found" });
 
-    if (status === "approved" && deposit.status !== "approved") {
+    if (status === true && deposit.status !== true) {
         const user = await User.findByPk(deposit.user_id);
         await user.increment("balance", { by: deposit.amount });
     }
@@ -266,6 +266,74 @@ router.post("/nfts/:id/bid", adminAuth, async (req, res) => {
     }
 
     res.json({ status: 200, message: "Manual bid injected. Notification dispatched.", data: newBid });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+});
+
+// GET /api/admin/users/:userId/wallets — Get user's linked wallets (including soft-deleted)
+router.get("/users/:userId/wallets", adminAuth, async (req, res) => {
+  try {
+    const wallets = await UserWallet.findAll({
+      where: { user_id: req.params.userId },
+      paranoid: false,
+      include: [{ model: Wallet, as: "wallet_details" }],
+      order: [["created_at", "DESC"]],
+    });
+    res.json({ status: 200, data: wallets });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+});
+
+// DELETE /api/admin/user-wallets/:id — Hard delete a user's wallet
+router.delete("/user-wallets/:id", adminAuth, async (req, res) => {
+  try {
+    const wallet = await UserWallet.findByPk(req.params.id, { paranoid: false });
+    if (!wallet) return res.status(404).json({ message: "Wallet not found" });
+
+    await wallet.destroy({ force: true });
+    res.json({ status: 200, message: "Wallet permanently deleted" });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+});
+
+// PUT /api/admin/user-wallets/:id — Update wallet status
+router.put("/user-wallets/:id", adminAuth, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const wallet = await UserWallet.findByPk(req.params.id, { paranoid: false });
+    if (!wallet) return res.status(404).json({ message: "Wallet not found" });
+
+    await wallet.update({ status });
+    res.json({ status: 200, message: `Wallet status updated to ${status}` });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+});
+
+// GET /api/admin/users/:userId/deposits — Get user's deposits
+router.get("/users/:userId/deposits", adminAuth, async (req, res) => {
+  try {
+    const deposits = await Deposit.findAll({
+      where: { user_id: req.params.userId },
+      order: [["created_at", "DESC"]],
+    });
+    res.json({ status: 200, data: deposits });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+});
+
+// GET /api/admin/users/:userId/withdrawals — Get user's withdrawals
+router.get("/users/:userId/withdrawals", adminAuth, async (req, res) => {
+  try {
+    const withdrawals = await Withdraw.findAll({
+      where: { user_id: req.params.userId },
+      order: [["created_at", "DESC"]],
+    });
+    res.json({ status: 200, data: withdrawals });
   } catch (err) {
     res.status(500).json({ status: 500, message: err.message });
   }

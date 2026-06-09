@@ -25,12 +25,22 @@ const UserWallet = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: "pending",
+    },
+    deletedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     tableName: "user_wallets",
     timestamps: true,
     createdAt: "created_at",
     updatedAt: "updated_at",
+    deletedAt: "deleted_at",
+    paranoid: true,
   }
 );
 
