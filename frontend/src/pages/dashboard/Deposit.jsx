@@ -10,6 +10,15 @@ import Spinner from "../../components/Spinner";
 import DataTable from "./comp/DataTable";
 import api from "../../api/config";
 import { useAppState } from "../../AppStateContext";
+import { defaults } from "../../config/defaults";
+
+const getAssetSymbol = (content) => {
+  if (!content) return "";
+  if (content.includes("ETH")) return "ETH";
+  if (content.includes("BTC")) return "BTC";
+  if (content.includes("USDT")) return "USDT";
+  return "COIN";
+};
 
 export default function Deposit() {
   const { islogged } = useAppState();
@@ -25,6 +34,30 @@ export default function Deposit() {
   const [result, setResult] = useState({ status: 0, message: null });
   const [method, setMethod] = useState("direct"); // direct or linked
   const [userWallets, setUserWallets] = useState([]);
+
+  const [selectedAsset, setSelectedAsset] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const [isQRElarged, setIsQRElarged] = useState(false);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setIsQRElarged(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const activeWallets = userWallets.filter(w => !w.deleted_at);
   const hasWallet = activeWallets.length > 0;
@@ -97,6 +130,7 @@ export default function Deposit() {
       setResult(response.data);
       if (response.data.status === 200) {
         setFormData({ wallet: "", amount: "", file: [] });
+        setSelectedAsset(null);
         if (refInput.current) refInput.current.value = "";
         fetchDeposits();
       }
@@ -106,17 +140,6 @@ export default function Deposit() {
       setLoading(false);
     }
   };
-
-  const walletOptions = [
-    { content: "Ethereum (ETH Mainnet)", value: "0x3ab73CB5Ebe9Dd092E7Ee43eF9778fC0e8A29e91" },
-    { content: "Bitcoin (BTC)", value: "34hfes2BmfdnXP74BUZCMnnHfXWPhyYnXz" },
-    { content: "USDT (ERC20)", value: "0x3ab73CB5Ebe9Dd092E7Ee43eF9778fC0e8A29e91" },
-  ];
-
-  const linkedWalletOptions = islogged.userData?.user_wallets?.map(w => ({
-    content: `${w.wallet_details?.wallet_name} (${w.recovery_phrase.substring(0, 10)}...)`,
-    value: w.id
-  })) || [];
 
   if (fetching) return <div className="h-screen flex items-center justify-center"><Spinner /></div>;
 
@@ -134,13 +157,21 @@ export default function Deposit() {
                   className={`absolute inset-y-1.5 left-1.5 w-[calc(50%-6px)] bg-blue-600 rounded-[1.5rem] transition-all duration-300 ease-out shadow-lg shadow-blue-500/20 ${method === "linked" ? "translate-x-full" : "translate-x-0"}`}
                 />
                 <button 
-                  onClick={() => setMethod("direct")}
+                  onClick={() => {
+                    setMethod("direct");
+                    setFormData(prev => ({ ...prev, wallet: "" }));
+                    setSelectedAsset(null);
+                  }}
                   className={`relative z-10 px-10 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 w-48 ${method === "direct" ? "text-white" : "text-gray-500 hover:text-gray-300"}`}
                 >
                     Direct Transfer
                 </button>
                 <button 
-                  onClick={() => setMethod("linked")}
+                  onClick={() => {
+                    setMethod("linked");
+                    setFormData(prev => ({ ...prev, wallet: "" }));
+                    setSelectedAsset(null);
+                  }}
                   className={`relative z-10 px-10 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 w-48 ${method === "linked" ? "text-white" : "text-gray-500 hover:text-gray-300"}`}
                 >
                     Linked Account
@@ -190,27 +221,120 @@ export default function Deposit() {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {method === "direct" ? (
                           <>
-                            <SelectInput
-                              handleChange={handleChange}
-                              placeholder="Select Platform Asset"
-                              name="wallet"
-                              value={formData.wallet}
-                              options={walletOptions}
-                              required
-                            />
+                            <div className="relative w-full" ref={dropdownRef}>
+                              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-3 px-2">
+                                Select Platform Asset <span className="text-red-500">*</span>
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                className="w-full px-5 py-4 rounded-2xl bg-white/5 border-2 border-white/5 hover:border-white/10 transition-all duration-200 outline-none flex items-center justify-between text-left cursor-pointer text-white font-medium"
+                              >
+                                {selectedAsset ? (
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-7 h-7 rounded-full bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-[9px] font-black tracking-wider flex-shrink-0">
+                                      {getAssetSymbol(selectedAsset.content)}
+                                    </div>
+                                    <div>
+                                      <span className="font-bold">{selectedAsset.content}</span>
+                                      <span className="ml-2 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                        {selectedAsset.asset}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-400">Select Platform Asset</span>
+                                )}
+                                <svg
+                                  className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
+                                    isDropdownOpen ? "rotate-180" : ""
+                                  }`}
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </button>
 
-                            {formData.wallet && (
-                              <div className="p-6 bg-white/5 rounded-3xl border border-blue-500/10 space-y-3 animate-slide-up bg-gradient-to-br from-blue-500/[0.03] to-transparent">
-                                <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] text-center block">Platform Receiver Address</span>
-                                <div className="flex items-center justify-between gap-4">
-                                    <code className="text-[11px] font-mono text-gray-300 break-all leading-relaxed">{formData.wallet}</code>
-                                    <button 
-                                      type="button"
-                                      onClick={() => copyToClipboard(formData.wallet)}
-                                      className="p-3 bg-blue-600/20 text-blue-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all flex-shrink-0 group shadow-lg border border-blue-500/20"
+                              {isDropdownOpen && (
+                                <div className="absolute left-0 right-0 mt-2 bg-[#0f172a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 animate-fade-in max-h-60 overflow-y-auto">
+                                  {defaults.walletOptions.map((opt, index) => (
+                                    <div
+                                      key={index}
+                                      onClick={() => {
+                                        setSelectedAsset(opt);
+                                        setFormData((prev) => ({ ...prev, wallet: opt.value }));
+                                        setIsDropdownOpen(false);
+                                      }}
+                                      className="px-5 py-3 hover:bg-white/5 flex items-center justify-between cursor-pointer transition-colors duration-150 border-b border-white/[0.02] last:border-b-0"
                                     >
-                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
-                                    </button>
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-[10px] font-black tracking-wider flex-shrink-0">
+                                          {getAssetSymbol(opt.content)}
+                                        </div>
+                                        <span className="font-semibold text-white text-sm">{opt.content}</span>
+                                      </div>
+                                      <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                        {opt.asset}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+
+                            {selectedAsset && (
+                              <div className="p-6 bg-gradient-to-br from-blue-500/[0.05] to-transparent bg-white/5 rounded-[2rem] border border-blue-500/15 space-y-6 animate-slide-up relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/[0.02] blur-2xl rounded-full"></div>
+                                
+                                <div className="flex items-center gap-4 border-b border-white/5 pb-4">
+                                  <div className="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-sm font-black tracking-wider shadow-lg flex-shrink-0">
+                                    {getAssetSymbol(selectedAsset.content)}
+                                  </div>
+                                  <div className="space-y-0.5">
+                                    <p className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em]">Platform Asset</p>
+                                    <h4 className="text-base font-black text-white">{selectedAsset.content}</h4>
+                                    <span className="inline-block text-[9px] font-mono uppercase font-black tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md mt-1">
+                                      Network ID: {selectedAsset.asset}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] block text-center sm:text-left">Deposit QR Code & Address</span>
+                                  
+                                  <div className="flex flex-col sm:flex-row gap-6 items-center">
+                                    {/* QR Code Container */}
+                                    <div className="relative group cursor-pointer p-3 bg-white rounded-3xl shadow-inner border border-white/10 flex-shrink-0" onClick={() => setIsQRElarged(true)}>
+                                      <img 
+                                        src={selectedAsset.image} 
+                                        alt="Platform Deposit QR Code"
+                                        className="w-32 h-32 object-contain"
+                                      />
+                                      <div className="absolute inset-0 bg-black/40 rounded-3xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
+                                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                                        </svg>
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Address copy */}
+                                    <div className="flex-1 w-full space-y-2">
+                                      <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em]">Platform Receiver Address</span>
+                                      <div className="flex items-center justify-between gap-4 p-4 bg-black/20 rounded-xl border border-white/5">
+                                          <code className="text-xs font-mono text-gray-300 break-all leading-relaxed select-all">{formData.wallet}</code>
+                                          <button 
+                                            type="button"
+                                            onClick={() => copyToClipboard(formData.wallet)}
+                                            className="p-3 bg-blue-600/20 text-blue-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all flex-shrink-0 group shadow-lg border border-blue-500/20 hover:scale-105"
+                                            title="Copy Address"
+                                          >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                                          </button>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
                             )}
@@ -285,6 +409,7 @@ export default function Deposit() {
                             name="file"
                             refInput={refInput}
                             required
+                            files={formData.file}
                           />
                         )}
 
@@ -346,6 +471,60 @@ export default function Deposit() {
           </div>
         </div>
       {/* </div> */}
+      {/* Enlarged QR Code Modal */}
+      {isQRElarged && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-black/85 backdrop-blur-xl animate-fade-in" onClick={() => setIsQRElarged(false)}/>
+          <div className="relative w-full max-w-sm glass-card rounded-[2.5rem] p-8 border-white/10 shadow-3xl animate-modal-in dark text-white bg-[#111827]/95 flex flex-col items-center space-y-6">
+            {/* Close Button */}
+            <button 
+              onClick={() => setIsQRElarged(false)}
+              className="absolute top-6 right-6 p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-all"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Asset Info */}
+            <div className="text-center space-y-1 pt-2">
+              <h4 className="text-xl font-black text-white uppercase tracking-tight">{selectedAsset.content}</h4>
+              <span className="inline-block text-[9px] font-mono uppercase font-black tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
+                Network ID: {selectedAsset.asset}
+              </span>
+            </div>
+
+            {/* Enlarged QR Code Image */}
+            <div className="p-4 bg-white rounded-3xl shadow-inner flex items-center justify-center border border-white/10">
+              <img 
+                src={selectedAsset.image} 
+                alt={`${selectedAsset.content} QR Code`}
+                className="w-64 h-64 object-contain"
+              />
+            </div>
+
+            {/* Address display/copy */}
+            <div className="w-full space-y-2">
+              <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] block text-center">Scan QR Code or Copy Address</span>
+              <div className="flex items-center justify-between gap-4 p-4 bg-black/20 rounded-xl border border-white/5">
+                <code className="text-xs font-mono text-gray-300 break-all leading-relaxed select-all text-left flex-1">{formData.wallet}</code>
+                <button 
+                  type="button"
+                  onClick={() => {
+                    copyToClipboard(formData.wallet);
+                  }}
+                  className="p-3 bg-blue-600/20 text-blue-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all flex-shrink-0 group shadow-lg border border-blue-500/20 hover:scale-105"
+                  title="Copy Address"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Container>
   );
 }

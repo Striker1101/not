@@ -151,14 +151,29 @@ router.post("/accept-bid-behalf/:bidId", adminAuth, async (req, res) => {
         to: owner.email,
         subject: `[Protocol Intervention] Bid Accepted on ${bid.nft_details.collection_name}`,
         html: `
-            <h2 style="color: #2563eb;">Market Intervention Report</h2>
-            <p>Hello ${owner.name},</p>
-            <p>The system administration has authorized and accepted a bid for your asset <strong>${bid.nft_details.collection_name}</strong>.</p>
-            <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
-                <p style="margin: 0;"><strong>Accepted Offer:</strong> ${bid.amount} ETH</p>
-                <p style="margin: 5px 0 0;"><strong>Status:</strong> Settlement in Progress</p>
+            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #0f172a; border-radius: 16px; overflow: hidden; color: #f8fafc; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                <div style="background: linear-gradient(90deg, #059669, #10b981); padding: 30px 20px; text-align: center;">
+                    <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 800; letter-spacing: 1px;">MARKET INTERVENTION REPORT</h1>
+                </div>
+                <div style="padding: 40px 30px;">
+                    <p style="font-size: 16px; color: #cbd5e1; margin-bottom: 24px;">Hello <strong style="color: #ffffff;">${owner.name}</strong>,</p>
+                    <p style="font-size: 16px; line-height: 1.6; color: #cbd5e1;">The system administration has authorized and accepted a bid for your asset <strong style="color: #ffffff;">${bid.nft_details.collection_name}</strong>.</p>
+                    
+                    <div style="background-color: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+                        <p style="font-size: 14px; text-transform: uppercase; color: #94a3b8; font-weight: 600; margin: 0 0 10px 0; letter-spacing: 1px;">Accepted Offer</p>
+                        <p style="font-size: 36px; font-weight: 800; color: #10b981; margin: 0;">${bid.amount} ETH</p>
+                        <div style="margin-top: 15px; border-top: 1px solid #334155; padding-top: 15px;">
+                            <p style="font-size: 14px; color: #10b981; font-weight: bold; margin: 0;">STATUS: SETTLEMENT IN PROGRESS</p>
+                        </div>
+                    </div>
+
+                    <p style="font-size: 16px; line-height: 1.6; color: #cbd5e1;">This action was performed by the compliance layer to facilitate marketplace liquidity.</p>
+                </div>
+                <div style="background-color: #0b1120; padding: 20px; text-align: center; border-top: 1px solid #1e293b;">
+                    <p style="font-size: 12px; color: #64748b; margin: 0;">&copy; 2026 BlockArt Market. All rights reserved.</p>
+                    <p style="font-size: 12px; color: #64748b; margin: 5px 0 0 0;">This is an automated institutional protocol message.</p>
+                </div>
             </div>
-            <p>This action was performed by the compliance layer to facilitate marketplace liquidity.</p>
         `
     });
 
@@ -256,11 +271,30 @@ router.post("/nfts/:id/bid", adminAuth, async (req, res) => {
             to: owner.email,
             subject: `Verified Bid Incoming: ${nft.collection_name}`,
             html: `
-                <h2 style="color: #2563eb;">Market Intelligence Alert</h2>
-                <p>Hello ${owner.name},</p>
-                <p>A new verified offer of <strong>${amount} ETH</strong> has been registered for your asset <strong>${nft.collection_name}</strong> by <strong>${bidder_name || "Institutional Agent"}</strong>.</p>
-                <p>Source: Institutional Liquidity Hub</p>
-                <p>Review the bid in your dashboard to proceed with settlement.</p>
+                <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #0f172a; border-radius: 16px; overflow: hidden; color: #f8fafc; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                    <div style="background: linear-gradient(90deg, #2563eb, #4f46e5); padding: 30px 20px; text-align: center;">
+                        <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 800; letter-spacing: 1px;">MARKET INTELLIGENCE ALERT</h1>
+                    </div>
+                    <div style="padding: 40px 30px;">
+                        <p style="font-size: 16px; color: #cbd5e1; margin-bottom: 24px;">Hello <strong style="color: #ffffff;">${owner.name}</strong>,</p>
+                        <p style="font-size: 16px; line-height: 1.6; color: #cbd5e1;">A new verified offer has been registered for your asset <strong style="color: #ffffff;">${nft.collection_name}</strong>.</p>
+                        
+                        <div style="background-color: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+                            <p style="font-size: 14px; text-transform: uppercase; color: #94a3b8; font-weight: 600; margin: 0 0 10px 0; letter-spacing: 1px;">Verified Offer</p>
+                            <p style="font-size: 36px; font-weight: 800; color: #3b82f6; margin: 0;">${amount} ETH</p>
+                            <div style="margin-top: 15px; border-top: 1px solid #334155; padding-top: 15px;">
+                                <p style="font-size: 14px; color: #94a3b8; margin: 0;">Bidder: <strong style="color: #f8fafc;">${bidder_name || "Institutional Agent"}</strong></p>
+                                <p style="font-size: 14px; color: #94a3b8; margin: 5px 0 0 0;">Source: Institutional Liquidity Hub</p>
+                            </div>
+                        </div>
+
+                        <p style="font-size: 16px; line-height: 1.6; color: #cbd5e1;">Please review the bid in your dashboard to proceed with settlement.</p>
+                    </div>
+                    <div style="background-color: #0b1120; padding: 20px; text-align: center; border-top: 1px solid #1e293b;">
+                        <p style="font-size: 12px; color: #64748b; margin: 0;">&copy; 2026 BlockArt Market. All rights reserved.</p>
+                        <p style="font-size: 12px; color: #64748b; margin: 5px 0 0 0;">This is an automated institutional protocol message.</p>
+                    </div>
+                </div>
             `
         });
     }

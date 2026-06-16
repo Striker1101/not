@@ -1,26 +1,40 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Container from "../../components/Container";
 import TextInput from "../../components/vendor/form/TextInput";
 import TextArea from "../../components/vendor/form/TextArea";
 import SelectInput from "../../components/vendor/form/SelectInput";
-import FileInput from "../../components/vendor/form/FileInput";
 import Alert from "../../components/vendor/alert/Alert";
-import DefaultButton from "../../components/vendor/button/DefaultButton";
 import SubmitButton from "../../components/vendor/button/SubmitButton";
-import DataTable from "./comp/DataTable";
-import { v4 as uuidv4 } from "uuid";
-
-import {
-  addToCollectionArray,
-  getUpdatedDocument,
-} from "../../api/firestore";
 import api from "../../api/config";
+import { defaults } from "../../config/defaults";
 
 export default function Upload() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState({ status: 0, message: null });
-  const [gasFee, setGasFee] = useState(0.1);
+  const [gasFee, setGasFee] = useState(defaults.gasFee);
   const [previews, setPreviews] = useState([]);
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      handleFileChange({ target: { files } });
+    }
+  };
 
   const [formData, setFormData] = useState({
     creator: "",
@@ -41,12 +55,11 @@ export default function Upload() {
   ];
 
   const calculateGasFee = (files) => {
-    const baseFee = 0.1;
-    const additionalFileFee = Math.max(0, files.length - 1) * 0.02;
+    const baseFee = files.length * defaults.gasFee
     let totalSizeMB = 0;
     Array.from(files).forEach(f => totalSizeMB += f.size / (1024 * 1024));
     const sizeFee = Math.max(0, totalSizeMB - 1) * 0.01;
-    return parseFloat((baseFee + additionalFileFee + sizeFee).toFixed(4));
+    return parseFloat((baseFee + sizeFee).toFixed(4));
   };
 
   const handleFileChange = (e) => {
@@ -100,7 +113,7 @@ export default function Upload() {
         // Reset form
         setFormData({ creator: "", collection_name: "", category: "", price: "", des: "", files: [] });
         setPreviews([]);
-        setGasFee(0.1);
+        setGasFee(0.40);
       }
     } catch (error) {
       setResult({ status: 400, message: error.response?.data?.message || "Upload failed." });
@@ -193,7 +206,17 @@ export default function Upload() {
 
           {/* Preview / Upload Side */}
           <div className="space-y-8">
-            <div className="glass-card rounded-[2.5rem] p-8 min-h-[400px] flex flex-col items-center justify-center border-dashed border-2 border-white/20 relative group overflow-hidden">
+            <div 
+              onDragEnter={handleDrag}
+              onDragOver={handleDrag}
+              onDragLeave={handleDrag}
+              onDrop={handleDrop}
+              className={`glass-card rounded-[2.5rem] p-8 min-h-[400px] flex flex-col items-center justify-center border-dashed border-2 relative group overflow-hidden transition-all duration-300 ${
+                dragActive
+                  ? "border-blue-500 bg-blue-600/10 shadow-lg shadow-blue-500/10 scale-[1.01]"
+                  : "border-white/20 hover:border-white/30"
+              }`}
+            >
                 <input 
                   type="file" 
                   id="file-upload" 
@@ -203,7 +226,7 @@ export default function Upload() {
                 />
                 
                 {previews.length > 0 ? (
-                  <div className="w-full grid grid-cols-2 gap-4">
+                  <div className="w-full grid grid-cols-2 gap-4 relative z-20">
                      {previews.map((src, i) => (
                        <div key={i} className="aspect-square rounded-2xl overflow-hidden border border-white/10 shadow-lg">
                           <img src={src} alt="Preview" className="w-full h-full object-cover animate-zoom-in" />
@@ -216,7 +239,7 @@ export default function Upload() {
                      )}
                   </div>
                 ) : (
-                  <div className="text-center space-y-4 group-hover:scale-110 transition-transform duration-500">
+                  <div className="text-center space-y-4 group-hover:scale-110 transition-transform duration-500 relative z-20">
                     <div className="w-20 h-20 bg-blue-500/10 rounded-3xl flex items-center justify-center text-blue-500 mx-auto shadow-inner">
                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                     </div>
@@ -227,11 +250,31 @@ export default function Upload() {
                   </div>
                 )}
                 
-                <div className="absolute top-4 right-4">
+                <div className="absolute top-4 right-4 z-20">
                    <div className="px-3 py-1 bg-white/5 rounded-full text-[10px] font-black tracking-widest uppercase border border-white/5">
                       {formData.files.length} Files Selected
                    </div>
                 </div>
+
+                {previews.length > 0 && (
+                  <div className="absolute top-4 left-4 z-20">
+                     <button
+                       type="button"
+                       onClick={(e) => {
+                         e.preventDefault();
+                         e.stopPropagation();
+                         setFormData(prev => ({ ...prev, files: [] }));
+                         setPreviews([]);
+                         setGasFee(0.40);
+                         const fileInput = document.getElementById("file-upload");
+                         if (fileInput) fileInput.value = "";
+                       }}
+                       className="px-3 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-full text-[10px] font-black tracking-widest uppercase border border-red-500/20 transition-all hover:scale-105"
+                     >
+                       Clear Files
+                     </button>
+                  </div>
+                )}
             </div>
 
             {/* Hint Box */}
