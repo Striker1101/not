@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAppState } from "../../AppStateContext";
 
 export default function AdminLayout({ children }) {
     const location = useLocation();
     const { islogged } = useAppState();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     
     const menuItems = [
         { name: "Overview", path: "/admin", icon: "M13 10V3L4 14h7v7l9-11h-7z" },
@@ -15,13 +16,18 @@ export default function AdminLayout({ children }) {
     return (
         <div className="dark min-h-screen bg-[#0b0f19] text-white flex">
             {/* Sidebar */}
-            <div className="w-72 bg-[#111827] border-r border-white/5 flex flex-col fixed h-full z-20">
-                <div className="p-10 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black shadow-lg shadow-blue-600/20">A</div>
-                    <div>
-                        <h1 className="text-xl font-black tracking-tighter uppercase leading-none">Command</h1>
-                        <span className="text-[10px] text-gray-500 font-bold tracking-[0.3em] uppercase">Control Layer</span>
+            <div className={`w-72 bg-[#111827] border-r border-white/5 flex flex-col fixed h-full z-20 transition-transform duration-300 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
+                <div className="p-10 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black shadow-lg shadow-blue-600/20">A</div>
+                        <div>
+                            <h1 className="text-xl font-black tracking-tighter uppercase leading-none">Command</h1>
+                            <span className="text-[10px] text-gray-500 font-bold tracking-[0.3em] uppercase">Control Layer</span>
+                        </div>
                     </div>
+                    <button onClick={() => setIsSidebarOpen(false)} className="p-2 rounded-xl hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
                 </div>
 
                 <nav className="flex-1 px-6 space-y-2">
@@ -57,8 +63,13 @@ export default function AdminLayout({ children }) {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 ml-72 p-12">
-                <div className="max-w-7xl mx-auto space-y-12">
+            <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? "ml-72" : "ml-0"} p-12`}>
+                {!isSidebarOpen && (
+                    <button onClick={() => setIsSidebarOpen(true)} className="fixed top-6 left-6 z-30 p-2 rounded-xl bg-[#111827] border border-white/5 text-gray-500 hover:text-white shadow-lg hover:bg-white/5 transition-colors">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                )}
+                <div className={`max-w-7xl mx-auto space-y-12 ${!isSidebarOpen ? "mt-8" : ""}`}>
                     {children}
                 </div>
             </div>
