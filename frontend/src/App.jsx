@@ -60,6 +60,19 @@ function App() {
     return () => clearTimeout(toggleVisibility);
   }, []);
 
+  useEffect(() => {
+    window.Tawk_API = window.Tawk_API || {};
+    window.Tawk_LoadStart = new Date();
+    (function(){
+      var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+      s1.async = true;
+      s1.src = 'https://embed.tawk.to/6a325d25397ab51d44062af6/1jrabnn0a';
+      s1.charset = 'UTF-8';
+      s1.setAttribute('crossorigin', '*');
+      s0.parentNode.insertBefore(s1, s0);
+    })();
+  }, []);
+
   return (
     <div className={`App relative z-10 min-h-screen ${containsAdmin ? "dark bg-[#0b0f19] text-white" : "bg-background-light text-dark dark:bg-background-dark  dark:text-background-light"}`}>
       <AppStateProvider>

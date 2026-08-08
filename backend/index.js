@@ -62,7 +62,8 @@ async function startServer() {
     app.use("/api/admin", adminRoutes);
 
     // Step 4: Sync tables
-    await sequelize.sync({ alter: true });
+    // Note: disabled alter: true to prevent MySQL "Too many keys specified; max 64 keys allowed" error on frequent restarts.
+    await sequelize.sync();
     console.log("✅ Database tables synced successfully");
 
     // Run comprehensive seeder
